@@ -32,6 +32,10 @@ protos/   gRPC API contracts
 Project scope, planned structure, and milestone checklist are tracked in
 [PROJECT.md](PROJECT.md).
 
+## Documentation
+
+- [Local Kubernetes deployment](docs/local-deployment.md)
+
 ## Attribution
 
 Application source code is based on Google's

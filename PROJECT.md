@@ -46,9 +46,9 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 
 ### 2. Local Deployment Baseline
 
-- [ ] Create plain Kubernetes manifests for local deployment
-- [ ] Run the workload locally
-- [ ] Document local setup and teardown
+- [x] Create plain Kubernetes manifests for local deployment
+- [x] Run the workload locally
+- [x] Document local setup and teardown
 
 ### 3. Helm Packaging
 
