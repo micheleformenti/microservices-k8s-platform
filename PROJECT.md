@@ -24,6 +24,7 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 .
 ├── src/
 ├── protos/
+├── manifests/
 ├── helm/
 ├── gitops/
 ├── infra/
@@ -45,7 +46,7 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 
 ### 2. Local Deployment Baseline
 
-- [ ] Define the first local Kubernetes deployment path
+- [ ] Create plain Kubernetes manifests for local deployment
 - [ ] Run the workload locally
 - [ ] Document local setup and teardown
 
