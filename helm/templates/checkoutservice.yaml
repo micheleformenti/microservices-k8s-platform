@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkoutservice
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "ms-k8s-platform.checkoutServiceLabels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.checkoutService.replicas }}
+  selector:
+    matchLabels:
+      {{- include "ms-k8s-platform.checkoutServiceSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ms-k8s-platform.checkoutServiceSelectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: checkoutservice
+          image: "{{ .Values.checkoutService.image.repository }}:{{ .Values.checkoutService.image.tag }}"
+          imagePullPolicy: {{ .Values.checkoutService.image.pullPolicy }}
+          ports:
+            - name: grpc
+              containerPort: 5050
+          readinessProbe:
+            grpc:
+              port: 5050
+          livenessProbe:
+            grpc:
+              port: 5050
+          env:
+            - name: PORT
+              value: "5050"
+            - name: PRODUCT_CATALOG_SERVICE_ADDR
+              value: "productcatalogservice:3550"
+            - name: SHIPPING_SERVICE_ADDR
+              value: "shippingservice:50051"
+            - name: PAYMENT_SERVICE_ADDR
+              value: "paymentservice:50051"
+            - name: EMAIL_SERVICE_ADDR
+              value: "emailservice:5000"
+            - name: CURRENCY_SERVICE_ADDR
+              value: "currencyservice:7000"
+            - name: CART_SERVICE_ADDR
+              value: "cartservice:7070"
+          resources:
+            requests:
+              cpu: {{ .Values.checkoutService.resources.requests.cpu }}
+              memory: {{ .Values.checkoutService.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.checkoutService.resources.limits.cpu }}
+              memory: {{ .Values.checkoutService.resources.limits.memory }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: checkoutservice
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "ms-k8s-platform.checkoutServiceLabels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "ms-k8s-platform.checkoutServiceSelectorLabels" . | nindent 4 }}
+  ports:
+    - name: grpc
+      port: 5050
+      targetPort: 5050

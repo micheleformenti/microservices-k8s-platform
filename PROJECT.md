@@ -52,9 +52,9 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 
 ### 3. Helm Packaging
 
-- [ ] Create a custom Helm chart
-- [ ] Add environment-specific values
-- [ ] Add chart validation
+- [x] Create a custom Helm chart
+- [x] Add configurable chart values
+- [x] Add chart validation
 
 ### 4. CI Validation
 
