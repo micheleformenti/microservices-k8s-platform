@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-cart
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "ms-k8s-platform.redisCartLabels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.redisCart.replicas }}
+  selector:
+    matchLabels:
+      {{- include "ms-k8s-platform.redisCartSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ms-k8s-platform.redisCartSelectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: redis
+          image: "{{ .Values.redisCart.image.repository }}:{{ .Values.redisCart.image.tag }}"
+          imagePullPolicy: {{ .Values.redisCart.image.pullPolicy }}
+          ports:
+            - name: redis
+              containerPort: 6379
+          readinessProbe:
+            periodSeconds: 5
+            tcpSocket:
+              port: 6379
+          livenessProbe:
+            periodSeconds: 5
+            tcpSocket:
+              port: 6379
+          volumeMounts:
+            - mountPath: /data
+              name: redis-data
+          resources:
+            requests:
+              cpu: {{ .Values.redisCart.resources.requests.cpu }}
+              memory: {{ .Values.redisCart.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.redisCart.resources.limits.cpu }}
+              memory: {{ .Values.redisCart.resources.limits.memory }}
+      volumes:
+        - name: redis-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cart
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "ms-k8s-platform.redisCartLabels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "ms-k8s-platform.redisCartSelectorLabels" . | nindent 4 }}
+  ports:
+    - name: tcp-redis
+      port: 6379
+      targetPort: 6379

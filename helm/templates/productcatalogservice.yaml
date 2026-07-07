@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productcatalogservice
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "ms-k8s-platform.productCatalogServiceLabels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.productCatalogService.replicas }}
+  selector:
+    matchLabels:
+      {{- include "ms-k8s-platform.productCatalogServiceSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ms-k8s-platform.productCatalogServiceSelectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: productcatalogservice
+          image: "{{ .Values.productCatalogService.image.repository }}:{{ .Values.productCatalogService.image.tag }}"
+          imagePullPolicy: {{ .Values.productCatalogService.image.pullPolicy }}
+          ports:
+            - containerPort: 3550
+          env:
+            - name: PORT
+              value: "3550"
+            - name: DISABLE_PROFILER
+              value: "1"
+          readinessProbe:
+            grpc:
+              port: 3550
+          livenessProbe:
+            grpc:
+              port: 3550
+          resources:
+            requests:
+              cpu: {{ .Values.productCatalogService.resources.requests.cpu }}
+              memory: {{ .Values.productCatalogService.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.productCatalogService.resources.limits.cpu }}
+              memory: {{ .Values.productCatalogService.resources.limits.memory }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: productcatalogservice
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "ms-k8s-platform.productCatalogServiceLabels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "ms-k8s-platform.productCatalogServiceSelectorLabels" . | nindent 4 }}
+  ports:
+    - name: grpc
+      port: 3550
+      targetPort: 3550

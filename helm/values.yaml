@@ -1,0 +1,180 @@
+namespace:
+  create: true
+  name: microservices-platform
+
+adService:
+  replicas: 1
+  image:
+    repository: adservice
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 200m
+      memory: 180Mi
+    limits:
+      cpu: 300m
+      memory: 300Mi
+
+cartService:
+  replicas: 1
+  image:
+    repository: cartservice
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 200m
+      memory: 64Mi
+    limits:
+      cpu: 300m
+      memory: 128Mi
+
+checkoutService:
+  replicas: 1
+  image:
+    repository: checkoutservice
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+currencyService:
+  replicas: 1
+  image:
+    repository: currencyservice
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+emailService:
+  replicas: 1
+  image:
+    repository: emailservice
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+frontend:
+  replicas: 1
+  image:
+    repository: frontend
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    nodePort: 30010
+  resources:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+loadGenerator:
+  replicas: 1
+  image:
+    repository: loadgenerator
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  initImage:
+    repository: busybox
+    tag: "1.37"
+    pullPolicy: IfNotPresent
+  users: "10"
+  rate: "1"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi
+
+paymentService:
+  replicas: 1
+  image:
+    repository: paymentservice
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+productCatalogService:
+  replicas: 1
+  image:
+    repository: productcatalogservice
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+recommendationService:
+  replicas: 1
+  image:
+    repository: recommendationservice
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 100m
+      memory: 220Mi
+    limits:
+      cpu: 200m
+      memory: 450Mi
+
+redisCart:
+  replicas: 1
+  image:
+    repository: redis
+    tag: "7-alpine"
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      memory: 256Mi
+      cpu: 125m
+    requests:
+      cpu: 70m
+      memory: 200Mi
+
+shippingService:
+  replicas: 1
+  image:
+    repository: shippingservice
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi

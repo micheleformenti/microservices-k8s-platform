@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paymentservice
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "ms-k8s-platform.paymentServiceLabels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.paymentService.replicas }}
+  selector:
+    matchLabels:
+      {{- include "ms-k8s-platform.paymentServiceSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ms-k8s-platform.paymentServiceSelectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: paymentservice
+          image: "{{ .Values.paymentService.image.repository }}:{{ .Values.paymentService.image.tag }}"
+          imagePullPolicy: {{ .Values.paymentService.image.pullPolicy }}
+          ports:
+            - name: grpc
+              containerPort: 50051
+          env:
+            - name: PORT
+              value: "50051"
+            - name: DISABLE_PROFILER
+              value: "1"
+          readinessProbe:
+            grpc:
+              port: 50051
+          livenessProbe:
+            grpc:
+              port: 50051
+          resources:
+            requests:
+              cpu: {{ .Values.paymentService.resources.requests.cpu }}
+              memory: {{ .Values.paymentService.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.paymentService.resources.limits.cpu }}
+              memory: {{ .Values.paymentService.resources.limits.memory }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: paymentservice
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "ms-k8s-platform.paymentServiceLabels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "ms-k8s-platform.paymentServiceSelectorLabels" . | nindent 4 }}
+  ports:
+    - name: grpc
+      port: 50051
+      targetPort: 50051

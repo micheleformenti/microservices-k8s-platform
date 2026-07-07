@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadgenerator
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "ms-k8s-platform.loadGeneratorLabels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.loadGenerator.replicas }}
+  selector:
+    matchLabels:
+      {{- include "ms-k8s-platform.loadGeneratorSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ms-k8s-platform.loadGeneratorSelectorLabels" . | nindent 8 }}
+    spec:
+      restartPolicy: Always
+      initContainers:
+        - command:
+          - /bin/sh
+          - -exc
+          - |
+            MAX_RETRIES=12
+            RETRY_INTERVAL=10
+            for i in $(seq 1 $MAX_RETRIES); do
+              echo "Attempt $i: Pinging frontend: ${FRONTEND_ADDR}..."
+              STATUSCODE=$(wget --server-response http://${FRONTEND_ADDR} 2>&1 | awk '/^  HTTP/{print $2}')
+              if [ "$STATUSCODE" = "200" ]; then
+                  echo "Frontend is reachable."
+                  exit 0
+              fi
+              echo "Error: Could not reach frontend - Status code: ${STATUSCODE}"
+              sleep $RETRY_INTERVAL
+            done
+            echo "Failed to reach frontend after $MAX_RETRIES attempts."
+            exit 1
+          name: frontend-check
+          image: "{{ .Values.loadGenerator.initImage.repository }}:{{ .Values.loadGenerator.initImage.tag }}"
+          imagePullPolicy: {{ .Values.loadGenerator.initImage.pullPolicy }}
+          env:
+            - name: FRONTEND_ADDR
+              value: "frontend:80"
+      containers:
+        - name: loadgenerator
+          image: "{{ .Values.loadGenerator.image.repository }}:{{ .Values.loadGenerator.image.tag }}"
+          imagePullPolicy: {{ .Values.loadGenerator.image.pullPolicy }}
+          env:
+            - name: FRONTEND_ADDR
+              value: "frontend:80"
+            - name: USERS
+              value: {{ .Values.loadGenerator.users | quote }}
+            - name: RATE
+              value: {{ .Values.loadGenerator.rate | quote }}
+          resources:
+            requests:
+              cpu: {{ .Values.loadGenerator.resources.requests.cpu }}
+              memory: {{ .Values.loadGenerator.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.loadGenerator.resources.limits.cpu }}
+              memory: {{ .Values.loadGenerator.resources.limits.memory }}

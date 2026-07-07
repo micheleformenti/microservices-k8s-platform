@@ -35,6 +35,7 @@ Project scope, planned structure, and milestone checklist are tracked in
 ## Documentation
 
 - [Local Kubernetes deployment](docs/local-deployment.md)
+- [Helm deployment](docs/helm-deployment.md)
 
 ## Attribution
 
