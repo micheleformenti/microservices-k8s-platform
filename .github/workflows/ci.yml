@@ -77,3 +77,23 @@ jobs:
       - name: Run Go tests
         working-directory: ${{ matrix.service }}
         run: go test ./...
+
+  dotnet-tests:
+    name: .NET tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Check .NET version
+        run: dotnet --version
+
+      - name: Run cartservice tests
+        working-directory: src/cartservice
+        run: dotnet test cartservice.sln
