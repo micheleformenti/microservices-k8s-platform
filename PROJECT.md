@@ -58,10 +58,11 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 
 ### 4. CI Validation
 
-- [ ] Add validation workflows
+- [x] Add validation workflows
 - [ ] Check service builds and tests where practical
-- [ ] Validate Helm changes
-- [ ] Add Dependabot for dependency update PRs
+- [x] Validate Helm changes
+- [x] Validate Kubernetes manifests
+- [x] Add Dependabot for GitHub Actions update PRs
 
 ### 5. Local GitOps Delivery
 
