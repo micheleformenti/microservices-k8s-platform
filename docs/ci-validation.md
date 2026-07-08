@@ -43,3 +43,19 @@ go test ./...
 
 This runs unit tests where `_test.go` files exist and also compiles the Go
 packages, which catches broken imports, syntax errors, and dependency issues.
+
+## .NET Service
+
+Cartservice includes an xUnit test project, so CI runs:
+
+```sh
+dotnet test cartservice.sln
+```
+
+## Other Services
+
+Other service checks are not included yet:
+
+- Node services have placeholder `npm test` scripts
+- Python services do not currently include test files
+- Java adservice does not currently include test files
