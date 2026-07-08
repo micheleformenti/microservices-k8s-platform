@@ -61,6 +61,7 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 - [ ] Add validation workflows
 - [ ] Check service builds and tests where practical
 - [ ] Validate Helm changes
+- [ ] Add Dependabot for dependency update PRs
 
 ### 5. Local GitOps Delivery
 
