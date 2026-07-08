@@ -46,3 +46,34 @@ jobs:
 
       - name: Validate rendered Helm manifests
         run: kubeconform -strict -summary rendered.yaml
+
+  go-tests:
+    name: Go tests
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - src/checkoutservice
+          - src/frontend
+          - src/productcatalogservice
+          - src/shippingservice
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.24.3"
+          cache-dependency-path: ${{ matrix.service }}/go.sum
+
+      - name: Check Go version
+        working-directory: ${{ matrix.service }}
+        run: go version
+
+      - name: Run Go tests
+        working-directory: ${{ matrix.service }}
+        run: go test ./...
