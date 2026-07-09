@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: microservices-platform-local
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/micheleformenti/microservices-k8s-platform.git
+    targetRevision: main
+    path: helm
+    helm:
+      releaseName: microservices-platform
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: microservices-platform
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
