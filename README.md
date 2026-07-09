@@ -40,18 +40,6 @@ src/      Microservices source code
 protos/   gRPC API contracts
 ```
 
-## Roadmap
-
-Project scope, planned structure, and milestone checklist are tracked in
-[PROJECT.md](PROJECT.md).
-
-## Documentation
-
-- [Local Kubernetes deployment](docs/local-deployment.md)
-- [Helm deployment](docs/helm-deployment.md)
-- [CI validation](docs/ci-validation.md)
-- [Local GitOps delivery with Argo CD](docs/argocd-local-gitops.md)
-
 ## Attribution
 
 Application source code is based on Google's
