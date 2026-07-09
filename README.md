@@ -1,14 +1,23 @@
 # Microservices Kubernetes Platform
 
-> **Project status: In progress** — this portfolio project is under active
-> development. Completed and planned work is tracked in
-> [PROJECT.md](PROJECT.md).
+> **Project status:** Active development.
+> Completed and planned work is tracked in [PROJECT.md](PROJECT.md).
 
-Production-style Kubernetes platform project for deploying a microservices
-workload.
+Production-inspired platform engineering project focused on Kubernetes, GitOps, Infrastructure as Code, observability, and security. The microservices application serves as a realistic workload.
 
-The focus is the platform layer: Kubernetes, Helm, GitOps, Terraform,
-observability, and security. The application is used as a realistic workload.
+## Current Progress
+
+| Status | Component | Documentation |
+|---------|-----------|---------------|
+| ✅ | Local Kubernetes deployment | [Guide](docs/local-deployment.md) |
+| ✅ | Helm deployment | [Guide](docs/helm-deployment.md) |
+| ✅ | CI validation | [Guide](docs/ci-validation.md) |
+| ✅ | Local GitOps with Argo CD | [Guide](docs/argocd-local-gitops.md) |
+| 🚧 | Terraform-managed EKS | Coming soon |
+| 🚧 | GitOps on EKS | Coming soon |
+| ⏳ | Observability | Planned |
+| ⏳ | Security hardening | Planned |
+| ⏳ | AKS deployment | Planned |
 
 ## Stack
 
