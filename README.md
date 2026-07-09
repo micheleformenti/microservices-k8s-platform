@@ -1,5 +1,9 @@
 # Microservices Kubernetes Platform
 
+> **Project status: In progress** — this portfolio project is under active
+> development. Completed and planned work is tracked in
+> [PROJECT.md](PROJECT.md).
+
 Production-style Kubernetes platform project for deploying a microservices
 workload.
 
@@ -37,6 +41,7 @@ Project scope, planned structure, and milestone checklist are tracked in
 - [Local Kubernetes deployment](docs/local-deployment.md)
 - [Helm deployment](docs/helm-deployment.md)
 - [CI validation](docs/ci-validation.md)
+- [Local GitOps delivery with Argo CD](docs/argocd-local-gitops.md)
 
 ## Attribution
 

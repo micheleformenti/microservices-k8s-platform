@@ -19,10 +19,18 @@ kubeconform -strict -summary manifests
 helm lint ./helm
 helm template microservices-platform ./helm --namespace microservices-platform > rendered.yaml
 kubeconform -strict -summary rendered.yaml
+kubeconform \
+  -strict \
+  -summary \
+  -schema-location default \
+  -schema-location \
+  'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
+  argocd/applications
 ```
 
-This validates both the plain Kubernetes manifests and the Kubernetes manifests
-rendered from the Helm chart.
+This validates the plain Kubernetes manifests, the Kubernetes manifests
+rendered from the Helm chart, and the Argo CD `Application` resources against
+their custom resource schema.
 
 ## Go Services
 

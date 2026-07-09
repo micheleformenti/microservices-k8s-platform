@@ -66,10 +66,11 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 
 ### 5. Local GitOps Delivery
 
-- [ ] Install Argo CD on the local cluster
-- [ ] Add Argo CD manifests
-- [ ] Deploy the workload through GitOps
-- [ ] Document the local sync workflow
+- [x] Install Argo CD on the local cluster
+- [x] Add Argo CD manifests
+- [x] Deploy the workload through GitOps
+- [x] Verify automated self-healing
+- [x] Document the local sync workflow
 
 ### 6. EKS Platform
 
