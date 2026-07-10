@@ -15,7 +15,9 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 - CI validation
 - Argo CD GitOps delivery, starting locally
 - Terraform-managed EKS cluster
+- Container image build and publishing
 - Terraform-managed AKS cluster
+- EKS storage integration
 - Observability and security hardening
 
 ## Planned Structure
@@ -26,8 +28,8 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 ├── protos/
 ├── manifests/
 ├── helm/
-├── gitops/
-├── infra/
+├── argocd/
+├── terraform/
 ├── docs/
 ├── .github/
 ├── LICENSE
@@ -72,41 +74,68 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 - [x] Verify automated self-healing
 - [x] Document the local sync workflow
 
-### 6. EKS Platform
+### 6. AWS EKS Infrastructure
 
+- [x] Add Terraform code for the EKS environment
+- [x] Use private worker subnets with NAT egress
+- [x] Pin Terraform module versions
+- [x] Add Terraform formatting and validation to CI
+- [ ] Run Terraform plan against AWS
 - [ ] Provision an EKS environment
 - [ ] Document EKS creation and teardown
 
-### 7. Deploy to EKS with GitOps
+### 7. Container Image Build and Publishing
+
+- [ ] Build service container images in GitHub Actions
+- [ ] Publish images to GitHub Container Registry
+- [ ] Tag images with commit SHAs
+- [ ] Document image naming, tagging, and registry decisions
+
+### 8. Deploy to EKS with Helm
+
+- [ ] Add EKS-specific Helm values
+- [ ] Deploy the workload to EKS with Helm
+- [ ] Validate service connectivity on EKS
+- [ ] Document the EKS Helm deployment workflow
+
+### 9. Deploy to EKS with GitOps
 
 - [ ] Bootstrap Argo CD on EKS
 - [ ] Deploy the workload to EKS through GitOps
 - [ ] Document the EKS sync workflow
 
-### 8. Observability
+### 10. EKS Storage Layer
+
+- [ ] Convert Redis cart storage from ephemeral storage to persistent storage
+- [ ] Add EKS storage class configuration
+- [ ] Install or configure the EBS CSI driver if required
+- [ ] Validate persistence across pod restarts
+- [ ] Document the EKS storage tradeoffs
+
+### 11. Observability
 
 - [ ] Add metrics and dashboards
 - [ ] Add logging approach
 - [ ] Document troubleshooting workflow
 
-### 9. Security Hardening
+### 12. Security Hardening
 
 - [ ] Add workload security defaults
 - [ ] Add secret management approach
 - [ ] Add security scanning
 
-### 10. AKS Platform
+### 13. AKS Platform
 
 - [ ] Provision an AKS environment
 - [ ] Document AKS creation and teardown
 
-### 11. Deploy to AKS with GitOps
+### 14. Deploy to AKS with GitOps
 
 - [ ] Bootstrap Argo CD on AKS
 - [ ] Deploy the workload to AKS through GitOps
 - [ ] Document EKS and AKS differences
 
-### 12. Portfolio Documentation
+### 15. Portfolio Documentation
 
 - [ ] Add architecture diagrams
 - [ ] Add screenshots
