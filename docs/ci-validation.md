@@ -32,6 +32,22 @@ This validates the plain Kubernetes manifests, the Kubernetes manifests
 rendered from the Helm chart, and the Argo CD `Application` resources against
 their custom resource schema.
 
+## Terraform
+
+The Terraform validation job checks the AWS infrastructure code without
+creating cloud resources.
+
+It runs:
+
+```sh
+terraform fmt -check -recursive terraform/aws
+terraform -chdir=terraform/aws init -backend=false
+terraform -chdir=terraform/aws validate
+```
+
+The backend is disabled during CI initialization so the workflow validates the
+configuration without requiring remote state or AWS credentials.
+
 ## Go Services
 
 The Go test job runs against each Go service with a matrix:

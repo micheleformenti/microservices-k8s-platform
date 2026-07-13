@@ -80,9 +80,10 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 - [x] Use private worker subnets with NAT egress
 - [x] Pin Terraform module versions
 - [x] Add Terraform formatting and validation to CI
-- [ ] Run Terraform plan against AWS
-- [ ] Provision an EKS environment
-- [ ] Document EKS creation and teardown
+- [x] Run Terraform plan against AWS
+- [x] Provision an EKS environment
+- [x] Verify kubectl access to the EKS cluster
+- [x] Document EKS creation and teardown
 
 ### 7. Container Image Build and Publishing
 

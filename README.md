@@ -13,7 +13,7 @@ Production-inspired platform engineering project focused on Kubernetes, GitOps, 
 | ✅ | Helm deployment | [Guide](docs/helm-deployment.md) |
 | ✅ | CI validation | [Guide](docs/ci-validation.md) |
 | ✅ | Local GitOps with Argo CD | [Guide](docs/argocd-local-gitops.md) |
-| 🚧 | Terraform-managed EKS | Coming soon |
+| ✅ | Terraform-managed EKS | [Guide](docs/eks-infrastructure.md) |
 | 🚧 | GitOps on EKS | Coming soon |
 | ⏳ | Observability | Planned |
 | ⏳ | Security hardening | Planned |
