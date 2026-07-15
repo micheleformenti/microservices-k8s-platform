@@ -87,10 +87,11 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 
 ### 7. Container Image Build and Publishing
 
-- [ ] Build service container images in GitHub Actions
-- [ ] Publish images to GitHub Container Registry
-- [ ] Tag images with commit SHAs
-- [ ] Document image naming, tagging, and registry decisions
+- [x] Add GitHub Actions workflow for service image builds
+- [x] Verify service image builds in GitHub Actions
+- [x] Publish images to GitHub Container Registry
+- [x] Tag images with commit SHAs
+- [x] Document image naming, tagging, and registry decisions
 
 ### 8. Deploy to EKS with Helm
 

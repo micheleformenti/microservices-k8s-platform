@@ -25,8 +25,8 @@ directly in the cluster are not treated as lasting configuration changes.
 - A running local Kubernetes cluster
 - `kubectl` configured for that cluster
 - Helm installed
-- The service images built in the local container runtime as described in
-  [Local Kubernetes Deployment](local-deployment.md#build-images)
+- Public service images published to GitHub Container Registry as described in
+  [Container Images](container-images.md)
 - The required Helm changes committed and pushed to the `main` branch
 
 Verify cluster access:
@@ -75,6 +75,7 @@ Its important settings are:
 - Repository: this project's GitHub repository
 - Revision: `main`
 - Source path: `helm`
+- Helm value files: `values.yaml` and `values-local.yaml`
 - Destination: the in-cluster Kubernetes API
 - Release name: `microservices-platform`
 - Automated sync: enabled

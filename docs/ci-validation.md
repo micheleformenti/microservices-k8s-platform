@@ -76,6 +76,23 @@ Cartservice includes an xUnit test project, so CI runs:
 dotnet test cartservice.sln
 ```
 
+## Build Container Images
+
+The build container images job runs after the validation and test jobs complete
+successfully.
+
+For pull requests, it builds the service images to validate the Dockerfiles but
+does not publish them. For pushes to `main`, it publishes the images to GitHub
+Container Registry.
+
+The image build job is skipped when a change does not touch deployed service
+source directories or the CI workflow itself. When one service changes, only
+that service image is included in the build matrix. Changes to the CI workflow
+build all service images.
+
+Image naming, tagging, and registry behavior are documented in
+[Container Images](container-images.md).
+
 ## Other Services
 
 Other service checks are not included yet:
