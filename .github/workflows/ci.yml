@@ -9,6 +9,9 @@ on:
 permissions:
   contents: read
 
+env:
+  REGISTRY: ghcr.io
+
 jobs:
   validate:
     name: Validate
@@ -131,3 +134,96 @@ jobs:
       - name: Run cartservice tests
         working-directory: src/cartservice
         run: dotnet test cartservice.sln
+
+  build-container-images:
+    name: Build container images
+    runs-on: ubuntu-latest
+    needs:
+      - validate
+      - go-tests
+      - dotnet-tests
+
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: adservice
+            context: src/adservice
+            dockerfile: src/adservice/Dockerfile
+          - image: cartservice
+            context: src/cartservice/src
+            dockerfile: src/cartservice/src/Dockerfile
+          - image: checkoutservice
+            context: src/checkoutservice
+            dockerfile: src/checkoutservice/Dockerfile
+          - image: currencyservice
+            context: src/currencyservice
+            dockerfile: src/currencyservice/Dockerfile
+          - image: emailservice
+            context: src/emailservice
+            dockerfile: src/emailservice/Dockerfile
+          - image: frontend
+            context: src/frontend
+            dockerfile: src/frontend/Dockerfile
+          - image: loadgenerator
+            context: src/loadgenerator
+            dockerfile: src/loadgenerator/Dockerfile
+          - image: paymentservice
+            context: src/paymentservice
+            dockerfile: src/paymentservice/Dockerfile
+          - image: productcatalogservice
+            context: src/productcatalogservice
+            dockerfile: src/productcatalogservice/Dockerfile
+          - image: recommendationservice
+            context: src/recommendationservice
+            dockerfile: src/recommendationservice/Dockerfile
+          - image: shippingservice
+            context: src/shippingservice
+            dockerfile: src/shippingservice/Dockerfile
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Prepare image tags
+        id: image-tags
+        env:
+          IMAGE_NAME: ${{ matrix.image }}
+        run: |
+          image="${REGISTRY}/${GITHUB_REPOSITORY_OWNER,,}/${IMAGE_NAME}"
+
+          {
+            echo "tags<<EOF"
+            echo "${image}:${GITHUB_SHA}"
+            if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
+              echo "${image}:main"
+            fi
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          platforms: linux/amd64
+          tags: ${{ steps.image-tags.outputs.tags }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
