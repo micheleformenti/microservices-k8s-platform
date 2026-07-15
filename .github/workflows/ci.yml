@@ -135,6 +135,127 @@ jobs:
         working-directory: src/cartservice
         run: dotnet test cartservice.sln
 
+  detect-changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: read
+
+    outputs:
+      container-images: ${{ steps.image-matrix.outputs.container-images }}
+      image-matrix: ${{ steps.image-matrix.outputs.image-matrix }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Detect container image changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            workflow:
+              - ".github/workflows/ci.yml"
+            adservice:
+              - src/adservice/**
+            cartservice:
+              - src/cartservice/**
+            checkoutservice:
+              - src/checkoutservice/**
+            currencyservice:
+              - src/currencyservice/**
+            emailservice:
+              - src/emailservice/**
+            frontend:
+              - src/frontend/**
+            loadgenerator:
+              - src/loadgenerator/**
+            paymentservice:
+              - src/paymentservice/**
+            productcatalogservice:
+              - src/productcatalogservice/**
+            recommendationservice:
+              - src/recommendationservice/**
+            shippingservice:
+              - src/shippingservice/**
+
+      - name: Build container image matrix
+        id: image-matrix
+        env:
+          WORKFLOW_CHANGED: ${{ steps.filter.outputs.workflow }}
+          ADSERVICE_CHANGED: ${{ steps.filter.outputs.adservice }}
+          CARTSERVICE_CHANGED: ${{ steps.filter.outputs.cartservice }}
+          CHECKOUTSERVICE_CHANGED: ${{ steps.filter.outputs.checkoutservice }}
+          CURRENCYSERVICE_CHANGED: ${{ steps.filter.outputs.currencyservice }}
+          EMAILSERVICE_CHANGED: ${{ steps.filter.outputs.emailservice }}
+          FRONTEND_CHANGED: ${{ steps.filter.outputs.frontend }}
+          LOADGENERATOR_CHANGED: ${{ steps.filter.outputs.loadgenerator }}
+          PAYMENTSERVICE_CHANGED: ${{ steps.filter.outputs.paymentservice }}
+          PRODUCTCATALOGSERVICE_CHANGED: ${{ steps.filter.outputs.productcatalogservice }}
+          RECOMMENDATIONSERVICE_CHANGED: ${{ steps.filter.outputs.recommendationservice }}
+          SHIPPINGSERVICE_CHANGED: ${{ steps.filter.outputs.shippingservice }}
+        run: |
+          services=()
+
+          add_service() {
+            services+=("{\"image\":\"$1\",\"context\":\"$2\",\"dockerfile\":\"$3\"}")
+          }
+
+          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${ADSERVICE_CHANGED}" = "true" ]; then
+            add_service "adservice" "src/adservice" "src/adservice/Dockerfile"
+          fi
+
+          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${CARTSERVICE_CHANGED}" = "true" ]; then
+            add_service "cartservice" "src/cartservice/src" "src/cartservice/src/Dockerfile"
+          fi
+
+          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${CHECKOUTSERVICE_CHANGED}" = "true" ]; then
+            add_service "checkoutservice" "src/checkoutservice" "src/checkoutservice/Dockerfile"
+          fi
+
+          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${CURRENCYSERVICE_CHANGED}" = "true" ]; then
+            add_service "currencyservice" "src/currencyservice" "src/currencyservice/Dockerfile"
+          fi
+
+          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${EMAILSERVICE_CHANGED}" = "true" ]; then
+            add_service "emailservice" "src/emailservice" "src/emailservice/Dockerfile"
+          fi
+
+          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${FRONTEND_CHANGED}" = "true" ]; then
+            add_service "frontend" "src/frontend" "src/frontend/Dockerfile"
+          fi
+
+          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${LOADGENERATOR_CHANGED}" = "true" ]; then
+            add_service "loadgenerator" "src/loadgenerator" "src/loadgenerator/Dockerfile"
+          fi
+
+          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${PAYMENTSERVICE_CHANGED}" = "true" ]; then
+            add_service "paymentservice" "src/paymentservice" "src/paymentservice/Dockerfile"
+          fi
+
+          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${PRODUCTCATALOGSERVICE_CHANGED}" = "true" ]; then
+            add_service "productcatalogservice" "src/productcatalogservice" "src/productcatalogservice/Dockerfile"
+          fi
+
+          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${RECOMMENDATIONSERVICE_CHANGED}" = "true" ]; then
+            add_service "recommendationservice" "src/recommendationservice" "src/recommendationservice/Dockerfile"
+          fi
+
+          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${SHIPPINGSERVICE_CHANGED}" = "true" ]; then
+            add_service "shippingservice" "src/shippingservice" "src/shippingservice/Dockerfile"
+          fi
+
+          if [ "${#services[@]}" -eq 0 ]; then
+            echo "container-images=false" >> "$GITHUB_OUTPUT"
+            echo 'image-matrix={"include":[]}' >> "$GITHUB_OUTPUT"
+          else
+            matrix=$(printf '%s\n' "${services[@]}" | jq -cs '{include: .}')
+            echo "container-images=true" >> "$GITHUB_OUTPUT"
+            echo "image-matrix=${matrix}" >> "$GITHUB_OUTPUT"
+          fi
+
   build-container-images:
     name: Build container images
     runs-on: ubuntu-latest
@@ -142,6 +263,8 @@ jobs:
       - validate
       - go-tests
       - dotnet-tests
+      - detect-changes
+    if: needs.detect-changes.outputs.container-images == 'true'
 
     permissions:
       contents: read
@@ -149,41 +272,7 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - image: adservice
-            context: src/adservice
-            dockerfile: src/adservice/Dockerfile
-          - image: cartservice
-            context: src/cartservice/src
-            dockerfile: src/cartservice/src/Dockerfile
-          - image: checkoutservice
-            context: src/checkoutservice
-            dockerfile: src/checkoutservice/Dockerfile
-          - image: currencyservice
-            context: src/currencyservice
-            dockerfile: src/currencyservice/Dockerfile
-          - image: emailservice
-            context: src/emailservice
-            dockerfile: src/emailservice/Dockerfile
-          - image: frontend
-            context: src/frontend
-            dockerfile: src/frontend/Dockerfile
-          - image: loadgenerator
-            context: src/loadgenerator
-            dockerfile: src/loadgenerator/Dockerfile
-          - image: paymentservice
-            context: src/paymentservice
-            dockerfile: src/paymentservice/Dockerfile
-          - image: productcatalogservice
-            context: src/productcatalogservice
-            dockerfile: src/productcatalogservice/Dockerfile
-          - image: recommendationservice
-            context: src/recommendationservice
-            dockerfile: src/recommendationservice/Dockerfile
-          - image: shippingservice
-            context: src/shippingservice
-            dockerfile: src/shippingservice/Dockerfile
+      matrix: ${{ fromJson(needs.detect-changes.outputs.image-matrix) }}
 
     steps:
       - name: Checkout
