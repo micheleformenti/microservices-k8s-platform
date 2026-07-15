@@ -12,6 +12,9 @@ spec:
     path: helm
     helm:
       releaseName: microservices-platform
+      valueFiles:
+        - values.yaml
+        - values-local.yaml
 
   destination:
     server: https://kubernetes.default.svc
