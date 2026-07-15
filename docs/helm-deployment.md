@@ -33,6 +33,22 @@ helm install microservices-platform ./helm
 
 The chart creates and deploys into the `microservices-platform` namespace.
 
+## Install with Published GHCR Images
+
+Use `helm/values-local.yaml` to test the service images published to GitHub
+Container Registry:
+
+```sh
+helm upgrade --install microservices-platform ./helm \
+  --namespace microservices-platform \
+  --create-namespace \
+  -f helm/values.yaml \
+  -f helm/values-local.yaml
+```
+
+This keeps the base chart values unchanged and overrides only the custom
+service image repositories, tags, and pull policies.
+
 ## Verify
 
 Check the Helm release:
@@ -74,4 +90,3 @@ Remove the Helm release:
 ```sh
 helm uninstall microservices-platform -n microservices-platform
 ```
-
