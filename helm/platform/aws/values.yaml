@@ -1,0 +1,9 @@
+storageClasses:
+  gp3:
+    enabled: true
+    name: gp3
+    default: false
+    reclaimPolicy: Delete
+    volumeBindingMode: WaitForFirstConsumer
+    allowVolumeExpansion: true
+    encrypted: true

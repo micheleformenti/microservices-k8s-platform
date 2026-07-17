@@ -10,13 +10,13 @@ the frontend with `kubectl port-forward`.
 ```text
 GitHub repository (main)
         |
-        | watches helm/application/
+        | watches helm/platform/aws/ and helm/application/
         v
 Argo CD on EKS
         |
-        | renders Helm chart with values.yaml + values-eks.yaml
+        | renders AWS platform resources and application workload
         v
-microservices-platform namespace
+EKS cluster + microservices-platform namespace
         |
         | pulls public images
         v
@@ -33,6 +33,8 @@ Load Balancer is planned as a later layer.
 - `kubectl` configured for the EKS cluster
 - Helm installed locally
 - Public service images published to GitHub Container Registry
+- EBS CSI driver installed on the EKS cluster for AWS storage resources
+- `helm/platform/aws` pushed to the Git branch watched by Argo CD
 - `helm/application/values-eks.yaml` pushed to the Git branch watched by Argo CD
 
 Configure kubeconfig:
@@ -72,10 +74,30 @@ Wait for the Argo CD pods:
 kubectl get pods -n argocd -w
 ```
 
+## Platform Configuration
+
+The EKS platform Argo CD application is defined in
+[`argocd/applications/eks-platform.yaml`](../argocd/applications/eks-platform.yaml).
+
+Important settings:
+
+- Repository: this project's GitHub repository
+- Revision: `main`
+- Source path: `helm/platform/aws`
+- Helm release name: `aws-platform`
+- Destination namespace: `kube-system`
+- Automated sync: enabled
+- Pruning: enabled
+- Self-healing: enabled
+
+The AWS platform chart currently manages the `gp3` `StorageClass`. It is kept
+separate from the workload chart because it represents cloud-specific cluster
+configuration, not application deployment.
+
 ## Application Configuration
 
 The EKS Argo CD application is defined in
-[`argocd/applications/eks.yaml`](../argocd/applications/eks.yaml).
+[`argocd/applications/eks-application.yaml`](../argocd/applications/eks-application.yaml).
 
 Important settings:
 
@@ -94,18 +116,36 @@ Important settings:
 `values-eks.yaml` uses public GHCR images and sets the frontend service to
 `ClusterIP` for the first EKS deployment.
 
-## Create and Sync the Application
+## Create and Sync the Applications
+
+Apply the EKS platform Argo CD application first:
+
+```sh
+kubectl apply -f argocd/applications/eks-platform.yaml
+```
+
+Watch the platform application:
+
+```sh
+kubectl get application eks-platform -n argocd -w
+```
+
+Verify the platform resource:
+
+```sh
+kubectl get storageclass gp3
+```
 
 Apply the EKS Argo CD application:
 
 ```sh
-kubectl apply -f argocd/applications/eks.yaml
+kubectl apply -f argocd/applications/eks-application.yaml
 ```
 
 Watch the application:
 
 ```sh
-kubectl get application microservices-platform-eks -n argocd -w
+kubectl get application eks-application -n argocd -w
 ```
 
 Verify the workload:
@@ -138,7 +178,8 @@ The application is not publicly exposed by this step.
 Delete the Argo CD application:
 
 ```sh
-kubectl delete -f argocd/applications/eks.yaml
+kubectl delete -f argocd/applications/eks-application.yaml
+kubectl delete -f argocd/applications/eks-platform.yaml
 ```
 
 Uninstall Argo CD:

@@ -6,6 +6,32 @@ locals {
   azs = slice(data.aws_availability_zones.available.names, 0, 2)
 }
 
+data "aws_iam_policy_document" "ebs_csi_driver_assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["pods.eks.amazonaws.com"]
+    }
+
+    actions = [
+      "sts:AssumeRole",
+      "sts:TagSession",
+    ]
+  }
+}
+
+resource "aws_iam_role" "ebs_csi_driver" {
+  name_prefix        = "${var.name}-ebs-csi-"
+  assume_role_policy = data.aws_iam_policy_document.ebs_csi_driver_assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "ebs_csi_driver" {
+  role       = aws_iam_role.ebs_csi_driver.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEBSCSIDriverPolicyV2"
+}
+
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.21.0"
@@ -71,6 +97,18 @@ module "eks" {
     }
     vpc-cni = {
       most_recent = true
+    }
+
+    eks-pod-identity-agent = {
+      most_recent = true
+    }
+
+    aws-ebs-csi-driver = {
+      most_recent = true
+      pod_identity_association = [{
+        role_arn        = aws_iam_role.ebs_csi_driver.arn
+        service_account = "ebs-csi-controller-sa"
+      }]
     }
   }
 

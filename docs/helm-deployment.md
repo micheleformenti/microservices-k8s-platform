@@ -5,16 +5,23 @@ custom application Helm chart in `helm/application/`.
 
 ## Validate
 
-Render the chart locally:
+Render the application chart locally:
 
 ```sh
 helm template microservices-platform ./helm/application
 ```
 
-Run Helm lint:
+Run Helm lint for the application chart:
 
 ```sh
 helm lint ./helm/application
+```
+
+For EKS platform resources, validate the AWS platform chart separately:
+
+```sh
+helm lint ./helm/platform/aws
+helm template aws-platform ./helm/platform/aws --namespace kube-system
 ```
 
 ## Install
@@ -50,6 +57,14 @@ This keeps the base chart values unchanged and overrides only the custom
 service image repositories, tags, and pull policies.
 
 ## Install on EKS
+
+Install the AWS platform chart first when testing EKS-specific platform
+resources without Argo CD:
+
+```sh
+helm upgrade --install aws-platform ./helm/platform/aws \
+  --namespace kube-system
+```
 
 Use `helm/application/values-eks.yaml` for the first EKS smoke test:
 
