@@ -1,0 +1,67 @@
+adService:
+  image:
+    repository: ghcr.io/micheleformenti/adservice
+    tag: main
+    pullPolicy: Always
+
+cartService:
+  image:
+    repository: ghcr.io/micheleformenti/cartservice
+    tag: main
+    pullPolicy: Always
+
+checkoutService:
+  image:
+    repository: ghcr.io/micheleformenti/checkoutservice
+    tag: main
+    pullPolicy: Always
+
+currencyService:
+  image:
+    repository: ghcr.io/micheleformenti/currencyservice
+    tag: main
+    pullPolicy: Always
+
+emailService:
+  image:
+    repository: ghcr.io/micheleformenti/emailservice
+    tag: main
+    pullPolicy: Always
+
+frontend:
+  image:
+    repository: ghcr.io/micheleformenti/frontend
+    tag: main
+    pullPolicy: Always
+  service:
+    type: ClusterIP
+
+loadGenerator:
+  image:
+    repository: ghcr.io/micheleformenti/loadgenerator
+    tag: main
+    pullPolicy: Always
+
+paymentService:
+  image:
+    repository: ghcr.io/micheleformenti/paymentservice
+    tag: main
+    pullPolicy: Always
+
+productCatalogService:
+  image:
+    repository: ghcr.io/micheleformenti/productcatalogservice
+    tag: main
+    pullPolicy: Always
+
+recommendationService:
+  image:
+    repository: ghcr.io/micheleformenti/recommendationservice
+    tag: main
+    pullPolicy: Always
+
+shippingService:
+  image:
+    repository: ghcr.io/micheleformenti/shippingservice
+    tag: main
+    pullPolicy: Always
