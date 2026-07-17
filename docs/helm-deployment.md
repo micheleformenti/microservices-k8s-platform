@@ -49,6 +49,22 @@ helm upgrade --install microservices-platform ./helm \
 This keeps the base chart values unchanged and overrides only the custom
 service image repositories, tags, and pull policies.
 
+## Install on EKS
+
+Use `helm/values-eks.yaml` for the first EKS smoke test:
+
+```sh
+helm upgrade --install microservices-platform ./helm \
+  --namespace microservices-platform \
+  --create-namespace \
+  -f helm/values.yaml \
+  -f helm/values-eks.yaml
+```
+
+The EKS values file uses public GHCR images and keeps the frontend service as
+`ClusterIP`. Frontend access is verified with port forwarding until an ingress
+layer is added.
+
 ## Verify
 
 Check the Helm release:
@@ -69,10 +85,22 @@ Check services:
 kubectl get svc -n microservices-platform
 ```
 
-The frontend is exposed through NodePort:
+With the default local values, the frontend is exposed through NodePort:
 
 ```text
 http://localhost:30010
+```
+
+With the EKS values file, use port forwarding:
+
+```sh
+kubectl port-forward -n microservices-platform svc/frontend 8080:80
+```
+
+Open:
+
+```text
+http://localhost:8080
 ```
 
 ## Upgrade
