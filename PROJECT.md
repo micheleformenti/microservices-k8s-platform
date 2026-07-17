@@ -30,14 +30,24 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 ├── helm/
 │   ├── application/
 │   └── platform/
+│       └── aws/
 ├── argocd/
+│   └── applications/
 ├── terraform/
+│   └── aws/
 ├── docs/
 ├── .github/
 ├── LICENSE
 ├── PROJECT.md
 └── README.md
 ```
+
+The Helm structure separates the portable workload from provider-specific
+platform resources:
+
+- `helm/application/` contains the cloud-neutral application chart.
+- `helm/platform/aws/` contains AWS/EKS-specific platform resources.
+- `helm/platform/azure/` is planned for the later AKS milestone.
 
 ## Milestones
 
@@ -111,9 +121,10 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 
 ### 10. EKS Storage Layer
 
+- [x] Split EKS platform resources into a provider-specific Helm chart
+- [x] Add EKS `gp3` storage class configuration
 - [ ] Convert Redis cart storage from ephemeral storage to persistent storage
-- [ ] Add EKS storage class configuration
-- [ ] Install or configure the EBS CSI driver if required
+- [x] Install or configure the EBS CSI driver if required
 - [ ] Validate persistence across pod restarts
 - [ ] Document the EKS storage tradeoffs
 

@@ -41,14 +41,23 @@ jobs:
       - name: Check Helm version
         run: helm version
 
-      - name: Lint Helm chart
+      - name: Lint application Helm chart
         run: helm lint ./helm/application
 
-      - name: Render Helm chart
-        run: helm template microservices-platform ./helm/application --namespace microservices-platform > rendered.yaml
+      - name: Render application Helm chart
+        run: helm template microservices-platform ./helm/application --namespace microservices-platform > rendered-application.yaml
 
-      - name: Validate rendered Helm manifests
-        run: kubeconform -strict -summary rendered.yaml
+      - name: Validate rendered application manifests
+        run: kubeconform -strict -summary rendered-application.yaml
+
+      - name: Lint AWS platform Helm chart
+        run: helm lint ./helm/platform/aws
+
+      - name: Render AWS platform Helm chart
+        run: helm template aws-platform ./helm/platform/aws --namespace kube-system > rendered-aws-platform.yaml
+
+      - name: Validate rendered AWS platform manifests
+        run: kubeconform -strict -summary rendered-aws-platform.yaml
 
       - name: Validate Argo CD applications
         run: |

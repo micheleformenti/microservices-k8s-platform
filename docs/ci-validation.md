@@ -17,8 +17,11 @@ It runs:
 ```sh
 kubeconform -strict -summary manifests
 helm lint ./helm/application
-helm template microservices-platform ./helm/application --namespace microservices-platform > rendered.yaml
-kubeconform -strict -summary rendered.yaml
+helm template microservices-platform ./helm/application --namespace microservices-platform > rendered-application.yaml
+kubeconform -strict -summary rendered-application.yaml
+helm lint ./helm/platform/aws
+helm template aws-platform ./helm/platform/aws --namespace kube-system > rendered-aws-platform.yaml
+kubeconform -strict -summary rendered-aws-platform.yaml
 kubeconform \
   -strict \
   -summary \
@@ -29,8 +32,8 @@ kubeconform \
 ```
 
 This validates the plain Kubernetes manifests, the Kubernetes manifests
-rendered from the Helm chart, and the Argo CD `Application` resources against
-their custom resource schema.
+rendered from the application and AWS platform Helm charts, and the Argo CD
+`Application` resources against their custom resource schema.
 
 ## Terraform
 

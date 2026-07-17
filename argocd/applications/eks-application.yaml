@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: eks-application
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/micheleformenti/microservices-k8s-platform.git
+    targetRevision: main
+    path: helm/application
+    helm:
+      releaseName: microservices-platform
+      valueFiles:
+        - values.yaml
+        - values-eks.yaml
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: microservices-platform
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
