@@ -16,8 +16,8 @@ It runs:
 
 ```sh
 kubeconform -strict -summary manifests
-helm lint ./helm
-helm template microservices-platform ./helm --namespace microservices-platform > rendered.yaml
+helm lint ./helm/application
+helm template microservices-platform ./helm/application --namespace microservices-platform > rendered.yaml
 kubeconform -strict -summary rendered.yaml
 kubeconform \
   -strict \

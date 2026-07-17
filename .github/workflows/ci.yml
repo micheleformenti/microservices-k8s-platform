@@ -42,10 +42,10 @@ jobs:
         run: helm version
 
       - name: Lint Helm chart
-        run: helm lint ./helm
+        run: helm lint ./helm/application
 
       - name: Render Helm chart
-        run: helm template microservices-platform ./helm --namespace microservices-platform > rendered.yaml
+        run: helm template microservices-platform ./helm/application --namespace microservices-platform > rendered.yaml
 
       - name: Validate rendered Helm manifests
         run: kubeconform -strict -summary rendered.yaml

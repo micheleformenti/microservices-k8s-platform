@@ -28,6 +28,8 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 ├── protos/
 ├── manifests/
 ├── helm/
+│   ├── application/
+│   └── platform/
 ├── argocd/
 ├── terraform/
 ├── docs/
