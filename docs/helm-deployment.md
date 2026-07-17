@@ -1,20 +1,20 @@
 # Helm Deployment
 
 This document describes how to deploy the local microservices workload with the
-custom Helm chart in `helm/`.
+custom application Helm chart in `helm/application/`.
 
 ## Validate
 
 Render the chart locally:
 
 ```sh
-helm template microservices-platform ./helm
+helm template microservices-platform ./helm/application
 ```
 
 Run Helm lint:
 
 ```sh
-helm lint ./helm
+helm lint ./helm/application
 ```
 
 ## Install
@@ -28,22 +28,22 @@ kubectl delete -f manifests/
 Install the chart:
 
 ```sh
-helm install microservices-platform ./helm
+helm install microservices-platform ./helm/application
 ```
 
 The chart creates and deploys into the `microservices-platform` namespace.
 
 ## Install with Published GHCR Images
 
-Use `helm/values-local.yaml` to test the service images published to GitHub
-Container Registry:
+Use `helm/application/values-local.yaml` to test the service images published
+to GitHub Container Registry:
 
 ```sh
-helm upgrade --install microservices-platform ./helm \
+helm upgrade --install microservices-platform ./helm/application \
   --namespace microservices-platform \
   --create-namespace \
-  -f helm/values.yaml \
-  -f helm/values-local.yaml
+  -f helm/application/values.yaml \
+  -f helm/application/values-local.yaml
 ```
 
 This keeps the base chart values unchanged and overrides only the custom
@@ -51,14 +51,14 @@ service image repositories, tags, and pull policies.
 
 ## Install on EKS
 
-Use `helm/values-eks.yaml` for the first EKS smoke test:
+Use `helm/application/values-eks.yaml` for the first EKS smoke test:
 
 ```sh
-helm upgrade --install microservices-platform ./helm \
+helm upgrade --install microservices-platform ./helm/application \
   --namespace microservices-platform \
   --create-namespace \
-  -f helm/values.yaml \
-  -f helm/values-eks.yaml
+  -f helm/application/values.yaml \
+  -f helm/application/values-eks.yaml
 ```
 
 The EKS values file uses public GHCR images and keeps the frontend service as
@@ -108,7 +108,7 @@ http://localhost:8080
 After changing chart templates or values:
 
 ```sh
-helm upgrade microservices-platform ./helm
+helm upgrade microservices-platform ./helm/application
 ```
 
 ## Uninstall

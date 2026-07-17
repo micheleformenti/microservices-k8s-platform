@@ -85,15 +85,15 @@ Private images are intentionally deferred to a later security milestone.
 
 ## Local GHCR Testing
 
-The Helm chart includes `helm/values-local.yaml` for testing the published GHCR
-images on a local cluster:
+The application Helm chart includes `helm/application/values-local.yaml` for
+testing the published GHCR images on a local cluster:
 
 ```sh
-helm upgrade --install microservices-platform ./helm \
+helm upgrade --install microservices-platform ./helm/application \
   --namespace microservices-platform \
   --create-namespace \
-  -f helm/values.yaml \
-  -f helm/values-local.yaml
+  -f helm/application/values.yaml \
+  -f helm/application/values-local.yaml
 ```
 
 The local values file uses the moving `main` tag and `pullPolicy: Always` for

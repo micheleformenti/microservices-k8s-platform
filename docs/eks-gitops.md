@@ -10,7 +10,7 @@ the frontend with `kubectl port-forward`.
 ```text
 GitHub repository (main)
         |
-        | watches helm/
+        | watches helm/application/
         v
 Argo CD on EKS
         |
@@ -33,7 +33,7 @@ Load Balancer is planned as a later layer.
 - `kubectl` configured for the EKS cluster
 - Helm installed locally
 - Public service images published to GitHub Container Registry
-- `helm/values-eks.yaml` pushed to the Git branch watched by Argo CD
+- `helm/application/values-eks.yaml` pushed to the Git branch watched by Argo CD
 
 Configure kubeconfig:
 
@@ -81,7 +81,7 @@ Important settings:
 
 - Repository: this project's GitHub repository
 - Revision: `main`
-- Source path: `helm`
+- Source path: `helm/application`
 - Helm release name: `microservices-platform`
 - Helm value files:
   - `values.yaml`
@@ -153,4 +153,3 @@ If the EKS environment is no longer needed, destroy it with Terraform:
 ```sh
 terraform -chdir=terraform/aws destroy
 ```
-

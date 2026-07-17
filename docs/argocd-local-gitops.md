@@ -8,7 +8,7 @@ Kubernetes cluster and automatically corrects configuration drift.
 ```text
 GitHub repository (main)
         |
-        | watches helm/
+        | watches helm/application/
         v
 Argo CD Application
         |
@@ -17,8 +17,9 @@ Argo CD Application
 microservices-platform namespace
 ```
 
-Git is the source of truth. Argo CD reads the chart from `helm/`; changes made
-directly in the cluster are not treated as lasting configuration changes.
+Git is the source of truth. Argo CD reads the chart from
+`helm/application/`; changes made directly in the cluster are not treated as
+lasting configuration changes.
 
 ## Prerequisites
 
@@ -152,7 +153,7 @@ and the declared state in Git remains authoritative.
 
 For an intentional configuration change:
 
-1. Edit the chart or `helm/values.yaml`.
+1. Edit the chart or `helm/application/values.yaml`.
 2. Validate the chart with `helm lint` and `helm template`.
 3. Commit and push the change to `main`.
 4. Watch Argo CD synchronize the new revision.
