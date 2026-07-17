@@ -95,16 +95,17 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 
 ### 8. Deploy to EKS with Helm
 
-- [ ] Add EKS-specific Helm values
-- [ ] Deploy the workload to EKS with Helm
-- [ ] Validate service connectivity on EKS
-- [ ] Document the EKS Helm deployment workflow
+- [x] Add EKS-specific Helm values
+- [x] Deploy the workload to EKS with Helm
+- [x] Validate service connectivity on EKS
+- [x] Document the EKS Helm deployment workflow
 
 ### 9. Deploy to EKS with GitOps
 
-- [ ] Bootstrap Argo CD on EKS
-- [ ] Deploy the workload to EKS through GitOps
-- [ ] Document the EKS sync workflow
+- [x] Bootstrap Argo CD on EKS
+- [x] Deploy the workload to EKS through GitOps
+- [x] Validate frontend access with port forwarding
+- [x] Document the EKS sync workflow
 
 ### 10. EKS Storage Layer
 
