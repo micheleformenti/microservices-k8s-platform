@@ -16,7 +16,7 @@ Production-inspired platform engineering project focused on Kubernetes, GitOps, 
 | ✅ | Terraform-managed EKS | [Guide](docs/eks-infrastructure.md) |
 | ✅ | Container image build and publishing to GHCR | [Guide](docs/container-images.md) |
 | ✅ | GitOps on EKS | [Guide](docs/eks-gitops.md) |
-| 🚧 | EKS storage layer | Coming soon |
+| ✅ | EKS storage layer | [Guide](docs/eks-storage.md) |
 | ⏳ | Observability | Planned |
 | ⏳ | Security hardening | Planned |
 | ⏳ | AKS deployment | Planned |
