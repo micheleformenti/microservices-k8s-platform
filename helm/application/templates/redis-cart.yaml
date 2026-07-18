@@ -1,11 +1,12 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: redis-cart
   namespace: {{ .Values.namespace.name }}
   labels:
     {{- include "ms-k8s-platform.redisCartLabels" . | nindent 4 }}
 spec:
+  serviceName: redis-cart
   replicas: {{ .Values.redisCart.replicas }}
   selector:
     matchLabels:
@@ -40,9 +41,24 @@ spec:
             limits:
               cpu: {{ .Values.redisCart.resources.limits.cpu }}
               memory: {{ .Values.redisCart.resources.limits.memory }}
+      {{- if not .Values.redisCart.persistence.enabled }}
       volumes:
         - name: redis-data
           emptyDir: {}
+      {{- end }}
+  {{- if .Values.redisCart.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: {{ .Values.redisCart.persistence.storageClassName | quote }}
+        resources:
+          requests:
+            storage: {{ .Values.redisCart.persistence.size }}
+  {{- end }}
+
 ---
 apiVersion: v1
 kind: Service
