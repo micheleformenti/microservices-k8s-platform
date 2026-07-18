@@ -164,6 +164,11 @@ redisCart:
     requests:
       cpu: 70m
       memory: 200Mi
+  persistence:
+    enabled: false
+    storageClassName: ""
+    size: 1Gi
+
 
 shippingService:
   replicas: 1

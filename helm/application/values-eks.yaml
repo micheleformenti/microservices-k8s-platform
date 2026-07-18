@@ -60,6 +60,12 @@ recommendationService:
     tag: main
     pullPolicy: Always
 
+redisCart:
+  persistence:
+    enabled: true
+    storageClassName: gp3
+    size: 1Gi
+
 shippingService:
   image:
     repository: ghcr.io/micheleformenti/shippingservice
