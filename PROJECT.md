@@ -123,10 +123,10 @@ platform resources:
 
 - [x] Split EKS platform resources into a provider-specific Helm chart
 - [x] Add EKS `gp3` storage class configuration
-- [ ] Convert Redis cart storage from ephemeral storage to persistent storage
+- [x] Convert Redis cart storage from ephemeral storage to persistent storage
 - [x] Install or configure the EBS CSI driver if required
-- [ ] Validate persistence across pod restarts
-- [ ] Document the EKS storage tradeoffs
+- [x] Validate persistence across pod restarts
+- [x] Document the EKS storage tradeoffs
 
 ### 11. Observability
 

@@ -94,6 +94,9 @@ The AWS platform chart currently manages the `gp3` `StorageClass`. It is kept
 separate from the workload chart because it represents cloud-specific cluster
 configuration, not application deployment.
 
+The storage design and Redis persistence validation are documented in
+[EKS Storage](eks-storage.md).
+
 ## Application Configuration
 
 The EKS Argo CD application is defined in
@@ -153,6 +156,8 @@ Verify the workload:
 ```sh
 kubectl get pods -n microservices-platform
 kubectl get services -n microservices-platform
+kubectl get statefulset redis-cart -n microservices-platform
+kubectl get pvc -n microservices-platform
 ```
 
 ## Access the Frontend
