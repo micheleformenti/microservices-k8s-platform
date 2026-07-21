@@ -1,73 +1,62 @@
 adService:
   image:
     repository: ghcr.io/micheleformenti/adservice
-    tag: main
-    pullPolicy: Always
-
+    tag: ff845257d3ef69f10fb1d85f5fcca2f61df4ced1
+    pullPolicy: IfNotPresent
 cartService:
   image:
     repository: ghcr.io/micheleformenti/cartservice
-    tag: main
-    pullPolicy: Always
-
+    tag: ff845257d3ef69f10fb1d85f5fcca2f61df4ced1
+    pullPolicy: IfNotPresent
 checkoutService:
   image:
     repository: ghcr.io/micheleformenti/checkoutservice
-    tag: main
-    pullPolicy: Always
-
+    tag: ff845257d3ef69f10fb1d85f5fcca2f61df4ced1
+    pullPolicy: IfNotPresent
 currencyService:
   image:
     repository: ghcr.io/micheleformenti/currencyservice
-    tag: main
-    pullPolicy: Always
-
+    tag: ff845257d3ef69f10fb1d85f5fcca2f61df4ced1
+    pullPolicy: IfNotPresent
 emailService:
   image:
     repository: ghcr.io/micheleformenti/emailservice
-    tag: main
-    pullPolicy: Always
-
+    tag: ff845257d3ef69f10fb1d85f5fcca2f61df4ced1
+    pullPolicy: IfNotPresent
 frontend:
   image:
     repository: ghcr.io/micheleformenti/frontend
-    tag: main
-    pullPolicy: Always
+    tag: ff845257d3ef69f10fb1d85f5fcca2f61df4ced1
+    pullPolicy: IfNotPresent
   service:
     type: ClusterIP
-
 loadGenerator:
   image:
     repository: ghcr.io/micheleformenti/loadgenerator
-    tag: main
-    pullPolicy: Always
-
+    tag: ff845257d3ef69f10fb1d85f5fcca2f61df4ced1
+    pullPolicy: IfNotPresent
 paymentService:
   image:
     repository: ghcr.io/micheleformenti/paymentservice
-    tag: main
-    pullPolicy: Always
-
+    tag: ff845257d3ef69f10fb1d85f5fcca2f61df4ced1
+    pullPolicy: IfNotPresent
 productCatalogService:
   image:
     repository: ghcr.io/micheleformenti/productcatalogservice
-    tag: main
-    pullPolicy: Always
-
+    tag: ff845257d3ef69f10fb1d85f5fcca2f61df4ced1
+    pullPolicy: IfNotPresent
 recommendationService:
   image:
     repository: ghcr.io/micheleformenti/recommendationservice
-    tag: main
-    pullPolicy: Always
-
+    tag: ff845257d3ef69f10fb1d85f5fcca2f61df4ced1
+    pullPolicy: IfNotPresent
 redisCart:
   persistence:
     enabled: true
     storageClassName: gp3
     size: 1Gi
-
 shippingService:
   image:
     repository: ghcr.io/micheleformenti/shippingservice
-    tag: main
-    pullPolicy: Always
+    tag: ff845257d3ef69f10fb1d85f5fcca2f61df4ced1
+    pullPolicy: IfNotPresent

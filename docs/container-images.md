@@ -38,6 +38,12 @@ and publish the images to GitHub Container Registry.
 The workflow detects service-level changes and builds only the affected service
 images. Changes to the CI workflow build all service images.
 
+After images are published from `main`, the workflow updates
+`helm/application/values-eks.yaml` and `helm/application/values-local.yaml`
+with the immutable commit SHA tag for the images that were built. It does not
+push that change directly to `main`. Instead, it opens an automated pull
+request for review.
+
 The job builds the services currently deployed by the Helm chart:
 
 - adservice
@@ -70,8 +76,9 @@ Builds from the `main` branch also update a moving `main` tag:
 ghcr.io/<github-owner>/<service-name>:main
 ```
 
-For EKS deployments, prefer the commit SHA tag so the deployed image version is
-explicit and reproducible.
+EKS deployments use the commit SHA tag in `helm/application/values-eks.yaml` so
+the deployed image version is explicit and reproducible. Local GHCR smoke tests
+can use the same immutable tags through `helm/application/values-local.yaml`.
 
 ## Visibility
 
@@ -96,7 +103,5 @@ helm upgrade --install microservices-platform ./helm/application \
   -f helm/application/values-local.yaml
 ```
 
-The local values file uses the moving `main` tag and `pullPolicy: Always` for
-custom service images. This is useful for smoke testing the latest published
-images. For EKS deployments, prefer commit SHA tags once the deployment flow is
-stable.
+The local values file uses the same immutable service image tags as the EKS
+values file after the image tag pull request is merged.
