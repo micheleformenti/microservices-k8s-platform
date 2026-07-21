@@ -103,6 +103,7 @@ platform resources:
 - [x] Verify service image builds in GitHub Actions
 - [x] Publish images to GitHub Container Registry
 - [x] Tag images with commit SHAs
+- [x] Open Helm image tag update pull requests for immutable GitOps deployments
 - [x] Document image naming, tagging, and registry decisions
 
 ### 8. Deploy to EKS with Helm

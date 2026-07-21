@@ -209,51 +209,51 @@ jobs:
           services=()
 
           add_service() {
-            services+=("{\"image\":\"$1\",\"context\":\"$2\",\"dockerfile\":\"$3\"}")
+            services+=("{\"image\":\"$1\",\"context\":\"$2\",\"dockerfile\":\"$3\",\"valuesKey\":\"$4\"}")
           }
 
           if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${ADSERVICE_CHANGED}" = "true" ]; then
-            add_service "adservice" "src/adservice" "src/adservice/Dockerfile"
+            add_service "adservice" "src/adservice" "src/adservice/Dockerfile" "adService"
           fi
 
           if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${CARTSERVICE_CHANGED}" = "true" ]; then
-            add_service "cartservice" "src/cartservice/src" "src/cartservice/src/Dockerfile"
+            add_service "cartservice" "src/cartservice/src" "src/cartservice/src/Dockerfile" "cartService"
           fi
 
           if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${CHECKOUTSERVICE_CHANGED}" = "true" ]; then
-            add_service "checkoutservice" "src/checkoutservice" "src/checkoutservice/Dockerfile"
+            add_service "checkoutservice" "src/checkoutservice" "src/checkoutservice/Dockerfile" "checkoutService"
           fi
 
           if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${CURRENCYSERVICE_CHANGED}" = "true" ]; then
-            add_service "currencyservice" "src/currencyservice" "src/currencyservice/Dockerfile"
+            add_service "currencyservice" "src/currencyservice" "src/currencyservice/Dockerfile" "currencyService"
           fi
 
           if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${EMAILSERVICE_CHANGED}" = "true" ]; then
-            add_service "emailservice" "src/emailservice" "src/emailservice/Dockerfile"
+            add_service "emailservice" "src/emailservice" "src/emailservice/Dockerfile" "emailService"
           fi
 
           if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${FRONTEND_CHANGED}" = "true" ]; then
-            add_service "frontend" "src/frontend" "src/frontend/Dockerfile"
+            add_service "frontend" "src/frontend" "src/frontend/Dockerfile" "frontend"
           fi
 
           if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${LOADGENERATOR_CHANGED}" = "true" ]; then
-            add_service "loadgenerator" "src/loadgenerator" "src/loadgenerator/Dockerfile"
+            add_service "loadgenerator" "src/loadgenerator" "src/loadgenerator/Dockerfile" "loadGenerator"
           fi
 
           if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${PAYMENTSERVICE_CHANGED}" = "true" ]; then
-            add_service "paymentservice" "src/paymentservice" "src/paymentservice/Dockerfile"
+            add_service "paymentservice" "src/paymentservice" "src/paymentservice/Dockerfile" "paymentService"
           fi
 
           if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${PRODUCTCATALOGSERVICE_CHANGED}" = "true" ]; then
-            add_service "productcatalogservice" "src/productcatalogservice" "src/productcatalogservice/Dockerfile"
+            add_service "productcatalogservice" "src/productcatalogservice" "src/productcatalogservice/Dockerfile" "productCatalogService"
           fi
 
           if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${RECOMMENDATIONSERVICE_CHANGED}" = "true" ]; then
-            add_service "recommendationservice" "src/recommendationservice" "src/recommendationservice/Dockerfile"
+            add_service "recommendationservice" "src/recommendationservice" "src/recommendationservice/Dockerfile" "recommendationService"
           fi
 
           if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${SHIPPINGSERVICE_CHANGED}" = "true" ]; then
-            add_service "shippingservice" "src/shippingservice" "src/shippingservice/Dockerfile"
+            add_service "shippingservice" "src/shippingservice" "src/shippingservice/Dockerfile" "shippingService"
           fi
 
           if [ "${#services[@]}" -eq 0 ]; then
@@ -325,3 +325,77 @@ jobs:
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
+
+  update-helm-image-tags:
+    name: Update Helm image tags
+    runs-on: ubuntu-latest
+    needs:
+      - detect-changes
+      - build-container-images
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.detect-changes.outputs.container-images == 'true'
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: main
+
+      - name: Install yq
+        run: |
+          curl -sSL https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64 -o yq
+          chmod +x yq
+          sudo mv yq /usr/local/bin/yq
+
+      - name: Update Helm image tags
+        env:
+          IMAGE_MATRIX: ${{ needs.detect-changes.outputs.image-matrix }}
+        run: |
+          echo "${IMAGE_MATRIX}" | jq -r '.include[].valuesKey' | while read -r values_key; do
+            yq -i ".${values_key}.image.tag = strenv(GITHUB_SHA)" helm/application/values-eks.yaml
+            yq -i ".${values_key}.image.tag = strenv(GITHUB_SHA)" helm/application/values-local.yaml
+          done
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v5
+        with:
+          version: v3.15.4
+
+      - name: Validate updated Helm values
+        run: |
+          helm lint ./helm/application
+          helm template microservices-platform ./helm/application \
+            --namespace microservices-platform \
+            -f helm/application/values.yaml \
+            -f helm/application/values-eks.yaml \
+            > rendered-application-eks.yaml
+          helm template microservices-platform ./helm/application \
+            --namespace microservices-platform \
+            -f helm/application/values.yaml \
+            -f helm/application/values-local.yaml \
+            > rendered-application-local.yaml
+
+      - name: Create image tag update PR
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          add-paths: |
+            helm/application/values-eks.yaml
+            helm/application/values-local.yaml
+          branch: automation/update-helm-image-tags/${{ github.sha }}
+          delete-branch: true
+          commit-message: Update Helm image tags for ${{ github.sha }}
+          title: Update Helm image tags for ${{ github.sha }}
+          body: |
+            Updates Helm values to use the immutable image tag
+            `${{ github.sha }}` for the service images built from this `main`
+            revision.
+
+            Updated files:
+            - `helm/application/values-eks.yaml`
+            - `helm/application/values-local.yaml`
+
+            Source workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

@@ -93,6 +93,10 @@ source directories or the CI workflow itself. When one service changes, only
 that service image is included in the build matrix. Changes to the CI workflow
 build all service images.
 
+After publishing images from `main`, CI updates the EKS and local GHCR Helm
+values with the new immutable commit SHA tags and opens an automated pull
+request.
+
 Image naming, tagging, and registry behavior are documented in
 [Container Images](container-images.md).
 
