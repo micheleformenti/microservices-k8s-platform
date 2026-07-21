@@ -1,54 +1,54 @@
 adService:
   image:
     repository: ghcr.io/micheleformenti/adservice
-    tag: bda2d334454152d7cf09163dfec7aa0c95796620
+    tag: bb1e712352a33d902fd44b668ef4b933b5889d62
     pullPolicy: IfNotPresent
 cartService:
   image:
     repository: ghcr.io/micheleformenti/cartservice
-    tag: bda2d334454152d7cf09163dfec7aa0c95796620
+    tag: bb1e712352a33d902fd44b668ef4b933b5889d62
     pullPolicy: IfNotPresent
 checkoutService:
   image:
     repository: ghcr.io/micheleformenti/checkoutservice
-    tag: bda2d334454152d7cf09163dfec7aa0c95796620
+    tag: bb1e712352a33d902fd44b668ef4b933b5889d62
     pullPolicy: IfNotPresent
 currencyService:
   image:
     repository: ghcr.io/micheleformenti/currencyservice
-    tag: bda2d334454152d7cf09163dfec7aa0c95796620
+    tag: bb1e712352a33d902fd44b668ef4b933b5889d62
     pullPolicy: IfNotPresent
 emailService:
   image:
     repository: ghcr.io/micheleformenti/emailservice
-    tag: bda2d334454152d7cf09163dfec7aa0c95796620
+    tag: bb1e712352a33d902fd44b668ef4b933b5889d62
     pullPolicy: IfNotPresent
 frontend:
   image:
     repository: ghcr.io/micheleformenti/frontend
-    tag: bda2d334454152d7cf09163dfec7aa0c95796620
+    tag: bb1e712352a33d902fd44b668ef4b933b5889d62
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
 loadGenerator:
   image:
     repository: ghcr.io/micheleformenti/loadgenerator
-    tag: bda2d334454152d7cf09163dfec7aa0c95796620
+    tag: bb1e712352a33d902fd44b668ef4b933b5889d62
     pullPolicy: IfNotPresent
 paymentService:
   image:
     repository: ghcr.io/micheleformenti/paymentservice
-    tag: bda2d334454152d7cf09163dfec7aa0c95796620
+    tag: bb1e712352a33d902fd44b668ef4b933b5889d62
     pullPolicy: IfNotPresent
 productCatalogService:
   image:
     repository: ghcr.io/micheleformenti/productcatalogservice
-    tag: bda2d334454152d7cf09163dfec7aa0c95796620
+    tag: bb1e712352a33d902fd44b668ef4b933b5889d62
     pullPolicy: IfNotPresent
 recommendationService:
   image:
     repository: ghcr.io/micheleformenti/recommendationservice
-    tag: bda2d334454152d7cf09163dfec7aa0c95796620
+    tag: bb1e712352a33d902fd44b668ef4b933b5889d62
     pullPolicy: IfNotPresent
 redisCart:
   persistence:
@@ -58,5 +58,5 @@ redisCart:
 shippingService:
   image:
     repository: ghcr.io/micheleformenti/shippingservice
-    tag: bda2d334454152d7cf09163dfec7aa0c95796620
+    tag: bb1e712352a33d902fd44b668ef4b933b5889d62
     pullPolicy: IfNotPresent
