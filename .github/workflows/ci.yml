@@ -13,137 +13,6 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
-  validate:
-    name: Validate
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Install kubeconform
-        run: |
-          curl -sSL https://github.com/yannh/kubeconform/releases/download/v0.6.7/kubeconform-linux-amd64.tar.gz -o kubeconform.tar.gz
-          tar -xzf kubeconform.tar.gz kubeconform
-          sudo mv kubeconform /usr/local/bin/kubeconform
-
-      - name: Check kubeconform version
-        run: kubeconform -v
-
-      - name: Validate plain Kubernetes manifests
-        run: kubeconform -strict -summary manifests
-
-      - name: Set up Helm
-        uses: azure/setup-helm@v5
-        with:
-          version: v3.15.4
-
-      - name: Check Helm version
-        run: helm version
-
-      - name: Lint application Helm chart
-        run: helm lint ./helm/application
-
-      - name: Render application Helm chart
-        run: helm template microservices-platform ./helm/application --namespace microservices-platform > rendered-application.yaml
-
-      - name: Validate rendered application manifests
-        run: kubeconform -strict -summary rendered-application.yaml
-
-      - name: Lint AWS platform Helm chart
-        run: helm lint ./helm/platform/aws
-
-      - name: Render AWS platform Helm chart
-        run: helm template aws-platform ./helm/platform/aws --namespace kube-system > rendered-aws-platform.yaml
-
-      - name: Validate rendered AWS platform manifests
-        run: kubeconform -strict -summary rendered-aws-platform.yaml
-
-      - name: Validate Argo CD applications
-        run: |
-          kubeconform \
-            -strict \
-            -summary \
-            -schema-location default \
-            -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
-            argocd/applications
-
-  terraform:
-    name: Terraform validation
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v4
-        with:
-          terraform_version: "1.15.8"
-
-      - name: Check Terraform version
-        run: terraform version
-
-      - name: Check Terraform formatting
-        run: terraform fmt -check -recursive terraform/aws
-
-      - name: Initialize Terraform
-        run: terraform -chdir=terraform/aws init -backend=false
-
-      - name: Validate Terraform
-        run: terraform -chdir=terraform/aws validate
-
-  go-tests:
-    name: Go tests
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        service:
-          - src/checkoutservice
-          - src/frontend
-          - src/productcatalogservice
-          - src/shippingservice
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Set up Go
-        uses: actions/setup-go@v6
-        with:
-          go-version: "1.24.3"
-          cache-dependency-path: ${{ matrix.service }}/go.sum
-
-      - name: Check Go version
-        working-directory: ${{ matrix.service }}
-        run: go version
-
-      - name: Run Go tests
-        working-directory: ${{ matrix.service }}
-        run: go test ./...
-
-  dotnet-tests:
-    name: .NET tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: "9.0.x"
-
-      - name: Check .NET version
-        run: dotnet --version
-
-      - name: Run cartservice tests
-        working-directory: src/cartservice
-        run: dotnet test cartservice.sln
-
   detect-changes:
     name: Detect changes
     runs-on: ubuntu-latest
@@ -153,6 +22,10 @@ jobs:
       pull-requests: read
 
     outputs:
+      kubernetes: ${{ steps.filter.outputs.workflow == 'true' || steps.filter.outputs.kubernetes == 'true' }}
+      terraform: ${{ steps.filter.outputs.workflow == 'true' || steps.filter.outputs.terraform == 'true' }}
+      go: ${{ steps.filter.outputs.workflow == 'true' || steps.filter.outputs.go == 'true' }}
+      dotnet: ${{ steps.filter.outputs.workflow == 'true' || steps.filter.outputs.dotnet == 'true' }}
       container-images: ${{ steps.image-matrix.outputs.container-images }}
       image-matrix: ${{ steps.image-matrix.outputs.image-matrix }}
 
@@ -162,11 +35,26 @@ jobs:
 
       - name: Detect container image changes
         id: filter
-        uses: dorny/paths-filter@v4
+        uses: dorny/paths-filter@v3
         with:
           filters: |
             workflow:
               - ".github/workflows/ci.yml"
+            kubernetes:
+              - manifests/**
+              - helm/**
+              - argocd/**
+            terraform:
+              - terraform/aws/**
+            go:
+              - src/checkoutservice/**
+              - src/frontend/**
+              - src/productcatalogservice/**
+              - src/shippingservice/**
+              - protos/**
+            dotnet:
+              - src/cartservice/**
+              - protos/**
             adservice:
               - src/adservice/**
             cartservice:
@@ -265,6 +153,149 @@ jobs:
             echo "image-matrix=${matrix}" >> "$GITHUB_OUTPUT"
           fi
 
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    needs:
+      - detect-changes
+    if: needs.detect-changes.outputs.kubernetes == 'true'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install kubeconform
+        run: |
+          curl -sSL https://github.com/yannh/kubeconform/releases/download/v0.6.7/kubeconform-linux-amd64.tar.gz -o kubeconform.tar.gz
+          tar -xzf kubeconform.tar.gz kubeconform
+          sudo mv kubeconform /usr/local/bin/kubeconform
+
+      - name: Check kubeconform version
+        run: kubeconform -v
+
+      - name: Validate plain Kubernetes manifests
+        run: kubeconform -strict -summary manifests
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v5
+        with:
+          version: v3.15.4
+
+      - name: Check Helm version
+        run: helm version
+
+      - name: Lint application Helm chart
+        run: helm lint ./helm/application
+
+      - name: Render application Helm chart
+        run: helm template microservices-platform ./helm/application --namespace microservices-platform > rendered-application.yaml
+
+      - name: Validate rendered application manifests
+        run: kubeconform -strict -summary rendered-application.yaml
+
+      - name: Lint AWS platform Helm chart
+        run: helm lint ./helm/platform/aws
+
+      - name: Render AWS platform Helm chart
+        run: helm template aws-platform ./helm/platform/aws --namespace kube-system > rendered-aws-platform.yaml
+
+      - name: Validate rendered AWS platform manifests
+        run: kubeconform -strict -summary rendered-aws-platform.yaml
+
+      - name: Validate Argo CD applications
+        run: |
+          kubeconform \
+            -strict \
+            -summary \
+            -schema-location default \
+            -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
+            argocd/applications
+
+  terraform:
+    name: Terraform validation
+    runs-on: ubuntu-latest
+    needs:
+      - detect-changes
+    if: needs.detect-changes.outputs.terraform == 'true'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.15.8"
+
+      - name: Check Terraform version
+        run: terraform version
+
+      - name: Check Terraform formatting
+        run: terraform fmt -check -recursive terraform/aws
+
+      - name: Initialize Terraform
+        run: terraform -chdir=terraform/aws init -backend=false
+
+      - name: Validate Terraform
+        run: terraform -chdir=terraform/aws validate
+
+  go-tests:
+    name: Go tests
+    runs-on: ubuntu-latest
+    needs:
+      - detect-changes
+    if: needs.detect-changes.outputs.go == 'true'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - src/checkoutservice
+          - src/frontend
+          - src/productcatalogservice
+          - src/shippingservice
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.24.3"
+          cache-dependency-path: ${{ matrix.service }}/go.sum
+
+      - name: Check Go version
+        working-directory: ${{ matrix.service }}
+        run: go version
+
+      - name: Run Go tests
+        working-directory: ${{ matrix.service }}
+        run: go test ./...
+
+  dotnet-tests:
+    name: .NET tests
+    runs-on: ubuntu-latest
+    needs:
+      - detect-changes
+    if: needs.detect-changes.outputs.dotnet == 'true'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Check .NET version
+        run: dotnet --version
+
+      - name: Run cartservice tests
+        working-directory: src/cartservice
+        run: dotnet test cartservice.sln
+
   build-container-images:
     name: Build container images
     runs-on: ubuntu-latest
@@ -273,7 +304,13 @@ jobs:
       - go-tests
       - dotnet-tests
       - detect-changes
-    if: needs.detect-changes.outputs.container-images == 'true'
+    # Path filters can skip some jobs in "needs"; always() makes GitHub still
+    # evaluate this condition. Skipped jobs are okay, failed/cancelled jobs are not.
+    if: |
+      always() &&
+      needs.detect-changes.outputs.container-images == 'true' &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
 
     permissions:
       contents: read

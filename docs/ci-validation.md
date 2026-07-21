@@ -7,6 +7,21 @@ It runs on:
 - Pull requests
 - Pushes to `main`
 
+## Path-Aware Jobs
+
+The workflow starts with a `detect-changes` job. Expensive jobs are skipped when
+their inputs did not change:
+
+| Job | Runs when these paths change |
+| --- | --- |
+| Kubernetes and Helm validation | `.github/workflows/ci.yml`, `manifests/**`, `helm/**`, `argocd/**` |
+| Terraform validation | `.github/workflows/ci.yml`, `terraform/aws/**` |
+| Go tests | `.github/workflows/ci.yml`, Go service directories, `protos/**` |
+| .NET tests | `.github/workflows/ci.yml`, `src/cartservice/**`, `protos/**` |
+| Container image builds | `.github/workflows/ci.yml` or changed deployed service source directories |
+
+Workflow changes intentionally run all jobs.
+
 ## Kubernetes and Helm
 
 The validation job checks deployment configuration without connecting to a
@@ -95,7 +110,8 @@ build all service images.
 
 After publishing images from `main`, CI updates the EKS and local GHCR Helm
 values with the new immutable commit SHA tags and opens an automated pull
-request.
+request. The workflow does not commit deployment tag changes directly to
+`main`.
 
 Image naming, tagging, and registry behavior are documented in
 [Container Images](container-images.md).
