@@ -153,8 +153,8 @@ jobs:
             echo "image-matrix=${matrix}" >> "$GITHUB_OUTPUT"
           fi
 
-  validate:
-    name: Validate
+  kubernetes-validation:
+    name: Kubernetes validation
     runs-on: ubuntu-latest
     needs:
       - detect-changes
@@ -194,7 +194,9 @@ jobs:
         run: kubeconform -strict -summary rendered-application.yaml
 
       - name: Build AWS platform Helm dependencies
-        run: helm dependency build ./helm/platform/aws
+        run: |
+          helm repo add eks https://aws.github.io/eks-charts
+          helm dependency build ./helm/platform/aws
 
       - name: Lint AWS platform Helm chart
         run: helm lint ./helm/platform/aws
@@ -303,7 +305,7 @@ jobs:
     name: Build container images
     runs-on: ubuntu-latest
     needs:
-      - validate
+      - kubernetes-validation
       - go-tests
       - dotnet-tests
       - detect-changes
