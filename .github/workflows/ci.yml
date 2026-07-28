@@ -245,10 +245,10 @@ jobs:
         run: terraform fmt -check -recursive terraform/aws
 
       - name: Initialize Terraform
-        run: terraform -chdir=terraform/aws init -backend=false
+        run: terraform -chdir=terraform/aws/eks init -backend=false
 
       - name: Validate Terraform
-        run: terraform -chdir=terraform/aws validate
+        run: terraform -chdir=terraform/aws/eks validate
 
   go-tests:
     name: Go tests

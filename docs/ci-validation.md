@@ -59,8 +59,8 @@ It runs:
 
 ```sh
 terraform fmt -check -recursive terraform/aws
-terraform -chdir=terraform/aws init -backend=false
-terraform -chdir=terraform/aws validate
+terraform -chdir=terraform/aws/eks init -backend=false
+terraform -chdir=terraform/aws/eks validate
 ```
 
 The backend is disabled during CI initialization so the workflow validates the

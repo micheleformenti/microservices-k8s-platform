@@ -1,6 +1,7 @@
 # EKS Infrastructure
 
-This document describes the AWS EKS infrastructure defined in `terraform/aws/`.
+This document describes the AWS EKS infrastructure defined in
+`terraform/aws/eks/`.
 
 The infrastructure was tested by applying the Terraform configuration,
 connecting to the cluster with `kubectl`, and tearing the environment down
@@ -114,7 +115,7 @@ aws sts get-caller-identity
 Create a local Terraform variables file:
 
 ```sh
-cp terraform/aws/terraform.tfvars.example terraform/aws/terraform.tfvars
+cp terraform/aws/eks/terraform.tfvars.example terraform/aws/eks/terraform.tfvars
 ```
 
 Restrict the public EKS API endpoint to your own public IP:
@@ -131,8 +132,8 @@ Format and validate the Terraform configuration:
 
 ```sh
 terraform fmt -check -recursive terraform/aws
-terraform -chdir=terraform/aws init
-terraform -chdir=terraform/aws validate
+terraform -chdir=terraform/aws/eks init
+terraform -chdir=terraform/aws/eks validate
 ```
 
 CI runs the same validation with `terraform init -backend=false` so it does not
@@ -143,7 +144,7 @@ need remote state or AWS credentials.
 Review the resources before creating anything:
 
 ```sh
-terraform -chdir=terraform/aws plan
+terraform -chdir=terraform/aws/eks plan
 ```
 
 The plan should be reviewed by category:
@@ -161,7 +162,7 @@ The plan should be reviewed by category:
 Create the environment:
 
 ```sh
-terraform -chdir=terraform/aws apply
+terraform -chdir=terraform/aws/eks apply
 ```
 
 ## Connect with kubectl
@@ -186,7 +187,7 @@ kubectl get pods -A
 Destroy the environment when the demo is complete:
 
 ```sh
-terraform -chdir=terraform/aws destroy
+terraform -chdir=terraform/aws/eks destroy
 ```
 
 After destroy, verify that cost-sensitive resources such as NAT Gateways,
