@@ -7,3 +7,10 @@ storageClasses:
     volumeBindingMode: WaitForFirstConsumer
     allowVolumeExpansion: true
     encrypted: true
+
+aws-load-balancer-controller:
+  clusterName: microservices-platform-eks
+  region: eu-central-1
+  serviceAccount:
+    create: true
+    name: aws-load-balancer-controller

@@ -153,8 +153,8 @@ jobs:
             echo "image-matrix=${matrix}" >> "$GITHUB_OUTPUT"
           fi
 
-  validate:
-    name: Validate
+  kubernetes-validation:
+    name: Kubernetes validation
     runs-on: ubuntu-latest
     needs:
       - detect-changes
@@ -193,6 +193,11 @@ jobs:
       - name: Validate rendered application manifests
         run: kubeconform -strict -summary rendered-application.yaml
 
+      - name: Build AWS platform Helm dependencies
+        run: |
+          helm repo add eks https://aws.github.io/eks-charts
+          helm dependency build ./helm/platform/aws
+
       - name: Lint AWS platform Helm chart
         run: helm lint ./helm/platform/aws
 
@@ -200,7 +205,13 @@ jobs:
         run: helm template aws-platform ./helm/platform/aws --namespace kube-system > rendered-aws-platform.yaml
 
       - name: Validate rendered AWS platform manifests
-        run: kubeconform -strict -summary rendered-aws-platform.yaml
+        run: |
+          kubeconform \
+            -strict \
+            -summary \
+            -schema-location default \
+            -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
+            rendered-aws-platform.yaml
 
       - name: Validate Argo CD applications
         run: |
@@ -300,7 +311,7 @@ jobs:
     name: Build container images
     runs-on: ubuntu-latest
     needs:
-      - validate
+      - kubernetes-validation
       - go-tests
       - dotnet-tests
       - detect-changes
