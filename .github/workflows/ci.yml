@@ -205,7 +205,13 @@ jobs:
         run: helm template aws-platform ./helm/platform/aws --namespace kube-system > rendered-aws-platform.yaml
 
       - name: Validate rendered AWS platform manifests
-        run: kubeconform -strict -summary rendered-aws-platform.yaml
+        run: |
+          kubeconform \
+            -strict \
+            -summary \
+            -schema-location default \
+            -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
+            rendered-aws-platform.yaml
 
       - name: Validate Argo CD applications
         run: |
