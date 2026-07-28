@@ -193,6 +193,9 @@ jobs:
       - name: Validate rendered application manifests
         run: kubeconform -strict -summary rendered-application.yaml
 
+      - name: Build AWS platform Helm dependencies
+        run: helm dependency build ./helm/platform/aws
+
       - name: Lint AWS platform Helm chart
         run: helm lint ./helm/platform/aws
 

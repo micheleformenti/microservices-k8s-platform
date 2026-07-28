@@ -6,7 +6,7 @@ locals {
   azs = slice(data.aws_availability_zones.available.names, 0, 2)
 }
 
-data "aws_iam_policy_document" "ebs_csi_driver_assume_role" {
+data "aws_iam_policy_document" "pod_identity_assume_role" {
   statement {
     effect = "Allow"
 
@@ -24,12 +24,28 @@ data "aws_iam_policy_document" "ebs_csi_driver_assume_role" {
 
 resource "aws_iam_role" "ebs_csi_driver" {
   name_prefix        = "${var.name}-ebs-csi-"
-  assume_role_policy = data.aws_iam_policy_document.ebs_csi_driver_assume_role.json
+  assume_role_policy = data.aws_iam_policy_document.pod_identity_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "ebs_csi_driver" {
   role       = aws_iam_role.ebs_csi_driver.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEBSCSIDriverPolicyV2"
+}
+
+resource "aws_iam_policy" "aws_load_balancer_controller" {
+  name_prefix = "${var.name}-lbc-"
+  description = "Permissions for the AWS Load Balancer Controller"
+  policy      = file("${path.module}/policies/aws-load-balancer-controller-v2.14.1.json")
+}
+
+resource "aws_iam_role" "aws_load_balancer_controller" {
+  name_prefix        = "${var.name}-lbc-"
+  assume_role_policy = data.aws_iam_policy_document.pod_identity_assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "aws_load_balancer_controller" {
+  role       = aws_iam_role.aws_load_balancer_controller.name
+  policy_arn = aws_iam_policy.aws_load_balancer_controller.arn
 }
 
 module "vpc" {
@@ -98,11 +114,9 @@ module "eks" {
     vpc-cni = {
       most_recent = true
     }
-
     eks-pod-identity-agent = {
       most_recent = true
     }
-
     aws-ebs-csi-driver = {
       most_recent = true
       pod_identity_association = [{
@@ -125,4 +139,11 @@ module "eks" {
       desired_size = var.node_desired_size
     }
   }
+}
+
+resource "aws_eks_pod_identity_association" "aws_load_balancer_controller" {
+  cluster_name    = module.eks.cluster_name
+  namespace       = "kube-system"
+  service_account = "aws-load-balancer-controller"
+  role_arn        = aws_iam_role.aws_load_balancer_controller.arn
 }
