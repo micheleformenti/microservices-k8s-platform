@@ -81,6 +81,12 @@ frontend:
   service:
     type: NodePort
     nodePort: 30010
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    path: /
+    pathType: Prefix
   resources:
     requests:
       cpu: 100m
