@@ -1,83 +1,109 @@
-<mxfile host="app.diagrams.net" agent="Codex" version="30.0.4">
+<mxfile host="Electron" agent="Codex">
   <diagram id="ci-cd-gitops-flow" name="CI/CD and GitOps Flow">
-    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="900" math="0" shadow="0">
+    <mxGraphModel dx="1157" dy="993" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="900" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-
-        <mxCell id="title" value="CI/CD and GitOps Image Delivery" style="text;html=1;align=center;verticalAlign=middle;fontSize=26;fontStyle=1;fontColor=#1F2937;" vertex="1" parent="1">
-          <mxGeometry x="550" y="25" width="700" height="40" as="geometry" />
+        <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=26;fontStyle=1;fontColor=#1F2937;" value="CI/CD and GitOps Image Delivery" vertex="1">
+          <mxGeometry height="40" width="700" x="550" y="25" as="geometry" />
         </mxCell>
-        <mxCell id="subtitle" value="Path-aware validation, immutable images, and reviewed deployment updates" style="text;html=1;align=center;verticalAlign=middle;fontSize=15;fontColor=#6B7280;" vertex="1" parent="1">
-          <mxGeometry x="500" y="65" width="800" height="30" as="geometry" />
+        <mxCell id="subtitle" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=15;fontColor=#6B7280;" value="Path-aware validation, immutable images, and reviewed deployment updates" vertex="1">
+          <mxGeometry height="30" width="800" x="500" y="65" as="geometry" />
         </mxCell>
-
-        <mxCell id="actions-boundary" value="GitHub Actions" style="swimlane;html=1;rounded=1;startSize=34;horizontal=1;fontSize=16;fontStyle=1;fillColor=#EFF6FF;strokeColor=#2563EB;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="40" y="120" width="1720" height="330" as="geometry" />
+        <mxCell id="actions-boundary" parent="1" style="swimlane;html=1;rounded=1;startSize=34;horizontal=1;fontSize=16;fontStyle=1;fillColor=#EFF6FF;strokeColor=#2563EB;dashed=1;" value="GitHub Actions" vertex="1">
+          <mxGeometry height="330" width="1720" x="40" y="120" as="geometry" />
         </mxCell>
-        <mxCell id="change" value="Git change&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;pull request or push to main&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#F3F4F6;strokeColor=#4B5563;" vertex="1" parent="actions-boundary">
-          <mxGeometry x="30" y="105" width="190" height="75" as="geometry" />
+        <mxCell id="change" parent="actions-boundary" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#F3F4F6;strokeColor=#4B5563;" value="Git change&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;pull request or push to main&lt;/font&gt;" vertex="1">
+          <mxGeometry height="75" width="190" x="30" y="105" as="geometry" />
         </mxCell>
-        <mxCell id="detect" value="Detect changes&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;paths + service matrix&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#DBEAFE;strokeColor=#2563EB;" vertex="1" parent="actions-boundary">
-          <mxGeometry x="260" y="105" width="190" height="75" as="geometry" />
+        <mxCell id="detect" parent="actions-boundary" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#DBEAFE;strokeColor=#2563EB;" value="Detect changes&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;paths + service matrix&lt;/font&gt;" vertex="1">
+          <mxGeometry height="75" width="190" x="260" y="105" as="geometry" />
         </mxCell>
-        <mxCell id="validate" value="Validation and tests&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;Kubernetes · Helm · Terraform&lt;br&gt;Go · .NET&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#EDE9FE;strokeColor=#7C3AED;" vertex="1" parent="actions-boundary">
-          <mxGeometry x="490" y="90" width="220" height="105" as="geometry" />
+        <mxCell id="validate" parent="actions-boundary" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#EDE9FE;strokeColor=#7C3AED;" value="Validation and tests&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;Kubernetes · Helm · Terraform&lt;br&gt;Go · .NET&lt;/font&gt;" vertex="1">
+          <mxGeometry height="105" width="220" x="490" y="90" as="geometry" />
         </mxCell>
-        <mxCell id="build" value="Build affected images&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;Docker Buildx matrix&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#DBEAFE;strokeColor=#2563EB;" vertex="1" parent="actions-boundary">
-          <mxGeometry x="750" y="105" width="210" height="75" as="geometry" />
+        <mxCell id="build" parent="actions-boundary" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#DBEAFE;strokeColor=#2563EB;" value="Build affected images&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;Docker Buildx matrix&lt;/font&gt;" vertex="1">
+          <mxGeometry height="75" width="210" x="750" y="105" as="geometry" />
         </mxCell>
-        <mxCell id="main-check" value="main?" style="rhombus;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#FEF3C7;strokeColor=#D97706;" vertex="1" parent="actions-boundary">
-          <mxGeometry x="1010" y="95" width="100" height="95" as="geometry" />
+        <mxCell id="main-check" parent="actions-boundary" style="rhombus;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#FEF3C7;strokeColor=#D97706;" value="main?" vertex="1">
+          <mxGeometry height="95" width="100" x="1010" y="95" as="geometry" />
         </mxCell>
-        <mxCell id="pr-result" value="PR verification&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;no image publication&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontStyle=1;fillColor=#F3F4F6;strokeColor=#4B5563;" vertex="1" parent="actions-boundary">
-          <mxGeometry x="1160" y="45" width="190" height="70" as="geometry" />
+        <mxCell id="pr-result" parent="actions-boundary" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontStyle=1;fillColor=#F3F4F6;strokeColor=#4B5563;" value="PR verification&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;no image publication&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="190" x="1160" y="45" as="geometry" />
         </mxCell>
-        <mxCell id="ghcr" value="Publish to GHCR&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;commit SHA + main tags&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fontSize=14;fontStyle=1;fillColor=#EDE9FE;strokeColor=#7C3AED;" vertex="1" parent="actions-boundary">
-          <mxGeometry x="1160" y="175" width="190" height="90" as="geometry" />
+        <mxCell id="ghcr" parent="actions-boundary" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fontSize=14;fontStyle=1;fillColor=#EDE9FE;strokeColor=#7C3AED;" value="Publish to GHCR&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;commit SHA + main tags&lt;/font&gt;" vertex="1">
+          <mxGeometry height="90" width="190" x="1160" y="175" as="geometry" />
         </mxCell>
-        <mxCell id="update-values" value="Update Helm values&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;local + EKS SHA tags&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontStyle=1;fillColor=#FEF3C7;strokeColor=#D97706;" vertex="1" parent="actions-boundary">
-          <mxGeometry x="1400" y="175" width="190" height="75" as="geometry" />
+        <mxCell id="update-values" parent="actions-boundary" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontStyle=1;fillColor=#FEF3C7;strokeColor=#D97706;" value="Update Helm values&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;local + EKS SHA tags&lt;/font&gt;" vertex="1">
+          <mxGeometry height="75" width="190" x="1400" y="182.5" as="geometry" />
         </mxCell>
-        <mxCell id="render" value="Validate Helm renders" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontStyle=1;fillColor=#EDE9FE;strokeColor=#7C3AED;" vertex="1" parent="actions-boundary">
-          <mxGeometry x="1400" y="70" width="190" height="60" as="geometry" />
+        <mxCell id="render" parent="actions-boundary" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontStyle=1;fillColor=#EDE9FE;strokeColor=#7C3AED;" value="Validate Helm renders" vertex="1">
+          <mxGeometry height="60" width="190" x="1400" y="70" as="geometry" />
         </mxCell>
-
-        <mxCell id="gitops-boundary" value="GitOps deployment" style="swimlane;html=1;rounded=1;startSize=34;horizontal=1;fontSize=16;fontStyle=1;fillColor=#F0FDF4;strokeColor=#16A34A;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="330" y="500" width="1100" height="300" as="geometry" />
+        <mxCell id="gitops-boundary" parent="1" style="swimlane;html=1;rounded=1;startSize=34;horizontal=1;fontSize=16;fontStyle=1;fillColor=#F0FDF4;strokeColor=#16A34A;dashed=1;" value="GitOps deployment" vertex="1">
+          <mxGeometry height="300" width="1100" x="330" y="500" as="geometry" />
         </mxCell>
-        <mxCell id="tag-pr" value="Automated tag-update PR&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;reviewed change to Git&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#FEF3C7;strokeColor=#D97706;" vertex="1" parent="gitops-boundary">
-          <mxGeometry x="850" y="80" width="210" height="80" as="geometry" />
+        <mxCell id="tag-pr" parent="gitops-boundary" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#FEF3C7;strokeColor=#D97706;" value="Automated tag-update PR&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;reviewed change to Git&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="210" x="850" y="80" as="geometry" />
         </mxCell>
-        <mxCell id="merge" value="Merge to main&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;Git is source of truth&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#F3F4F6;strokeColor=#4B5563;" vertex="1" parent="gitops-boundary">
-          <mxGeometry x="590" y="80" width="200" height="80" as="geometry" />
+        <mxCell id="merge" parent="gitops-boundary" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#F3F4F6;strokeColor=#4B5563;" value="Merge to main&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;Git is source of truth&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="200" x="590" y="80" as="geometry" />
         </mxCell>
-        <mxCell id="argocd" value="Argo CD sync&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;prune + self-heal&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#DBEAFE;strokeColor=#2563EB;" vertex="1" parent="gitops-boundary">
-          <mxGeometry x="340" y="80" width="190" height="80" as="geometry" />
+        <mxCell id="argocd" parent="gitops-boundary" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#DBEAFE;strokeColor=#2563EB;" value="Argo CD sync&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;prune + self-heal&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="190" x="340" y="80" as="geometry" />
         </mxCell>
-        <mxCell id="clusters" value="Kubernetes workloads&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;local + EKS pull immutable SHA&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#DCFCE7;strokeColor=#16A34A;" vertex="1" parent="gitops-boundary">
-          <mxGeometry x="80" y="80" width="200" height="80" as="geometry" />
+        <mxCell id="clusters" parent="gitops-boundary" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#DCFCE7;strokeColor=#16A34A;" value="Kubernetes workloads&lt;br&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;local + EKS pull immutable SHA&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="200" x="80" y="80" as="geometry" />
         </mxCell>
-
-        <mxCell id="e-change-detect" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#2563EB;" edge="1" parent="1" source="change" target="detect"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="e-detect-validate" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#2563EB;" edge="1" parent="1" source="detect" target="validate"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="e-validate-build" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#2563EB;" edge="1" parent="1" source="validate" target="build"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="e-build-check" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#2563EB;" edge="1" parent="1" source="build" target="main-check"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="e-check-pr" value="no" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#4B5563;" edge="1" parent="1" source="main-check" target="pr-result"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="e-check-ghcr" value="yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#7C3AED;" edge="1" parent="1" source="main-check" target="ghcr"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="e-ghcr-update" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#D97706;" edge="1" parent="1" source="ghcr" target="update-values"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="e-update-render" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#7C3AED;" edge="1" parent="1" source="update-values" target="render"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="e-render-pr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#D97706;exitX=1;exitY=0.5;exitPerimeter=1;entryX=1;entryY=0.5;entryPerimeter=1;" edge="1" parent="1" source="render" target="tag-pr">
+        <mxCell id="e-change-detect" edge="1" parent="1" source="change" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#2563EB;" target="detect">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-detect-validate" edge="1" parent="1" source="detect" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#2563EB;" target="validate">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-validate-build" edge="1" parent="1" source="validate" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#2563EB;" target="build">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-build-check" edge="1" parent="1" source="build" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#2563EB;" target="main-check">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-check-pr" edge="1" parent="1" source="main-check" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#4B5563;" target="pr-result" value="no">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-check-ghcr" edge="1" parent="1" source="main-check" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#7C3AED;" target="ghcr" value="yes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ghcr-update" edge="1" parent="1" source="ghcr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#D97706;" target="update-values">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-update-render" edge="1" parent="1" source="update-values" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#7C3AED;" target="render">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-render-pr" edge="1" parent="1" source="render" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#D97706;exitX=1;exitY=0.5;exitPerimeter=1;entryX=1;entryY=0.5;entryPerimeter=1;" target="tag-pr">
           <mxGeometry relative="1" as="geometry">
-            <Array as="points"><mxPoint x="1700" y="250" /><mxPoint x="1700" y="655" /></Array>
+            <Array as="points">
+              <mxPoint x="1700" y="220" />
+              <mxPoint x="1700" y="620" />
+            </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="e-pr-merge" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#D97706;" edge="1" parent="1" source="tag-pr" target="merge"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="e-merge-argo" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#2563EB;" edge="1" parent="1" source="merge" target="argocd"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="e-argo-clusters" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#16A34A;" edge="1" parent="1" source="argocd" target="clusters"><mxGeometry relative="1" as="geometry" /></mxCell>
-        <mxCell id="e-ghcr-clusters" value="pull" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#7C3AED;exitX=0.5;exitY=1;entryX=0.5;entryY=1;" edge="1" parent="1" source="ghcr" target="clusters">
+        <mxCell id="e-pr-merge" edge="1" parent="1" source="tag-pr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#D97706;" target="merge">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-merge-argo" edge="1" parent="1" source="merge" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#2563EB;" target="argocd">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-argo-clusters" edge="1" parent="1" source="argocd" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#16A34A;" target="clusters">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ghcr-clusters" edge="1" parent="1" source="ghcr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#7C3AED;exitX=0.5;exitY=1;" value="pull">
           <mxGeometry relative="1" as="geometry">
-            <Array as="points"><mxPoint x="1255" y="840" /><mxPoint x="510" y="840" /></Array>
+            <Array as="points">
+              <mxPoint x="1255" y="385" />
+              <mxPoint x="1255" y="470" />
+              <mxPoint x="510" y="470" />
+            </Array>
+            <mxPoint x="510" y="580" as="targetPoint" />
           </mxGeometry>
         </mxCell>
       </root>
