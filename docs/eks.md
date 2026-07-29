@@ -9,22 +9,9 @@ and Route 53 records managed by ExternalDNS.
 
 ## Architecture
 
-```text
-GitHub repository (main)
-        |
-        | watched by Argo CD
-        v
-EKS cluster
-  |-- AWS platform chart
-  |     |-- gp3 StorageClass
-  |     |-- AWS Load Balancer Controller
-  |     `-- ExternalDNS
-  |
-  `-- application chart
-        |-- microservices
-        |-- Redis StatefulSet -> PVC -> EBS
-        `-- frontend Ingress -> ALB -> HTTPS + Route 53
-```
+![EKS platform architecture](diagrams/eks-platform-architecture.svg)
+
+[Editable draw.io source](diagrams/eks-platform-architecture.drawio)
 
 Worker nodes run in private subnets across two Availability Zones and use NAT
 for outbound access. Public subnets host internet-facing load balancers. The EKS
