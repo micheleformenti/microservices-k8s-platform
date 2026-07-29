@@ -13,6 +13,16 @@ output "region" {
   value       = var.aws_region
 }
 
+output "application_domain_name" {
+  description = "Public DNS name used for the EKS application."
+  value       = var.application_domain_name
+}
+
+output "application_certificate_arn" {
+  description = "ARN of the validated ACM certificate for the application."
+  value       = aws_acm_certificate_validation.application.certificate_arn
+}
+
 output "vpc_id" {
   description = "VPC ID."
   value       = module.vpc.vpc_id

@@ -10,6 +10,18 @@ variable "aws_region" {
   default     = "eu-central-1"
 }
 
+variable "hosted_zone_name" {
+  description = "Name of the existing public Route 53 hosted zone."
+  type        = string
+  default     = "aws.micheleformenti.com"
+}
+
+variable "application_domain_name" {
+  description = "Public DNS name used for the EKS application."
+  type        = string
+  default     = "eks-demo.aws.micheleformenti.com"
+}
+
 variable "kubernetes_version" {
   description = "EKS Kubernetes minor version. Use a version in standard support to avoid extended support fees."
   type        = string
