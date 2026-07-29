@@ -18,6 +18,7 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 - Container image build and publishing
 - Terraform-managed AKS cluster
 - EKS storage integration
+- EKS ingress, HTTPS, and automated DNS
 - Observability and security hardening
 
 ## Planned Structure
@@ -132,30 +133,40 @@ platform resources:
 - [x] Validate persistence across pod restarts
 - [x] Document the EKS storage tradeoffs
 
-### 11. Observability
+### 11. EKS Ingress, HTTPS, and DNS
+
+- [x] Install the AWS Load Balancer Controller through the AWS platform chart
+- [x] Expose the frontend through an internet-facing Application Load Balancer
+- [x] Provision and validate an ACM certificate with Terraform
+- [x] Redirect HTTP traffic to HTTPS
+- [x] Install ExternalDNS with EKS Pod Identity
+- [x] Create and reconcile Route 53 records automatically
+- [x] Document validation and teardown order
+
+### 12. Observability
 
 - [ ] Add metrics and dashboards
 - [ ] Add logging approach
 - [ ] Document troubleshooting workflow
 
-### 12. Security Hardening
+### 13. Security Hardening
 
 - [ ] Add workload security defaults
 - [ ] Add secret management approach
 - [ ] Add security scanning
 
-### 13. AKS Platform
+### 14. AKS Platform
 
 - [ ] Provision an AKS environment
 - [ ] Document AKS creation and teardown
 
-### 14. Deploy to AKS with GitOps
+### 15. Deploy to AKS with GitOps
 
 - [ ] Bootstrap Argo CD on AKS
 - [ ] Deploy the workload to AKS through GitOps
 - [ ] Document EKS and AKS differences
 
-### 15. Portfolio Documentation
+### 16. Portfolio Documentation
 
 - [ ] Add architecture diagrams
 - [ ] Add screenshots
