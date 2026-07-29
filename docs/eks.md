@@ -9,22 +9,7 @@ and Route 53 records managed by ExternalDNS.
 
 ## Architecture
 
-```text
-GitHub repository (main)
-        |
-        | watched by Argo CD
-        v
-EKS cluster
-  |-- AWS platform chart
-  |     |-- gp3 StorageClass
-  |     |-- AWS Load Balancer Controller
-  |     `-- ExternalDNS
-  |
-  `-- application chart
-        |-- microservices
-        |-- Redis StatefulSet -> PVC -> EBS
-        `-- frontend Ingress -> ALB -> HTTPS + Route 53
-```
+![EKS platform architecture](diagrams/eks-platform-architecture.svg)
 
 Worker nodes run in private subnets across two Availability Zones and use NAT
 for outbound access. Public subnets host internet-facing load balancers. The EKS
@@ -63,6 +48,8 @@ Demo defaults use two `t3.medium` Spot nodes and one shared NAT Gateway. This
 reduces cost but is less resilient than on-demand capacity and one NAT Gateway
 per Availability Zone. The environment is intended to be destroyed when it is
 not being demonstrated.
+
+![EKS infrastructure and networking](diagrams/eks-network-architecture.svg)
 
 ## Provision the Cluster
 

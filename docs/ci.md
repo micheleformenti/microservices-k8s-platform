@@ -6,6 +6,10 @@ tag update pull requests.
 
 It runs for pull requests and pushes to `main`.
 
+## Delivery Flow
+
+![CI/CD and GitOps image delivery](diagrams/ci-cd-gitops-flow.svg)
+
 ## Path-Aware Validation
 
 `detect-changes` prevents unrelated jobs from running while workflow changes

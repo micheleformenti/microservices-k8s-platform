@@ -16,6 +16,15 @@ Production-inspired platform engineering project focused on Kubernetes, GitOps, 
 | ⏳ | Security hardening | Planned |
 | ⏳ | AKS deployment | Planned |
 
+## Architecture
+
+<p align="center">
+  <img src="docs/diagrams/eks-platform-architecture.svg" alt="EKS platform architecture" width="900">
+</p>
+
+The diagram shows the current AWS implementation. See the
+[AWS EKS platform guide](docs/eks.md) for deployment details and tradeoffs.
+
 ## Stack
 
 - Kubernetes
