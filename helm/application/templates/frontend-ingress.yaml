@@ -13,7 +13,10 @@ metadata:
 spec:
   ingressClassName: {{ .Values.frontend.ingress.className }}
   rules:
-    - http:
+    - {{- with .Values.frontend.ingress.host }}
+      host: {{ . | quote }}
+      {{- end }}
+      http:
         paths:
           - path: {{ .Values.frontend.ingress.path }}
             pathType: {{ .Values.frontend.ingress.pathType }}

@@ -196,6 +196,7 @@ jobs:
       - name: Build AWS platform Helm dependencies
         run: |
           helm repo add eks https://aws.github.io/eks-charts
+          helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
           helm dependency build ./helm/platform/aws
 
       - name: Lint AWS platform Helm chart

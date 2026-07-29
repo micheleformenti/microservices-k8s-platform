@@ -14,3 +14,17 @@ aws-load-balancer-controller:
   serviceAccount:
     create: true
     name: aws-load-balancer-controller
+
+external-dns:
+  provider:
+    name: aws
+  sources:
+    - ingress
+  domainFilters:
+    - aws.micheleformenti.com
+  policy: sync
+  registry: txt
+  txtOwnerId: microservices-platform-eks
+  serviceAccount:
+    create: true
+    name: external-dns

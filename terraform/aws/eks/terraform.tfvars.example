@@ -2,6 +2,9 @@ name               = "microservices-platform-eks"
 aws_region         = "eu-central-1"
 kubernetes_version = "1.36"
 
+hosted_zone_name       = "aws.micheleformenti.com"
+application_domain_name = "eks-demo.aws.micheleformenti.com"
+
 # For better security, replace this with your own public IP as /32.
 cluster_endpoint_public_access_cidrs = ["0.0.0.0/0"]
 
