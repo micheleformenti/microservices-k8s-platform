@@ -34,9 +34,17 @@ kubeconform -strict -summary manifests
 helm lint ./helm/application
 helm template microservices-platform ./helm/application --namespace microservices-platform > rendered-application.yaml
 kubeconform -strict -summary rendered-application.yaml
+helm repo add eks https://aws.github.io/eks-charts
+helm dependency build ./helm/platform/aws
 helm lint ./helm/platform/aws
 helm template aws-platform ./helm/platform/aws --namespace kube-system > rendered-aws-platform.yaml
-kubeconform -strict -summary rendered-aws-platform.yaml
+kubeconform \
+  -strict \
+  -summary \
+  -schema-location default \
+  -schema-location \
+  'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
+  rendered-aws-platform.yaml
 kubeconform \
   -strict \
   -summary \
@@ -59,12 +67,15 @@ It runs:
 
 ```sh
 terraform fmt -check -recursive terraform/aws
-terraform -chdir=terraform/aws init -backend=false
-terraform -chdir=terraform/aws validate
+terraform -chdir=terraform/aws/bootstrap init -backend=false
+terraform -chdir=terraform/aws/bootstrap validate
+terraform -chdir=terraform/aws/eks init -backend=false
+terraform -chdir=terraform/aws/eks validate
 ```
 
-The backend is disabled during CI initialization so the workflow validates the
-configuration without requiring remote state or AWS credentials.
+Both independent Terraform roots are validated. The backend is disabled during
+CI initialization so the workflow does not access remote state or require AWS
+credentials.
 
 ## Go Services
 

@@ -197,5 +197,5 @@ kubectl delete namespace argocd
 If the EKS environment is no longer needed, destroy it with Terraform:
 
 ```sh
-terraform -chdir=terraform/aws destroy
+terraform -chdir=terraform/aws/eks destroy
 ```

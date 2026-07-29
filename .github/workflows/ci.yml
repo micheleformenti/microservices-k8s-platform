@@ -244,11 +244,17 @@ jobs:
       - name: Check Terraform formatting
         run: terraform fmt -check -recursive terraform/aws
 
-      - name: Initialize Terraform
-        run: terraform -chdir=terraform/aws init -backend=false
+      - name: Initialize Terraform bootstrap
+        run: terraform -chdir=terraform/aws/bootstrap init -backend=false
 
-      - name: Validate Terraform
-        run: terraform -chdir=terraform/aws validate
+      - name: Validate Terraform bootstrap
+        run: terraform -chdir=terraform/aws/bootstrap validate
+
+      - name: Initialize Terraform EKS
+        run: terraform -chdir=terraform/aws/eks init -backend=false
+
+      - name: Validate Terraform EKS
+        run: terraform -chdir=terraform/aws/eks validate
 
   go-tests:
     name: Go tests

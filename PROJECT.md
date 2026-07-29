@@ -35,6 +35,8 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 │   └── applications/
 ├── terraform/
 │   └── aws/
+│       ├── bootstrap/
+│       └── eks/
 ├── docs/
 ├── .github/
 ├── LICENSE
@@ -88,6 +90,7 @@ platform resources:
 
 ### 6. AWS EKS Infrastructure
 
+- [x] Bootstrap encrypted S3 remote state with state locking
 - [x] Add Terraform code for the EKS environment
 - [x] Use private worker subnets with NAT egress
 - [x] Pin Terraform module versions

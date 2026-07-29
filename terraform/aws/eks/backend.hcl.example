@@ -1,0 +1,5 @@
+bucket       = "microservices-platform-tfstate-ACCOUNT_ID"
+key          = "microservices-platform/eks/terraform.tfstate"
+region       = "eu-central-1"
+encrypt      = true
+use_lockfile = true
