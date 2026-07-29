@@ -49,6 +49,8 @@ reduces cost but is less resilient than on-demand capacity and one NAT Gateway
 per Availability Zone. The environment is intended to be destroyed when it is
 not being demonstrated.
 
+![EKS infrastructure and networking](diagrams/eks-network-architecture.svg)
+
 ## Provision the Cluster
 
 ### Remote state

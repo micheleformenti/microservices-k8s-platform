@@ -168,6 +168,6 @@ platform resources:
 
 ### 16. Portfolio Documentation
 
-- [ ] Add architecture diagrams
+- [x] Add architecture diagrams
 - [ ] Add screenshots
 - [ ] Document design decisions and tradeoffs
