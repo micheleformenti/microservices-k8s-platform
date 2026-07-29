@@ -1,55 +1,55 @@
 adService:
   image:
     repository: ghcr.io/micheleformenti/adservice
-    tag: a914c1a370aa2e7388310977ee0d3a9bf2645e87
+    tag: c9fc7cba34b040a52c50ec1036563bd502595f5a
     pullPolicy: IfNotPresent
 cartService:
   image:
     repository: ghcr.io/micheleformenti/cartservice
-    tag: a914c1a370aa2e7388310977ee0d3a9bf2645e87
+    tag: c9fc7cba34b040a52c50ec1036563bd502595f5a
     pullPolicy: IfNotPresent
 checkoutService:
   image:
     repository: ghcr.io/micheleformenti/checkoutservice
-    tag: a914c1a370aa2e7388310977ee0d3a9bf2645e87
+    tag: c9fc7cba34b040a52c50ec1036563bd502595f5a
     pullPolicy: IfNotPresent
 currencyService:
   image:
     repository: ghcr.io/micheleformenti/currencyservice
-    tag: a914c1a370aa2e7388310977ee0d3a9bf2645e87
+    tag: c9fc7cba34b040a52c50ec1036563bd502595f5a
     pullPolicy: IfNotPresent
 emailService:
   image:
     repository: ghcr.io/micheleformenti/emailservice
-    tag: a914c1a370aa2e7388310977ee0d3a9bf2645e87
+    tag: c9fc7cba34b040a52c50ec1036563bd502595f5a
     pullPolicy: IfNotPresent
 frontend:
   image:
     repository: ghcr.io/micheleformenti/frontend
-    tag: a914c1a370aa2e7388310977ee0d3a9bf2645e87
+    tag: c9fc7cba34b040a52c50ec1036563bd502595f5a
     pullPolicy: IfNotPresent
 loadGenerator:
   image:
     repository: ghcr.io/micheleformenti/loadgenerator
-    tag: a914c1a370aa2e7388310977ee0d3a9bf2645e87
+    tag: c9fc7cba34b040a52c50ec1036563bd502595f5a
     pullPolicy: IfNotPresent
 paymentService:
   image:
     repository: ghcr.io/micheleformenti/paymentservice
-    tag: a914c1a370aa2e7388310977ee0d3a9bf2645e87
+    tag: c9fc7cba34b040a52c50ec1036563bd502595f5a
     pullPolicy: IfNotPresent
 productCatalogService:
   image:
     repository: ghcr.io/micheleformenti/productcatalogservice
-    tag: a914c1a370aa2e7388310977ee0d3a9bf2645e87
+    tag: c9fc7cba34b040a52c50ec1036563bd502595f5a
     pullPolicy: IfNotPresent
 recommendationService:
   image:
     repository: ghcr.io/micheleformenti/recommendationservice
-    tag: a914c1a370aa2e7388310977ee0d3a9bf2645e87
+    tag: c9fc7cba34b040a52c50ec1036563bd502595f5a
     pullPolicy: IfNotPresent
 shippingService:
   image:
     repository: ghcr.io/micheleformenti/shippingservice
-    tag: a914c1a370aa2e7388310977ee0d3a9bf2645e87
+    tag: c9fc7cba34b040a52c50ec1036563bd502595f5a
     pullPolicy: IfNotPresent
