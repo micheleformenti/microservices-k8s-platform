@@ -11,8 +11,6 @@ and Route 53 records managed by ExternalDNS.
 
 ![EKS platform architecture](diagrams/eks-platform-architecture.svg)
 
-[Editable draw.io source](diagrams/eks-platform-architecture.drawio)
-
 Worker nodes run in private subnets across two Availability Zones and use NAT
 for outbound access. Public subnets host internet-facing load balancers. The EKS
 API is public but restricted to a configured CIDR.

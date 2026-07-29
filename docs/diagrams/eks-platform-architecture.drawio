@@ -10,11 +10,11 @@
         <mxCell id="subtitle" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=15;fontColor=#6B7280;" value="CI/CD, GitOps, and AWS EKS runtime" vertex="1">
           <mxGeometry height="30" width="500" x="550" y="60" as="geometry" />
         </mxCell>
-        <mxCell id="developer" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=14;fontStyle=1;" value="Developer" vertex="1">
-          <mxGeometry height="100" width="70" x="40" y="180" as="geometry" />
+        <mxCell id="developer" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontStyle=1;fillColor=#F3F4F6;strokeColor=#4B5563;arcSize=20;" value="Developer" vertex="1">
+          <mxGeometry height="55" width="100" x="20" y="205" as="geometry" />
         </mxCell>
-        <mxCell id="user" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fontSize=14;fontStyle=1;" value="User" vertex="1">
-          <mxGeometry height="100" width="70" x="40" y="700" as="geometry" />
+        <mxCell id="user" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontStyle=1;fillColor=#F3F4F6;strokeColor=#4B5563;arcSize=20;" value="User" vertex="1">
+          <mxGeometry height="55" width="100" x="20" y="725" as="geometry" />
         </mxCell>
         <mxCell id="github-boundary" parent="1" style="swimlane;html=1;rounded=1;startSize=34;horizontal=1;fontSize=16;fontStyle=1;fillColor=#F3F4F6;strokeColor=#6B7280;dashed=1;" value="GitHub" vertex="1">
           <mxGeometry height="390" width="420" x="150" y="110" as="geometry" />
