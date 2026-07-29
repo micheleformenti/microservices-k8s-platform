@@ -90,7 +90,7 @@ platform resources:
 
 ### 6. AWS EKS Infrastructure
 
-- [ ] Bootstrap encrypted S3 remote state with state locking
+- [x] Bootstrap encrypted S3 remote state with state locking
 - [x] Add Terraform code for the EKS environment
 - [x] Use private worker subnets with NAT egress
 - [x] Pin Terraform module versions

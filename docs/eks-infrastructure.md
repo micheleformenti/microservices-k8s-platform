@@ -251,6 +251,7 @@ created.
 
 Tested successfully:
 
+- S3 remote state, versioning, and state locking were verified
 - Terraform apply completed
 - kubeconfig was configured with AWS CLI
 - `kubectl` connected to the EKS cluster
