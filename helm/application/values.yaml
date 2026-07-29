@@ -84,6 +84,7 @@ frontend:
   ingress:
     enabled: false
     className: ""
+    host: ""
     annotations: {}
     path: /
     pathType: Prefix
