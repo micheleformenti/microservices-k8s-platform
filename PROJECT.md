@@ -145,9 +145,16 @@ platform resources:
 
 ### 12. Observability
 
-- [ ] Add metrics and dashboards
-- [ ] Add logging approach
-- [ ] Document troubleshooting workflow
+- [ ] Create `helm/observability` using a fixed `kube-prometheus-stack` version
+- [ ] Deploy it through Argo CD in a `monitoring` namespace
+- [ ] Run one Prometheus replica with 24-hour retention and access Grafana
+      through port forwarding
+- [ ] Check dashboards for node and pod CPU and memory, restarts, deployment
+      replicas, and PVC capacity
+- [ ] Add alerts for unavailable deployments, repeated restarts, failed targets,
+      and low PVC capacity
+- [ ] Check how much CPU and memory the monitoring pods use
+- [ ] Add Helm linting and rendering to CI and document how to troubleshoot issues
 
 ### 13. Security Hardening
 
