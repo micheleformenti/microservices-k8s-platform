@@ -1,0 +1,11 @@
+apiVersion: v2
+name: microservices-platform-observability
+description: Observability stack for the microservices platform
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+
+dependencies:
+  - name: kube-prometheus-stack
+    version: 88.0.1
+    repository: https://prometheus-community.github.io/helm-charts
