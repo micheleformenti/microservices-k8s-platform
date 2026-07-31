@@ -214,6 +214,27 @@ jobs:
             -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
             rendered-aws-platform.yaml
 
+      - name: Build observability Helm dependencies
+        run: |
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm dependency build ./helm/observability
+
+      - name: Lint observability Helm chart
+        run: helm lint ./helm/observability
+
+      - name: Render observability Helm chart
+        run: helm template observability ./helm/observability --namespace monitoring --include-crds > rendered-observability.yaml
+
+      - name: Validate rendered observability manifests
+        run: |
+          kubeconform \
+            -strict \
+            -summary \
+            -skip CustomResourceDefinition \
+            -schema-location default \
+            -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
+            rendered-observability.yaml
+
       - name: Validate Argo CD applications
         run: |
           kubeconform \

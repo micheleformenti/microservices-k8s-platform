@@ -13,3 +13,4 @@ override.tf.json
 
 # Downloaded Helm dependencies are rebuilt from Chart.lock.
 helm/platform/aws/charts/
+helm/observability/charts/
