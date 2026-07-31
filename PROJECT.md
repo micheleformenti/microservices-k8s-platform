@@ -156,24 +156,29 @@ platform resources:
 - [ ] Check how much CPU and memory the monitoring pods use
 - [ ] Add Helm linting and rendering to CI and document how to troubleshoot issues
 
-### 13. Security Hardening
+### 13. Pod and Node Autoscaling
+
+- [ ] Add Horizontal Pod Autoscaler
+- [ ] Add Cluster Autoscaler
+
+### 14. Security Hardening
 
 - [ ] Add workload security defaults
 - [ ] Add secret management approach
 - [ ] Add security scanning
 
-### 14. AKS Platform
+### 15. AKS Platform
 
 - [ ] Provision an AKS environment
 - [ ] Document AKS creation and teardown
 
-### 15. Deploy to AKS with GitOps
+### 16. Deploy to AKS with GitOps
 
 - [ ] Bootstrap Argo CD on AKS
 - [ ] Deploy the workload to AKS through GitOps
 - [ ] Document EKS and AKS differences
 
-### 16. Portfolio Documentation
+### 17. Portfolio Documentation
 
 - [x] Add architecture diagrams
 - [ ] Add screenshots
