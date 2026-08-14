@@ -12,3 +12,9 @@ dependencies:
   - name: external-dns
     version: 1.20.0
     repository: https://kubernetes-sigs.github.io/external-dns/
+  - name: metrics-server
+    version: 3.13.1
+    repository: https://kubernetes-sigs.github.io/metrics-server/
+  - name: cluster-autoscaler
+    version: 9.59.0
+    repository: https://kubernetes.github.io/autoscaler

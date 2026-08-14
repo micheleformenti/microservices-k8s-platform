@@ -74,6 +74,11 @@ emailService:
 
 frontend:
   replicas: 1
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 60
   image:
     repository: frontend
     tag: "latest"

@@ -197,6 +197,8 @@ jobs:
         run: |
           helm repo add eks https://aws.github.io/eks-charts
           helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
+          helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+          helm repo add autoscaler https://kubernetes.github.io/autoscaler
           helm dependency build ./helm/platform/aws
 
       - name: Lint AWS platform Helm chart

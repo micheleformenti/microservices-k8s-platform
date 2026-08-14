@@ -28,3 +28,15 @@ external-dns:
   serviceAccount:
     create: true
     name: external-dns
+
+cluster-autoscaler:
+  cloudProvider: aws
+  awsRegion: eu-central-1
+  autoDiscovery:
+    clusterName: microservices-platform-eks
+  image:
+    tag: v1.36.1
+  rbac:
+    serviceAccount:
+      create: true
+      name: cluster-autoscaler
