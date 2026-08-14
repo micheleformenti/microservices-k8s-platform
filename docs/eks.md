@@ -1,11 +1,11 @@
 # AWS EKS Platform
 
-This guide covers the complete AWS deployment: Terraform infrastructure,
-Argo CD delivery, persistent Redis storage, and public HTTPS access.
+This guide covers Terraform infrastructure, GitOps delivery, persistent Redis
+storage, autoscaling, and public HTTPS access on EKS.
 
 The platform was validated end to end on EKS, including remote Terraform state,
 GitOps reconciliation, EBS persistence, an Application Load Balancer, ACM TLS,
-and Route 53 records managed by ExternalDNS.
+Route 53 records managed by ExternalDNS, and pod and node autoscaling.
 
 ## Architecture
 
@@ -34,6 +34,8 @@ The controllers manage resources discovered at runtime:
 - AWS Load Balancer Controller: Ingress to ALB
 - ExternalDNS: Ingress hostname to Route 53 records
 - EBS CSI driver: PVC to EBS volume
+- Metrics Server: pod resource metrics for the HPA
+- Cluster Autoscaler: pending pods to managed node group capacity
 
 This avoids feeding dynamic values such as the ALB hostname back into
 Terraform.
@@ -44,10 +46,11 @@ The configuration uses pinned community VPC and EKS Terraform modules. This
 keeps the infrastructure reproducible while the project remains focused on
 Kubernetes platform delivery.
 
-Demo defaults use two `t3.medium` Spot nodes and one shared NAT Gateway. This
-reduces cost but is less resilient than on-demand capacity and one NAT Gateway
-per Availability Zone. The environment is intended to be destroyed when it is
-not being demonstrated.
+Demo defaults start with two `t3.medium` Spot nodes and allow the managed node
+group to scale between one and four nodes. One shared NAT Gateway reduces cost
+but is less resilient than on-demand capacity and one NAT Gateway per
+Availability Zone. The environment is intended to be destroyed when it is not
+being demonstrated.
 
 ![EKS infrastructure and networking](diagrams/eks-network-architecture.svg)
 
@@ -153,6 +156,53 @@ This demonstrates persistence, not highly available Redis. EBS is
 Availability-Zone-bound; production would require Redis replication or a
 managed multi-AZ service.
 
+## Pod and Node Autoscaling
+
+Metrics Server supplies CPU metrics to an HPA that scales the frontend between
+one and three replicas at a 60% target. Cluster Autoscaler uses a matching
+Kubernetes version and EKS Pod Identity to resize the tagged node group within
+its configured minimum and maximum.
+
+Validated with temporary load:
+
+```text
+traffic -> frontend HPA: 1 -> 3 -> 1 replicas
+pending CPU request -> managed node group: 3 -> 4 -> 3 nodes
+```
+
+```sh
+kubectl get hpa frontend -n microservices-platform
+kubectl get nodes
+kubectl logs -n kube-system deployment/aws-platform-aws-cluster-autoscaler
+```
+
+HPA scale-down is stabilized; Cluster Autoscaler waits about ten minutes before
+removing an unneeded node.
+
+Reproduce the test by adding application load, then requesting more CPU than
+the current nodes can schedule:
+
+```sh
+LOAD_IMAGE=$(kubectl get deployment loadgenerator -n microservices-platform \
+  -o jsonpath='{.spec.template.spec.containers[0].image}')
+
+kubectl run hpa-load-test -n microservices-platform \
+  --image="$LOAD_IMAGE" --restart=Never \
+  --env=FRONTEND_ADDR=frontend:80 --env=USERS=200 --env=RATE=10
+
+kubectl create deployment ca-load-test --image=registry.k8s.io/pause:3.10
+kubectl set resources deployment ca-load-test \
+  --requests=cpu=1500m,memory=128Mi
+```
+
+Watch `kubectl get hpa frontend -n microservices-platform --watch` and
+`kubectl get nodes --watch`, then clean up:
+
+```sh
+kubectl delete pod hpa-load-test -n microservices-platform
+kubectl delete deployment ca-load-test
+```
+
 ## ALB, HTTPS, and DNS
 
 The frontend remains a `ClusterIP`. Its Ingress uses ALB `target-type: ip`, so
@@ -186,11 +236,20 @@ application alias and an ExternalDNS ownership TXT record.
 Order matters because the controllers must clean up their AWS resources.
 
 ```sh
+argocd app delete observability --cascade --yes  # if installed
 argocd app delete eks-application --cascade --yes
 ```
 
 Wait for ExternalDNS to remove its records and for the Load Balancer Controller
-to delete the ALB. Then remove the platform and cluster:
+to delete the ALB. Confirm that the application PVC and its EBS volume are also
+gone before removing the platform and cluster:
+
+```sh
+kubectl get ingress,pvc -A
+kubectl get pv
+```
+
+Then remove the platform and cluster:
 
 ```sh
 argocd app delete eks-platform --cascade --yes

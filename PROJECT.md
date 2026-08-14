@@ -19,6 +19,7 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 - Terraform-managed AKS cluster
 - EKS storage integration
 - EKS ingress, HTTPS, and automated DNS
+- EKS pod and node autoscaling
 - Observability and security hardening
 
 ## Planned Structure
@@ -158,8 +159,8 @@ platform resources:
 
 ### 13. Pod and Node Autoscaling
 
-- [ ] Add Horizontal Pod Autoscaler
-- [ ] Add Cluster Autoscaler
+- [x] Add Horizontal Pod Autoscaler
+- [x] Add Cluster Autoscaler
 
 ### 14. Security Hardening
 

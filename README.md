@@ -11,7 +11,7 @@ Production-inspired platform engineering project focused on Kubernetes, GitOps, 
 |---------|-----------|---------------|
 | ✅ | Local Kubernetes, Helm, and Argo CD delivery | [Guide](docs/local.md) |
 | ✅ | CI validation, GHCR publishing, and GitOps image updates | [Guide](docs/ci.md) |
-| ✅ | AWS EKS platform: Terraform, GitOps, storage, HTTPS, and DNS | [Guide](docs/eks.md) |
+| ✅ | AWS EKS platform: Terraform, GitOps, storage, autoscaling, HTTPS, and DNS | [Guide](docs/eks.md) |
 | 🚧 | Observability | In progress |
 | ⏳ | Security hardening | Planned |
 | ⏳ | AKS deployment | Planned |
