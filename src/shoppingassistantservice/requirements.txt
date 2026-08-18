@@ -29,7 +29,7 @@ charset-normalizer==3.4.3
     # via requests
 click==8.3.0
     # via flask
-cryptography==46.0.1
+cryptography==50.0.0
     # via google-cloud-alloydb-connector
 filetype==1.2.0
     # via langchain-google-genai
