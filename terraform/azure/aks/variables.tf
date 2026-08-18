@@ -30,7 +30,7 @@ variable "kubernetes_version" {
 variable "node_vm_size" {
   description = "Azure VM size used by the AKS system node pool."
   type        = string
-  default     = "Standard_D2s_v5"
+  default     = "Standard_D2s_v6"
 }
 
 variable "node_desired_count" {
