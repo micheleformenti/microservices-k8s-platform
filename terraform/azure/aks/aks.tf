@@ -14,6 +14,7 @@ resource "azurerm_kubernetes_cluster" "platform" {
     vm_size                = var.node_vm_size
     vnet_subnet_id         = azurerm_subnet.aks_nodes.id
     node_public_ip_enabled = false
+    zones                  = ["1", "2", "3"]
 
     auto_scaling_enabled = true
     node_count           = var.node_desired_count
