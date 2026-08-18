@@ -25,3 +25,10 @@ resource "azurerm_role_assignment" "terraform_apply_project" {
   principal_id         = azuread_service_principal.terraform_apply.object_id
   principal_type       = "ServicePrincipal"
 }
+
+resource "azurerm_role_assignment" "aks_network" {
+  scope                = azurerm_resource_group.project.id
+  role_definition_name = "Network Contributor"
+  principal_id         = azurerm_user_assigned_identity.aks.principal_id
+  principal_type       = "ServicePrincipal"
+}
