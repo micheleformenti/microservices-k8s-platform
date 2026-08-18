@@ -12,7 +12,6 @@ resource "azurerm_kubernetes_cluster" "platform" {
   default_node_pool {
     name                   = "system"
     vm_size                = var.node_vm_size
-    zones                  = ["1", "2", "3"]
     vnet_subnet_id         = azurerm_subnet.aks_nodes.id
     node_public_ip_enabled = false
 
