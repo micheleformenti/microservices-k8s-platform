@@ -46,10 +46,10 @@ jobs:
     env:
       ARM_USE_OIDC: true
       ARM_USE_AZUREAD: true
-      ARM_CLIENT_ID: ${{ vars.AZURE_PLAN_CLIENT_ID }}
-      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-      TF_VAR_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      ARM_CLIENT_ID: ${{ secrets.AZURE_PLAN_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     defaults:
       run:
@@ -67,9 +67,9 @@ jobs:
       - name: Log in to Azure
         uses: azure/login@v3
         with:
-          client-id: ${{ vars.AZURE_PLAN_CLIENT_ID }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
-          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ secrets.AZURE_PLAN_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Check formatting
         run: terraform fmt -check
@@ -81,7 +81,22 @@ jobs:
         run: terraform validate
 
       - name: Plan Terraform changes
-        run: terraform plan -input=false -no-color
+        run: |
+          if ! terraform plan -input=false -out=tfplan > "$RUNNER_TEMP/terraform-plan.log" 2>&1; then
+            echo "Terraform plan failed. Detailed output was not published to protect infrastructure metadata." >&2
+            exit 1
+          fi
+
+          terraform show -json tfplan | jq -r '
+            [.resource_changes[]?
+              | select(.change.actions != ["no-op"])
+              | "\(.change.actions | join("/")) \(.address)"]
+            | if length == 0 then
+                "No infrastructure changes."
+              else
+                "Terraform plan summary:\n" + join("\n")
+              end
+          '
 
   apply:
     name: Create/Update AKS infrastructure
@@ -98,10 +113,10 @@ jobs:
     env:
       ARM_USE_OIDC: true
       ARM_USE_AZUREAD: true
-      ARM_CLIENT_ID: ${{ vars.AZURE_APPLY_CLIENT_ID }}
-      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-      TF_VAR_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      ARM_CLIENT_ID: ${{ secrets.AZURE_APPLY_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     defaults:
       run:
@@ -119,9 +134,9 @@ jobs:
       - name: Log in to Azure
         uses: azure/login@v3
         with:
-          client-id: ${{ vars.AZURE_APPLY_CLIENT_ID }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
-          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ secrets.AZURE_APPLY_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Check formatting
         run: terraform fmt -check
@@ -133,8 +148,29 @@ jobs:
         run: terraform validate
 
       - name: Create Terraform plan
-        run: terraform plan -input=false -out=tfplan
+        run: |
+          if ! terraform plan -input=false -out=tfplan > "$RUNNER_TEMP/terraform-plan.log" 2>&1; then
+            echo "Terraform plan failed. Detailed output was not published to protect infrastructure metadata." >&2
+            exit 1
+          fi
+
+          terraform show -json tfplan | jq -r '
+            [.resource_changes[]?
+              | select(.change.actions != ["no-op"])
+              | "\(.change.actions | join("/")) \(.address)"]
+            | if length == 0 then
+                "No infrastructure changes."
+              else
+                "Terraform plan summary:\n" + join("\n")
+              end
+          '
 
       - name: Apply Terraform plan
         if: github.event_name == 'push' || inputs.operation != 'plan'
-        run: terraform apply -input=false -auto-approve tfplan
+        run: |
+          if ! terraform apply -input=false -auto-approve tfplan > "$RUNNER_TEMP/terraform-apply.log" 2>&1; then
+            echo "Terraform apply failed. Detailed output was not published to protect infrastructure metadata." >&2
+            exit 1
+          fi
+
+          echo "Terraform apply completed successfully."

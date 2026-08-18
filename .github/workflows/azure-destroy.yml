@@ -32,10 +32,10 @@ jobs:
     env:
       ARM_USE_OIDC: true
       ARM_USE_AZUREAD: true
-      ARM_CLIENT_ID: ${{ vars.AZURE_APPLY_CLIENT_ID }}
-      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-      TF_VAR_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      ARM_CLIENT_ID: ${{ secrets.AZURE_APPLY_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     defaults:
       run:
@@ -63,9 +63,9 @@ jobs:
       - name: Log in to Azure
         uses: azure/login@v3
         with:
-          client-id: ${{ vars.AZURE_APPLY_CLIENT_ID }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
-          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ secrets.AZURE_APPLY_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Check formatting
         run: terraform fmt -check
@@ -77,7 +77,28 @@ jobs:
         run: terraform validate
 
       - name: Create destroy plan
-        run: terraform plan -destroy -input=false -out=tfplan
+        run: |
+          if ! terraform plan -destroy -input=false -out=tfplan > "$RUNNER_TEMP/terraform-plan.log" 2>&1; then
+            echo "Terraform destroy plan failed. Detailed output was not published to protect infrastructure metadata." >&2
+            exit 1
+          fi
+
+          terraform show -json tfplan | jq -r '
+            [.resource_changes[]?
+              | select(.change.actions != ["no-op"])
+              | "\(.change.actions | join("/")) \(.address)"]
+            | if length == 0 then
+                "No infrastructure resources to destroy."
+              else
+                "Terraform destroy summary:\n" + join("\n")
+              end
+          '
 
       - name: Apply destroy plan
-        run: terraform apply -input=false -auto-approve tfplan
+        run: |
+          if ! terraform apply -input=false -auto-approve tfplan > "$RUNNER_TEMP/terraform-destroy.log" 2>&1; then
+            echo "Terraform destroy failed. Detailed output was not published to protect infrastructure metadata." >&2
+            exit 1
+          fi
+
+          echo "Terraform destroy completed successfully."
