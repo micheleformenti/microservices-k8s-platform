@@ -20,7 +20,7 @@ env:
 
 jobs:
   destroy:
-    name: Destroy AKS infrastructure
+    name: Destroy Azure environment
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: azure-apply
@@ -75,6 +75,43 @@ jobs:
 
       - name: Validate Terraform
         run: terraform validate
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v5
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v5
+
+      - name: Remove GitOps applications
+        run: |
+          if ! terraform state show azurerm_kubernetes_cluster.platform > /dev/null 2>&1; then
+            echo "AKS is not present in Terraform state; skipping GitOps cleanup."
+            exit 0
+          fi
+
+          az aks get-credentials \
+            --admin \
+            --overwrite-existing \
+            --resource-group "$(terraform output -raw resource_group_name)" \
+            --name "$(terraform output -raw cluster_name)" \
+            > /dev/null
+
+          if kubectl get crd applications.argoproj.io > /dev/null 2>&1; then
+            if kubectl get application azure -n argocd > /dev/null 2>&1; then
+              kubectl delete application azure -n argocd
+              kubectl wait \
+                --for=delete \
+                application/azure \
+                --namespace argocd \
+                --timeout 15m
+            fi
+          else
+            echo "Argo CD is not installed; skipping application cleanup."
+          fi
+
+          if helm status argocd -n argocd > /dev/null 2>&1; then
+            helm uninstall argocd -n argocd --wait --timeout 5m
+          fi
 
       - name: Create destroy plan
         run: |
