@@ -188,10 +188,31 @@ jobs:
         run: helm lint ./helm/application
 
       - name: Render application Helm chart
-        run: helm template microservices-platform ./helm/application --namespace microservices-platform > rendered-application.yaml
+        run: |
+          helm template microservices-platform ./helm/application \
+            --namespace microservices-platform \
+            -f helm/application/values.yaml \
+            -f helm/application/values-local.yaml \
+            > rendered-application-local.yaml
+          helm template microservices-platform ./helm/application \
+            --namespace microservices-platform \
+            -f helm/application/values.yaml \
+            -f helm/application/values-eks.yaml \
+            > rendered-application-eks.yaml
+          helm template microservices-platform ./helm/application \
+            --namespace microservices-platform \
+            -f helm/application/values.yaml \
+            -f helm/application/values-aks.yaml \
+            > rendered-application-aks.yaml
 
       - name: Validate rendered application manifests
-        run: kubeconform -strict -summary rendered-application.yaml
+        run: |
+          kubeconform \
+            -strict \
+            -summary \
+            rendered-application-local.yaml \
+            rendered-application-eks.yaml \
+            rendered-application-aks.yaml
 
       - name: Build AWS platform Helm dependencies
         run: |
@@ -242,9 +263,10 @@ jobs:
           kubeconform \
             -strict \
             -summary \
+            -recursive \
             -schema-location default \
             -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
-            argocd/applications
+            argocd
 
   terraform:
     name: Terraform validation

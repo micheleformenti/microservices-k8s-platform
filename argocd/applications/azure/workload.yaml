@@ -1,20 +1,20 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: microservices-platform-local
+  name: azure-workload
   namespace: argocd
 spec:
   project: default
 
   source:
     repoURL: https://github.com/micheleformenti/microservices-k8s-platform.git
-    targetRevision: main
+    targetRevision: feature/argocd-app-of-apps
     path: helm/application
     helm:
       releaseName: microservices-platform
       valueFiles:
         - values.yaml
-        - values-local.yaml
+        - values-aks.yaml
 
   destination:
     server: https://kubernetes.default.svc
