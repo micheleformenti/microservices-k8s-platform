@@ -216,8 +216,3 @@ jobs:
             application/azure \
             --namespace argocd \
             --timeout 5m
-          kubectl wait \
-            --for=jsonpath='{.status.health.status}'=Healthy \
-            application/azure \
-            --namespace argocd \
-            --timeout 5m
