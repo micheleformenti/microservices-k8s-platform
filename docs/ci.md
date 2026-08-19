@@ -74,8 +74,9 @@ built in:
 
 - `helm/application/values-local.yaml`
 - `helm/application/values-eks.yaml`
+- `helm/application/values-aks.yaml`
 
-Both files receive the new commit SHA. Helm renders are validated before the
+All three files receive the new commit SHA. Helm renders are validated before the
 workflow opens a pull request. The workflow never commits deployment changes
 directly to `main`.
 

@@ -13,16 +13,17 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 - Local Kubernetes deployment
 - Custom Helm packaging
 - CI validation
-- Argo CD GitOps delivery, starting locally
+- Argo CD app-of-apps delivery for local, EKS, and AKS
 - Terraform-managed EKS cluster
 - Container image build and publishing
 - Terraform-managed AKS cluster
 - EKS storage integration
 - EKS ingress, HTTPS, and automated DNS
 - EKS pod and node autoscaling
-- Observability and security hardening
+- Prometheus and Grafana observability baseline
+- Security hardening
 
-## Planned Structure
+## Repository Structure
 
 ```text
 .
@@ -31,14 +32,15 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 ├── manifests/
 ├── helm/
 │   ├── application/
+│   ├── observability/
 │   └── platform/
 │       └── aws/
 ├── argocd/
+│   ├── roots/
 │   └── applications/
 ├── terraform/
-│   └── aws/
-│       ├── bootstrap/
-│       └── eks/
+│   ├── aws/
+│   └── azure/
 ├── docs/
 ├── .github/
 ├── LICENSE
@@ -49,9 +51,8 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 The Helm structure separates the portable workload from provider-specific
 platform resources:
 
-- `helm/application/` contains the cloud-neutral application chart.
+- `helm/application/` contains the shared application chart.
 - `helm/platform/aws/` contains AWS/EKS-specific platform resources.
-- `helm/platform/azure/` is planned for the later AKS milestone.
 
 ## Milestones
 
@@ -146,16 +147,11 @@ platform resources:
 
 ### 12. Observability
 
-- [ ] Create `helm/observability` using a fixed `kube-prometheus-stack` version
-- [ ] Deploy it through Argo CD in a `monitoring` namespace
-- [ ] Run one Prometheus replica with 24-hour retention and access Grafana
-      through port forwarding
-- [ ] Check dashboards for node and pod CPU and memory, restarts, deployment
-      replicas, and PVC capacity
-- [ ] Add alerts for unavailable deployments, repeated restarts, failed targets,
-      and low PVC capacity
-- [ ] Check how much CPU and memory the monitoring pods use
-- [ ] Add Helm linting and rendering to CI and document how to troubleshoot issues
+- [x] Package a fixed `kube-prometheus-stack` version
+- [x] Deploy Prometheus and Grafana through Argo CD
+- [x] Validate dashboards and monitoring resource usage
+- [x] Add observability Helm chart validation to CI
+- [ ] Add project-specific alerts
 
 ### 13. Pod and Node Autoscaling
 
@@ -170,13 +166,20 @@ platform resources:
 
 ### 15. AKS Platform
 
-- [ ] Provision an AKS environment
+- [x] Bootstrap remote state and GitHub Actions OIDC identities
+- [x] Provision a multi-zone, autoscaling AKS environment through Terraform
+- [x] Validate pipeline-based creation and teardown
+- [ ] Add persistent storage
+- [ ] Add ingress, DNS, and HTTPS
 - [ ] Document AKS creation and teardown
 
 ### 16. Deploy to AKS with GitOps
 
-- [ ] Bootstrap Argo CD on AKS
-- [ ] Deploy the workload to AKS through GitOps
+- [x] Add local, AWS, and Azure app-of-apps roots
+- [x] Bootstrap Argo CD manually on AKS
+- [x] Deploy the workload and observability to AKS through GitOps
+- [x] Validate the frontend through port forwarding
+- [ ] Automate Argo CD bootstrap in the Azure deployment workflow
 - [ ] Document EKS and AKS differences
 
 ### 17. Portfolio Documentation
