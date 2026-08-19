@@ -188,10 +188,31 @@ jobs:
         run: helm lint ./helm/application
 
       - name: Render application Helm chart
-        run: helm template microservices-platform ./helm/application --namespace microservices-platform > rendered-application.yaml
+        run: |
+          helm template microservices-platform ./helm/application \
+            --namespace microservices-platform \
+            -f helm/application/values.yaml \
+            -f helm/application/values-local.yaml \
+            > rendered-application-local.yaml
+          helm template microservices-platform ./helm/application \
+            --namespace microservices-platform \
+            -f helm/application/values.yaml \
+            -f helm/application/values-eks.yaml \
+            > rendered-application-eks.yaml
+          helm template microservices-platform ./helm/application \
+            --namespace microservices-platform \
+            -f helm/application/values.yaml \
+            -f helm/application/values-aks.yaml \
+            > rendered-application-aks.yaml
 
       - name: Validate rendered application manifests
-        run: kubeconform -strict -summary rendered-application.yaml
+        run: |
+          kubeconform \
+            -strict \
+            -summary \
+            rendered-application-local.yaml \
+            rendered-application-eks.yaml \
+            rendered-application-aks.yaml
 
       - name: Build AWS platform Helm dependencies
         run: |
@@ -244,7 +265,7 @@ jobs:
             -summary \
             -schema-location default \
             -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
-            argocd/applications
+            argocd
 
   terraform:
     name: Terraform validation
@@ -434,6 +455,7 @@ jobs:
         run: |
           echo "${IMAGE_MATRIX}" | jq -r '.include[].valuesKey' | while read -r values_key; do
             yq -i ".${values_key}.image.tag = strenv(GITHUB_SHA)" helm/application/values-eks.yaml
+            yq -i ".${values_key}.image.tag = strenv(GITHUB_SHA)" helm/application/values-aks.yaml
             yq -i ".${values_key}.image.tag = strenv(GITHUB_SHA)" helm/application/values-local.yaml
           done
 
@@ -453,6 +475,11 @@ jobs:
           helm template microservices-platform ./helm/application \
             --namespace microservices-platform \
             -f helm/application/values.yaml \
+            -f helm/application/values-aks.yaml \
+            > rendered-application-aks.yaml
+          helm template microservices-platform ./helm/application \
+            --namespace microservices-platform \
+            -f helm/application/values.yaml \
             -f helm/application/values-local.yaml \
             > rendered-application-local.yaml
 
@@ -462,6 +489,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           add-paths: |
             helm/application/values-eks.yaml
+            helm/application/values-aks.yaml
             helm/application/values-local.yaml
           branch: automation/update-helm-image-tags/${{ github.sha }}
           delete-branch: true
@@ -474,6 +502,7 @@ jobs:
 
             Updated files:
             - `helm/application/values-eks.yaml`
+            - `helm/application/values-aks.yaml`
             - `helm/application/values-local.yaml`
 
             Source workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
