@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: azure
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
 

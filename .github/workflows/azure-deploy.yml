@@ -30,6 +30,7 @@ concurrency:
 
 env:
   TERRAFORM_VERSION: 1.15.8
+  ARGO_CD_CHART_VERSION: 10.4.0
 
 jobs:
   plan:
@@ -99,7 +100,7 @@ jobs:
           '
 
   apply:
-    name: Create/Update AKS infrastructure
+    name: Create/Update Azure environment
     if: >-
       github.event_name == 'push' ||
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
@@ -174,3 +175,49 @@ jobs:
           fi
 
           echo "Terraform apply completed successfully."
+
+      - name: Set up kubectl
+        if: github.event_name == 'push' || inputs.operation != 'plan'
+        uses: azure/setup-kubectl@v5
+
+      - name: Configure kubectl
+        if: github.event_name == 'push' || inputs.operation != 'plan'
+        run: |
+          az aks get-credentials \
+            --admin \
+            --overwrite-existing \
+            --resource-group "$(terraform output -raw resource_group_name)" \
+            --name "$(terraform output -raw cluster_name)" \
+            > /dev/null
+
+      - name: Set up Helm
+        if: github.event_name == 'push' || inputs.operation != 'plan'
+        uses: azure/setup-helm@v5
+
+      - name: Install Argo CD
+        if: github.event_name == 'push' || inputs.operation != 'plan'
+        working-directory: .
+        run: |
+          helm repo add argo https://argoproj.github.io/argo-helm
+          helm upgrade --install argocd argo/argo-cd \
+            --version "$ARGO_CD_CHART_VERSION" \
+            --namespace argocd \
+            --create-namespace \
+            --wait \
+            --timeout 10m
+
+      - name: Bootstrap Azure GitOps applications
+        if: github.event_name == 'push' || inputs.operation != 'plan'
+        working-directory: .
+        run: |
+          kubectl apply -f argocd/roots/azure.yaml
+          kubectl wait \
+            --for=jsonpath='{.status.sync.status}'=Synced \
+            application/azure \
+            --namespace argocd \
+            --timeout 5m
+          kubectl wait \
+            --for=jsonpath='{.status.health.status}'=Healthy \
+            application/azure \
+            --namespace argocd \
+            --timeout 5m
