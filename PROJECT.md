@@ -179,7 +179,7 @@ platform resources:
 - [x] Bootstrap Argo CD manually on AKS
 - [x] Deploy the workload and observability to AKS through GitOps
 - [x] Validate the frontend through port forwarding
-- [ ] Automate Argo CD bootstrap in the Azure deployment workflow
+- [x] Automate Argo CD bootstrap in the Azure deployment workflow
 - [ ] Document EKS and AKS differences
 
 ### 17. Portfolio Documentation
