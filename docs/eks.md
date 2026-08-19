@@ -24,10 +24,11 @@ Terraform manages resources that must exist before Kubernetes controllers:
 - ACM certificate and DNS validation
 - IAM policies, roles, and EKS Pod Identity associations
 
-Argo CD manages two Helm charts:
+The AWS root Application creates three child Applications:
 
 - `helm/platform/aws`: AWS controllers and storage configuration
-- `helm/application`: portable workload with EKS value overrides
+- `helm/application`: shared workload with EKS value overrides
+- `helm/observability`: Prometheus and Grafana
 
 The controllers manage resources discovered at runtime:
 
@@ -108,7 +109,7 @@ public IP.
 
 ## Deploy with Argo CD
 
-Install Argo CD and apply the platform before the workload:
+Install Argo CD and apply only the AWS root Application:
 
 ```sh
 helm repo add argo https://argoproj.github.io/argo-helm
@@ -116,15 +117,16 @@ helm upgrade --install argocd argo/argo-cd \
   --namespace argocd \
   --create-namespace
 
-kubectl apply -f argocd/applications/eks-platform.yaml
-kubectl apply -f argocd/applications/eks-application.yaml
+kubectl apply -f argocd/roots/aws.yaml
 ```
 
-Both applications track `main` with automated sync, pruning, and self-healing:
+The root creates three children that track `main` with automated sync, pruning,
+and self-healing:
 
 ```text
-eks-platform    -> helm/platform/aws -> kube-system
-eks-application -> helm/application  -> microservices-platform
+aws-platform      -> helm/platform/aws -> kube-system
+aws-workload      -> helm/application  -> microservices-platform
+aws-observability -> helm/observability -> monitoring
 ```
 
 ```sh
@@ -233,11 +235,13 @@ application alias and an ExternalDNS ownership TXT record.
 
 ## Teardown
 
-Order matters because the controllers must clean up their AWS resources.
+Order matters because the controllers must clean up their AWS resources. Delete
+the root first so it cannot recreate its children:
 
 ```sh
-argocd app delete observability --cascade --yes  # if installed
-argocd app delete eks-application --cascade --yes
+kubectl delete -f argocd/roots/aws.yaml
+argocd app delete aws-observability --cascade --yes
+argocd app delete aws-workload --cascade --yes
 ```
 
 Wait for ExternalDNS to remove its records and for the Load Balancer Controller
@@ -252,7 +256,7 @@ kubectl get pv
 Then remove the platform and cluster:
 
 ```sh
-argocd app delete eks-platform --cascade --yes
+argocd app delete aws-platform --cascade --yes
 helm uninstall argocd -n argocd
 kubectl delete namespace argocd
 terraform -chdir=terraform/aws/eks destroy

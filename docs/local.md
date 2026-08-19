@@ -102,7 +102,7 @@ helm uninstall microservices-platform -n microservices-platform
 ## Local GitOps with Argo CD
 
 ```text
-GitHub main -> Argo CD -> helm/application -> microservices-platform
+GitHub main -> local root -> workload + observability
 ```
 
 Install Argo CD with Helm:
@@ -114,13 +114,12 @@ helm upgrade --install argocd argo/argo-cd \
   --create-namespace
 ```
 
-The declarative application in `argocd/applications/local.yaml` tracks `main`,
-uses `values.yaml` plus `values-local.yaml`, and enables automated sync,
-pruning, and self-healing.
+The local root creates workload and observability child Applications. Both
+track `main` with automated sync, pruning, and self-healing.
 
 ```sh
-kubectl apply -f argocd/applications/local.yaml
-kubectl get application microservices-platform-local -n argocd -w
+kubectl apply -f argocd/roots/local.yaml
+kubectl get applications -n argocd -w
 ```
 
 Argo CD now owns the workload; lasting changes should be committed to Git rather
@@ -150,12 +149,13 @@ Open `https://localhost:8080` and sign in as `admin`.
 
 ## Teardown
 
-The local Application does not declare a cascading-deletion finalizer, so
-remove its orphaned workload namespace explicitly:
+Delete the root first so it cannot recreate its children, then remove the child
+Applications and Argo CD:
 
 ```sh
-kubectl delete -f argocd/applications/local.yaml
-kubectl delete namespace microservices-platform
+kubectl delete -f argocd/roots/local.yaml
+argocd app delete local-observability --cascade --yes
+argocd app delete local-workload --cascade --yes
 helm uninstall argocd -n argocd
 kubectl delete namespace argocd
 ```
