@@ -12,8 +12,3 @@ output "terraform_apply_client_id" {
   description = "Client ID used by GitHub Actions Terraform apply jobs."
   value       = azuread_application.terraform_apply.client_id
 }
-
-output "aks_identity_name" {
-  description = "Name of the managed identity used by AKS."
-  value       = azurerm_user_assigned_identity.aks.name
-}
