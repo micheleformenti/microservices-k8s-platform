@@ -1,6 +1,24 @@
+data "azurerm_role_definition" "application_gateway_configuration_manager" {
+  name  = "AppGw for Containers Configuration Manager"
+  scope = "/subscriptions/${var.subscription_id}"
+}
+
 data "azurerm_role_definition" "network_contributor" {
   name  = "Network Contributor"
   scope = "/subscriptions/${var.subscription_id}"
+}
+
+data "azurerm_role_definition" "reader" {
+  name  = "Reader"
+  scope = "/subscriptions/${var.subscription_id}"
+}
+
+locals {
+  terraform_apply_assignable_role_ids = join(", ", [
+    basename(data.azurerm_role_definition.application_gateway_configuration_manager.role_definition_id),
+    basename(data.azurerm_role_definition.network_contributor.role_definition_id),
+    basename(data.azurerm_role_definition.reader.role_definition_id),
+  ])
 }
 
 resource "azurerm_role_assignment" "terraform_plan_state" {
@@ -39,18 +57,18 @@ resource "azurerm_role_assignment" "terraform_apply_project" {
 }
 
 resource "azurerm_role_assignment" "terraform_apply_network_rbac" {
-  scope                = azurerm_resource_group.project.id
+  scope                = "/subscriptions/${var.subscription_id}"
   role_definition_name = "Role Based Access Control Administrator"
   principal_id         = azuread_service_principal.terraform_apply.object_id
   principal_type       = "ServicePrincipal"
   condition_version    = "2.0"
   condition            = <<-CONDITION
     ((!(ActionMatches{'Microsoft.Authorization/roleAssignments/write'})) OR
-      (@Request[Microsoft.Authorization/roleAssignments:RoleDefinitionId] ForAnyOfAnyValues:GuidEquals {${basename(data.azurerm_role_definition.network_contributor.role_definition_id)}} AND
+      (@Request[Microsoft.Authorization/roleAssignments:RoleDefinitionId] ForAnyOfAnyValues:GuidEquals {${local.terraform_apply_assignable_role_ids}} AND
       @Request[Microsoft.Authorization/roleAssignments:PrincipalType] ForAnyOfAnyValues:StringEqualsIgnoreCase {'ServicePrincipal'}))
     AND
     ((!(ActionMatches{'Microsoft.Authorization/roleAssignments/delete'})) OR
-      (@Resource[Microsoft.Authorization/roleAssignments:RoleDefinitionId] ForAnyOfAnyValues:GuidEquals {${basename(data.azurerm_role_definition.network_contributor.role_definition_id)}} AND
+      (@Resource[Microsoft.Authorization/roleAssignments:RoleDefinitionId] ForAnyOfAnyValues:GuidEquals {${local.terraform_apply_assignable_role_ids}} AND
       @Resource[Microsoft.Authorization/roleAssignments:PrincipalType] ForAnyOfAnyValues:StringEqualsIgnoreCase {'ServicePrincipal'}))
   CONDITION
 }

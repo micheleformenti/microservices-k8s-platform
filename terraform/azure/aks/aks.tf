@@ -8,6 +8,8 @@ resource "azurerm_kubernetes_cluster" "platform" {
   sku_tier            = "Free"
 
   role_based_access_control_enabled = true
+  oidc_issuer_enabled               = true
+  workload_identity_enabled         = true
 
   default_node_pool {
     name                   = "system"

@@ -21,6 +21,12 @@ variable "aks_subnet_address_prefixes" {
   default     = ["10.10.0.0/20"]
 }
 
+variable "application_gateway_subnet_address_prefixes" {
+  description = "Address prefixes assigned to Application Gateway for Containers."
+  type        = list(string)
+  default     = ["10.10.16.0/24"]
+}
+
 variable "kubernetes_version" {
   description = "Kubernetes minor version used by AKS."
   type        = string
