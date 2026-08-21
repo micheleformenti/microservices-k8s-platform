@@ -1,14 +1,3 @@
-data "azurerm_resource_group" "project" {
-  name = "rg-${var.project_name}"
-}
-
-locals {
-  common_tags = {
-    Project   = var.project_name
-    ManagedBy = "terraform"
-  }
-}
-
 resource "azurerm_virtual_network" "project" {
   name                = "vnet-${var.project_name}"
   location            = data.azurerm_resource_group.project.location
@@ -24,6 +13,24 @@ resource "azurerm_subnet" "aks_nodes" {
   virtual_network_name            = azurerm_virtual_network.project.name
   address_prefixes                = var.aks_subnet_address_prefixes
   default_outbound_access_enabled = false
+}
+
+resource "azurerm_subnet" "application_gateway" {
+  name                 = "snet-application-gateway"
+  resource_group_name  = data.azurerm_resource_group.project.name
+  virtual_network_name = azurerm_virtual_network.project.name
+  address_prefixes     = var.application_gateway_subnet_address_prefixes
+
+  delegation {
+    name = "application-gateway-for-containers"
+
+    service_delegation {
+      name = "Microsoft.ServiceNetworking/trafficControllers"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+      ]
+    }
+  }
 }
 
 resource "azurerm_public_ip" "egress" {
