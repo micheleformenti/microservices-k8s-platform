@@ -31,6 +31,7 @@ concurrency:
 env:
   TERRAFORM_VERSION: 1.15.8
   ARGO_CD_CHART_VERSION: 10.4.0
+  ALB_CONTROLLER_CHART_VERSION: 1.11.4
 
 jobs:
   plan:
@@ -244,6 +245,25 @@ jobs:
             --version "$ARGO_CD_CHART_VERSION" \
             --namespace argocd \
             --create-namespace \
+            --wait \
+            --timeout 10m
+
+      - name: Install ALB Controller
+        if: github.event_name == 'push' || inputs.operation != 'plan'
+        working-directory: .
+        run: |
+          CLIENT_ID="$(
+            terraform -chdir=terraform/azure/aks output \
+              -raw application_gateway_controller_client_id
+          )"
+
+          helm upgrade --install alb-controller \
+            oci://mcr.microsoft.com/application-lb/charts/alb-controller \
+            --version "$ALB_CONTROLLER_CHART_VERSION" \
+            --namespace azure-alb-system \
+            --create-namespace \
+            --set albController.namespace=azure-alb-system \
+            --set-string albController.podIdentity.clientID="$CLIENT_ID" \
             --wait \
             --timeout 10m
 

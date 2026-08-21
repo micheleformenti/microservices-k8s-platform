@@ -23,6 +23,11 @@ output "cluster_name" {
   value       = azurerm_kubernetes_cluster.platform.name
 }
 
+output "application_gateway_controller_client_id" {
+  description = "Client ID used by the Application Gateway for Containers ALB Controller."
+  value       = azurerm_user_assigned_identity.application_gateway_controller.client_id
+}
+
 output "kubernetes_version" {
   description = "Kubernetes version used by AKS."
   value       = azurerm_kubernetes_cluster.platform.kubernetes_version
