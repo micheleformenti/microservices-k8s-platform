@@ -48,8 +48,14 @@ recommendationService:
     repository: ghcr.io/micheleformenti/recommendationservice
     tag: 61d8b4635afb1a8bd10e1306bbe6d30b2fa62761
     pullPolicy: IfNotPresent
+redisCart:
+  persistence:
+    enabled: true
+    storageClassName: managed-csi
+    size: 1Gi
 shippingService:
   image:
     repository: ghcr.io/micheleformenti/shippingservice
     tag: 61d8b4635afb1a8bd10e1306bbe6d30b2fa62761
     pullPolicy: IfNotPresent
+    
