@@ -24,7 +24,7 @@ resource "azurerm_kubernetes_cluster" "platform" {
 
   identity {
     type         = "UserAssigned"
-    identity_ids = [data.azurerm_user_assigned_identity.aks.id]
+    identity_ids = [azurerm_user_assigned_identity.aks.id]
   }
 
   network_profile {
