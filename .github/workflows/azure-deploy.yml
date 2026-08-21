@@ -86,7 +86,9 @@ jobs:
         run: |
           if ! terraform plan -json -input=false -out=tfplan > "$RUNNER_TEMP/terraform-plan.json" 2> "$RUNNER_TEMP/terraform-plan.stderr"; then
             echo "Terraform plan failed:" >&2
-            jq -r '
+            jq -Rr '
+              fromjson?
+              |
               select(.type == "diagnostic" and .diagnostic.severity == "error")
               | .diagnostic.summary
             ' "$RUNNER_TEMP/terraform-plan.json" >&2
