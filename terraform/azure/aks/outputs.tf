@@ -13,6 +13,11 @@ output "aks_subnet_id" {
   value       = azurerm_subnet.aks_nodes.id
 }
 
+output "application_gateway_subnet_id" {
+  description = "ID of the delegated Application Gateway for Containers subnet."
+  value       = azurerm_subnet.application_gateway.id
+}
+
 output "outbound_ip_address" {
   description = "Stable public IP used for AKS outbound traffic."
   value       = azurerm_public_ip.egress.ip_address

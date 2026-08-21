@@ -6,7 +6,7 @@ resource "azurerm_role_assignment" "aks_network" {
 }
 
 resource "azurerm_role_assignment" "application_gateway_controller_configuration" {
-  scope                            = data.azurerm_resource_group.project.id
+  scope                            = "/subscriptions/${var.subscription_id}/resourceGroups/${azurerm_kubernetes_cluster.platform.node_resource_group}"
   role_definition_name             = "AppGw for Containers Configuration Manager"
   principal_id                     = azurerm_user_assigned_identity.application_gateway_controller.principal_id
   principal_type                   = "ServicePrincipal"
