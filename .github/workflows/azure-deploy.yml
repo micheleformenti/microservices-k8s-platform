@@ -4,12 +4,14 @@ on:
   pull_request:
     paths:
       - ".github/workflows/azure-deploy.yml"
+      - "helm/platform/azure/**"
       - "terraform/azure/aks/**"
   push:
     branches:
       - main
     paths:
       - ".github/workflows/azure-deploy.yml"
+      - "helm/platform/azure/**"
       - "terraform/azure/aks/**"
   workflow_dispatch:
     inputs:
@@ -268,6 +270,27 @@ jobs:
             --set-string albController.podIdentity.clientID="$CLIENT_ID" \
             --wait \
             --timeout 10m
+
+      - name: Provision Application Gateway for Containers
+        if: github.event_name == 'push' || inputs.operation != 'plan'
+        working-directory: .
+        run: |
+          SUBNET_ID="$(
+            terraform -chdir=terraform/azure/aks output \
+              -raw application_gateway_subnet_id
+          )"
+
+          helm upgrade --install azure-platform helm/platform/azure \
+            --namespace azure-alb-system \
+            --set applicationGateway.enabled=true \
+            --set-string applicationGateway.subnetId="$SUBNET_ID" \
+            --wait \
+            --timeout 15m
+
+          kubectl wait applicationloadbalancer/platform \
+            --namespace azure-alb-system \
+            --for=jsonpath='{.status.conditions[?(@.type=="Deployment")].status}'=True \
+            --timeout 15m
 
       - name: Bootstrap Azure GitOps applications
         if: github.event_name == 'push' || inputs.operation != 'plan'

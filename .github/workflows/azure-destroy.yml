@@ -109,6 +109,20 @@ jobs:
             echo "Argo CD is not installed; skipping application cleanup."
           fi
 
+          if helm status azure-platform -n azure-alb-system > /dev/null 2>&1; then
+            helm uninstall azure-platform \
+              --namespace azure-alb-system \
+              --wait \
+              --timeout 15m
+          fi
+
+          if helm status alb-controller -n azure-alb-system > /dev/null 2>&1; then
+            helm uninstall alb-controller \
+              --namespace azure-alb-system \
+              --wait \
+              --timeout 5m
+          fi
+
           if helm status argocd -n argocd > /dev/null 2>&1; then
             helm uninstall argocd -n argocd --wait --timeout 5m
           fi

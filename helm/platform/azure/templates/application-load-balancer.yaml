@@ -1,0 +1,10 @@
+{{- if .Values.applicationGateway.enabled }}
+apiVersion: alb.networking.azure.io/v1
+kind: ApplicationLoadBalancer
+metadata:
+  name: platform
+  namespace: {{ .Release.Namespace }}
+spec:
+  associations:
+    - {{ required "applicationGateway.subnetId is required" .Values.applicationGateway.subnetId | quote }}
+{{- end }}
