@@ -1,3 +1,8 @@
+data "azurerm_role_definition" "network_contributor" {
+  name  = "Network Contributor"
+  scope = "/subscriptions/${var.subscription_id}"
+}
+
 resource "azurerm_role_assignment" "terraform_plan_state" {
   scope                = azurerm_storage_container.terraform_state.id
   role_definition_name = "Storage Blob Data Contributor"
@@ -24,6 +29,23 @@ resource "azurerm_role_assignment" "terraform_apply_project" {
   role_definition_name = "Contributor"
   principal_id         = azuread_service_principal.terraform_apply.object_id
   principal_type       = "ServicePrincipal"
+}
+
+resource "azurerm_role_assignment" "terraform_apply_network_rbac" {
+  scope                = azurerm_resource_group.project.id
+  role_definition_name = "Role Based Access Control Administrator"
+  principal_id         = azuread_service_principal.terraform_apply.object_id
+  principal_type       = "ServicePrincipal"
+  condition_version    = "2.0"
+  condition            = <<-CONDITION
+    ((!(ActionMatches{'Microsoft.Authorization/roleAssignments/write'})) OR
+      (@Request[Microsoft.Authorization/roleAssignments:RoleDefinitionId] ForAnyOfAnyValues:GuidEquals {${basename(data.azurerm_role_definition.network_contributor.role_definition_id)}} AND
+      @Request[Microsoft.Authorization/roleAssignments:PrincipalType] ForAnyOfAnyValues:StringEqualsIgnoreCase {'ServicePrincipal'}))
+    AND
+    ((!(ActionMatches{'Microsoft.Authorization/roleAssignments/delete'})) OR
+      (@Resource[Microsoft.Authorization/roleAssignments:RoleDefinitionId] ForAnyOfAnyValues:GuidEquals {${basename(data.azurerm_role_definition.network_contributor.role_definition_id)}} AND
+      @Resource[Microsoft.Authorization/roleAssignments:PrincipalType] ForAnyOfAnyValues:StringEqualsIgnoreCase {'ServicePrincipal'}))
+  CONDITION
 }
 
 resource "azurerm_role_assignment" "aks_network" {
