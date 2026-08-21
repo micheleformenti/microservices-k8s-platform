@@ -83,15 +83,38 @@ jobs:
 
       - name: Plan Terraform changes
         run: |
-          if ! terraform plan -input=false -out=tfplan > "$RUNNER_TEMP/terraform-plan.log" 2>&1; then
-            echo "Terraform plan failed. Detailed output was not published to protect infrastructure metadata." >&2
+          if ! terraform plan -json -input=false -out=tfplan > "$RUNNER_TEMP/terraform-plan.json" 2> "$RUNNER_TEMP/terraform-plan.stderr"; then
+            echo "Terraform plan failed:" >&2
+            jq -r '
+              select(.type == "diagnostic" and .diagnostic.severity == "error")
+              | .diagnostic.summary
+            ' "$RUNNER_TEMP/terraform-plan.json" >&2
+            echo "Detailed output was not published to protect infrastructure metadata." >&2
             exit 1
           fi
 
           terraform show -json tfplan | jq -r '
+            def changed_paths:
+              .change.before as $before
+              | .change.after as $after
+              | ([($before | paths(scalars)), ($after | paths(scalars))] | unique) as $paths
+              | [$paths[] as $path
+                  | select(
+                      (try ($before | getpath($path)) catch null)
+                      != (try ($after | getpath($path)) catch null)
+                    )
+                  | ($path | map(tostring) | join("."))]
+              | unique;
+
             [.resource_changes[]?
-              | select(.change.actions != ["no-op"])
-              | "\(.change.actions | join("/")) \(.address)"]
+              | select(.change.actions != ["no-op"] or .change.importing != null)
+              | if .change.importing != null then
+                  "import \(.address)"
+                elif .change.actions == ["update"] then
+                  "update \(.address) [\(changed_paths | join(", "))]"
+                else
+                  "\(.change.actions | join("/")) \(.address)"
+                end]
             | if length == 0 then
                 "No infrastructure changes."
               else
@@ -156,9 +179,27 @@ jobs:
           fi
 
           terraform show -json tfplan | jq -r '
+            def changed_paths:
+              .change.before as $before
+              | .change.after as $after
+              | ([($before | paths(scalars)), ($after | paths(scalars))] | unique) as $paths
+              | [$paths[] as $path
+                  | select(
+                      (try ($before | getpath($path)) catch null)
+                      != (try ($after | getpath($path)) catch null)
+                    )
+                  | ($path | map(tostring) | join("."))]
+              | unique;
+
             [.resource_changes[]?
-              | select(.change.actions != ["no-op"])
-              | "\(.change.actions | join("/")) \(.address)"]
+              | select(.change.actions != ["no-op"] or .change.importing != null)
+              | if .change.importing != null then
+                  "import \(.address)"
+                elif .change.actions == ["update"] then
+                  "update \(.address) [\(changed_paths | join(", "))]"
+                else
+                  "\(.change.actions | join("/")) \(.address)"
+                end]
             | if length == 0 then
                 "No infrastructure changes."
               else
