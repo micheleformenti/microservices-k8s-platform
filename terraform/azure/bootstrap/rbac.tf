@@ -24,6 +24,13 @@ resource "azurerm_role_assignment" "terraform_plan_project" {
   principal_type       = "ServicePrincipal"
 }
 
+resource "azurerm_role_assignment" "terraform_plan_aks_user" {
+  scope                = azurerm_resource_group.project.id
+  role_definition_name = "Azure Kubernetes Service Cluster User Role"
+  principal_id         = azuread_service_principal.terraform_plan.object_id
+  principal_type       = "ServicePrincipal"
+}
+
 resource "azurerm_role_assignment" "terraform_apply_project" {
   scope                = azurerm_resource_group.project.id
   role_definition_name = "Contributor"

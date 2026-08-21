@@ -83,7 +83,7 @@ jobs:
 
       - name: Plan Terraform changes
         run: |
-          if ! terraform plan -json -input=false -out=tfplan > "$RUNNER_TEMP/terraform-plan.json" 2>&1; then
+          if ! terraform plan -json -input=false -out=tfplan > "$RUNNER_TEMP/terraform-plan.json" 2> "$RUNNER_TEMP/terraform-plan.stderr"; then
             echo "Terraform plan failed:" >&2
             jq -r '
               select(.type == "diagnostic" and .diagnostic.severity == "error")
@@ -95,8 +95,12 @@ jobs:
 
           terraform show -json tfplan | jq -r '
             [.resource_changes[]?
-              | select(.change.actions != ["no-op"])
-              | "\(.change.actions | join("/")) \(.address)"]
+              | select(.change.actions != ["no-op"] or .change.importing != null)
+              | if .change.importing != null then
+                  "import \(.address)"
+                else
+                  "\(.change.actions | join("/")) \(.address)"
+                end]
             | if length == 0 then
                 "No infrastructure changes."
               else
@@ -162,8 +166,12 @@ jobs:
 
           terraform show -json tfplan | jq -r '
             [.resource_changes[]?
-              | select(.change.actions != ["no-op"])
-              | "\(.change.actions | join("/")) \(.address)"]
+              | select(.change.actions != ["no-op"] or .change.importing != null)
+              | if .change.importing != null then
+                  "import \(.address)"
+                else
+                  "\(.change.actions | join("/")) \(.address)"
+                end]
             | if length == 0 then
                 "No infrastructure changes."
               else
