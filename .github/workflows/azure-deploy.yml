@@ -83,8 +83,13 @@ jobs:
 
       - name: Plan Terraform changes
         run: |
-          if ! terraform plan -input=false -out=tfplan > "$RUNNER_TEMP/terraform-plan.log" 2>&1; then
-            echo "Terraform plan failed. Detailed output was not published to protect infrastructure metadata." >&2
+          if ! terraform plan -json -input=false -out=tfplan > "$RUNNER_TEMP/terraform-plan.json" 2>&1; then
+            echo "Terraform plan failed:" >&2
+            jq -r '
+              select(.type == "diagnostic" and .diagnostic.severity == "error")
+              | .diagnostic.summary
+            ' "$RUNNER_TEMP/terraform-plan.json" >&2
+            echo "Detailed output was not published to protect infrastructure metadata." >&2
             exit 1
           fi
 
