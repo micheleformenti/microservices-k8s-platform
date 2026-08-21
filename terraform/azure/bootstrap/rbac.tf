@@ -54,10 +54,3 @@ resource "azurerm_role_assignment" "terraform_apply_network_rbac" {
       @Resource[Microsoft.Authorization/roleAssignments:PrincipalType] ForAnyOfAnyValues:StringEqualsIgnoreCase {'ServicePrincipal'}))
   CONDITION
 }
-
-resource "azurerm_role_assignment" "aks_network" {
-  scope                = azurerm_resource_group.project.id
-  role_definition_name = "Network Contributor"
-  principal_id         = azurerm_user_assigned_identity.aks.principal_id
-  principal_type       = "ServicePrincipal"
-}

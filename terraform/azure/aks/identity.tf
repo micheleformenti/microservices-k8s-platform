@@ -5,8 +5,3 @@ resource "azurerm_user_assigned_identity" "aks" {
 
   tags = local.common_tags
 }
-
-moved {
-  from = azurerm_user_assigned_identity.aks_imported
-  to   = azurerm_user_assigned_identity.aks
-}

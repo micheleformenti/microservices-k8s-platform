@@ -6,17 +6,6 @@ locals {
   github_apply_subject = "repo:${var.github_repository}:environment:${var.github_apply_environment}"
 }
 
-resource "azurerm_user_assigned_identity" "aks" {
-  name                = "id-${var.project_name}-aks"
-  location            = azurerm_resource_group.project.location
-  resource_group_name = azurerm_resource_group.project.name
-
-  tags = {
-    Project   = var.project_name
-    ManagedBy = "terraform"
-  }
-}
-
 resource "azuread_application" "terraform_plan" {
   display_name = "gh-${var.project_name}-tf-plan"
   description  = "GitHub Actions identity for Terraform plans."
