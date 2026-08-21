@@ -35,10 +35,17 @@ resource "azurerm_role_assignment" "terraform_apply_state" {
   principal_type       = "ServicePrincipal"
 }
 
-resource "azurerm_role_assignment" "terraform_plan_project" {
-  scope                = azurerm_resource_group.project.id
+resource "azurerm_role_assignment" "terraform_plan_subscription" {
+  scope                = "/subscriptions/${var.subscription_id}"
   role_definition_name = "Reader"
   principal_id         = azuread_service_principal.terraform_plan.object_id
+  principal_type       = "ServicePrincipal"
+}
+
+resource "azurerm_role_assignment" "terraform_apply_subscription" {
+  scope                = "/subscriptions/${var.subscription_id}"
+  role_definition_name = "Reader"
+  principal_id         = azuread_service_principal.terraform_apply.object_id
   principal_type       = "ServicePrincipal"
 }
 
