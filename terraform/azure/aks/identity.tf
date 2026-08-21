@@ -8,5 +8,5 @@ resource "azurerm_user_assigned_identity" "aks" {
 
 import {
   to = azurerm_user_assigned_identity.aks
-  id = "${data.azurerm_resource_group.project.id}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-${var.project_name}-aks"
+  id = "/subscriptions/${var.subscription_id}/resourceGroups/rg-${var.project_name}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-${var.project_name}-aks"
 }
