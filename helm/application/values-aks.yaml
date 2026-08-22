@@ -34,6 +34,8 @@ frontend:
     annotations:
       alb.networking.azure.io/alb-namespace: azure-alb-system
       alb.networking.azure.io/alb-name: platform
+  autoscaling:
+    enabled: true
 loadGenerator:
   image:
     repository: ghcr.io/micheleformenti/loadgenerator
