@@ -1,0 +1,59 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: azure-platform
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
+
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            cloud: azure
+
+  template:
+    metadata:
+      name: azure-platform
+      namespace: argocd
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
+
+      sources:
+        - repoURL: mcr.microsoft.com/application-lb/charts
+          chart: alb-controller
+          targetRevision: 1.11.4
+          helm:
+            releaseName: alb-controller
+            parameters:
+              - name: albController.namespace
+                value: azure-alb-system
+              - name: albController.podIdentity.clientID
+                value: '{{ index .metadata.annotations "gitops-bridge/alb-controller-client-id" }}'
+
+        - repoURL: https://github.com/micheleformenti/microservices-k8s-platform.git
+          targetRevision: main
+          path: helm/platform/azure
+          helm:
+            releaseName: azure-platform
+            parameters:
+              - name: applicationGateway.enabled
+                value: "true"
+              - name: applicationGateway.subnetId
+                value: '{{ index .metadata.annotations "gitops-bridge/application-gateway-subnet-id" }}'
+
+      destination:
+        server: '{{ .server }}'
+        namespace: azure-alb-system
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
