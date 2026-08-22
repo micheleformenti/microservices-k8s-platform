@@ -4,6 +4,8 @@ kind: ApplicationLoadBalancer
 metadata:
   name: platform
   namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   associations:
     - {{ required "applicationGateway.subnetId is required" .Values.applicationGateway.subnetId | quote }}

@@ -22,8 +22,9 @@ helm/platform/
 
 - **Azure**
   - Creates the controller-managed Application Gateway for Containers.
-  - Receives the Terraform-managed Application Gateway subnet ID from the Azure
-    deployment pipeline at install time.
+  - Receives the Terraform-managed Application Gateway subnet ID through Argo
+    CD cluster metadata.
+  - Runs after the ALB Controller resources by using an Argo CD sync wave.
 
 Provider-specific resources stay in these charts instead of the application
 chart. Examples include cloud storage classes, cloud load balancer integrations,

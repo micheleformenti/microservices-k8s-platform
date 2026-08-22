@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - ".github/workflows/azure-deploy.yml"
+      - "argocd/bootstrap/azure/cluster-metadata.yaml.tpl"
       - "helm/platform/azure/**"
       - "terraform/azure/aks/**"
   push:
@@ -11,6 +12,7 @@ on:
       - main
     paths:
       - ".github/workflows/azure-deploy.yml"
+      - "argocd/bootstrap/azure/cluster-metadata.yaml.tpl"
       - "helm/platform/azure/**"
       - "terraform/azure/aks/**"
   workflow_dispatch:
@@ -33,7 +35,6 @@ concurrency:
 env:
   TERRAFORM_VERSION: 1.15.8
   ARGO_CD_CHART_VERSION: 10.4.0
-  ALB_CONTROLLER_CHART_VERSION: 1.11.4
 
 jobs:
   plan:
@@ -252,45 +253,24 @@ jobs:
             --wait \
             --timeout 10m
 
-      - name: Install ALB Controller
+      - name: Publish Azure GitOps metadata
         if: github.event_name == 'push' || inputs.operation != 'plan'
         working-directory: .
         run: |
-          CLIENT_ID="$(
+          export ALB_CONTROLLER_CLIENT_ID="$(
             terraform -chdir=terraform/azure/aks output \
               -raw application_gateway_controller_client_id
           )"
-
-          helm upgrade --install alb-controller \
-            oci://mcr.microsoft.com/application-lb/charts/alb-controller \
-            --version "$ALB_CONTROLLER_CHART_VERSION" \
-            --namespace azure-alb-system \
-            --create-namespace \
-            --set albController.namespace=azure-alb-system \
-            --set-string albController.podIdentity.clientID="$CLIENT_ID" \
-            --wait \
-            --timeout 10m
-
-      - name: Provision Application Gateway for Containers
-        if: github.event_name == 'push' || inputs.operation != 'plan'
-        working-directory: .
-        run: |
-          SUBNET_ID="$(
+          export APPLICATION_GATEWAY_SUBNET_ID="$(
             terraform -chdir=terraform/azure/aks output \
               -raw application_gateway_subnet_id
           )"
 
-          helm upgrade --install azure-platform helm/platform/azure \
-            --namespace azure-alb-system \
-            --set applicationGateway.enabled=true \
-            --set-string applicationGateway.subnetId="$SUBNET_ID" \
-            --wait \
-            --timeout 15m
+          envsubst \
+            < argocd/bootstrap/azure/cluster-metadata.yaml.tpl \
+            > "$RUNNER_TEMP/azure-cluster-metadata.yaml"
 
-          kubectl wait applicationloadbalancer/platform \
-            --namespace azure-alb-system \
-            --for=jsonpath='{.status.conditions[?(@.type=="Deployment")].status}'=True \
-            --timeout 15m
+          kubectl apply -f "$RUNNER_TEMP/azure-cluster-metadata.yaml"
 
       - name: Bootstrap Azure GitOps applications
         if: github.event_name == 'push' || inputs.operation != 'plan'

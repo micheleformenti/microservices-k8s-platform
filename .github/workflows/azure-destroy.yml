@@ -89,38 +89,57 @@ jobs:
             exit 0
           fi
 
+          RESOURCE_GROUP="$(terraform output -raw resource_group_name)"
+          CLUSTER_NAME="$(terraform output -raw cluster_name)"
+          NODE_RESOURCE_GROUP="$(
+            az aks show \
+              --resource-group "$RESOURCE_GROUP" \
+              --name "$CLUSTER_NAME" \
+              --query nodeResourceGroup \
+              --output tsv
+          )"
+
           az aks get-credentials \
             --admin \
             --overwrite-existing \
-            --resource-group "$(terraform output -raw resource_group_name)" \
-            --name "$(terraform output -raw cluster_name)" \
+            --resource-group "$RESOURCE_GROUP" \
+            --name "$CLUSTER_NAME" \
             > /dev/null
 
           if kubectl get crd applications.argoproj.io > /dev/null 2>&1; then
             if kubectl get application azure -n argocd > /dev/null 2>&1; then
-              kubectl delete application azure -n argocd
-              kubectl wait \
-                --for=delete \
-                application/azure \
+              while read -r application; do
+                kubectl patch "$application" \
+                  --namespace argocd \
+                  --type merge \
+                  --patch '{"operation":null}' \
+                  > /dev/null
+              done < <(kubectl get applications -n argocd --output name)
+
+              kubectl delete application azure \
                 --namespace argocd \
+                --wait=true \
                 --timeout 15m
             fi
           else
             echo "Argo CD is not installed; skipping application cleanup."
           fi
 
-          if helm status azure-platform -n azure-alb-system > /dev/null 2>&1; then
-            helm uninstall azure-platform \
-              --namespace azure-alb-system \
-              --wait \
-              --timeout 15m
-          fi
+          mapfile -t GATEWAY_IDS < <(
+            az resource list \
+              --resource-group "$NODE_RESOURCE_GROUP" \
+              --resource-type Microsoft.ServiceNetworking/trafficControllers \
+              --query '[].id' \
+              --output tsv
+          )
 
-          if helm status alb-controller -n azure-alb-system > /dev/null 2>&1; then
-            helm uninstall alb-controller \
-              --namespace azure-alb-system \
-              --wait \
-              --timeout 5m
+          if [ "${#GATEWAY_IDS[@]}" -gt 0 ]; then
+            echo "Waiting for Application Gateway for Containers deletion..."
+            az resource wait \
+              --deleted \
+              --ids "${GATEWAY_IDS[@]}" \
+              --interval 20 \
+              --timeout 1800
           fi
 
           if helm status argocd -n argocd > /dev/null 2>&1; then

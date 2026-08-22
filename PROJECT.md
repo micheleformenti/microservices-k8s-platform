@@ -169,7 +169,7 @@ platform resources:
 - [x] Bootstrap remote state and GitHub Actions OIDC identities
 - [x] Provision a multi-zone, autoscaling AKS environment through Terraform
 - [x] Validate pipeline-based creation and teardown
-- [ ] Add persistent storage
+- [x] Add persistent storage
 - [ ] Add ingress, DNS, and HTTPS
 - [ ] Document AKS creation and teardown
 
@@ -180,6 +180,7 @@ platform resources:
 - [x] Deploy the workload and observability to AKS through GitOps
 - [x] Validate the frontend through port forwarding
 - [x] Automate Argo CD bootstrap in the Azure deployment workflow
+- [x] Pass Azure infrastructure metadata to Argo CD through GitOps Bridge
 - [ ] Document EKS and AKS differences
 
 ### 17. Portfolio Documentation
