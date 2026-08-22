@@ -93,6 +93,10 @@ frontend:
     annotations: {}
     path: /
     pathType: Prefix
+  gateway:
+    enabled: false
+    className: ""
+    annotations: {}
   resources:
     requests:
       cpu: 100m
