@@ -210,6 +210,8 @@ jobs:
           kubeconform \
             -strict \
             -summary \
+            -schema-location default \
+            -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
             rendered-application-local.yaml \
             rendered-application-eks.yaml \
             rendered-application-aks.yaml
