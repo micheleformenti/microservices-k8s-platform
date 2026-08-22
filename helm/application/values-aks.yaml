@@ -28,6 +28,12 @@ frontend:
     repository: ghcr.io/micheleformenti/frontend
     tag: 61d8b4635afb1a8bd10e1306bbe6d30b2fa62761
     pullPolicy: IfNotPresent
+  gateway:
+    enabled: true
+    className: azure-alb-external
+    annotations:
+      alb.networking.azure.io/alb-namespace: azure-alb-system
+      alb.networking.azure.io/alb-name: platform
 loadGenerator:
   image:
     repository: ghcr.io/micheleformenti/loadgenerator

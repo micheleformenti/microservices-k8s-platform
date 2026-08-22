@@ -81,6 +81,7 @@ jobs:
       - name: Build container image matrix
         id: image-matrix
         env:
+          EVENT_NAME: ${{ github.event_name }}
           WORKFLOW_CHANGED: ${{ steps.filter.outputs.workflow }}
           ADSERVICE_CHANGED: ${{ steps.filter.outputs.adservice }}
           CARTSERVICE_CHANGED: ${{ steps.filter.outputs.cartservice }}
@@ -95,52 +96,57 @@ jobs:
           SHIPPINGSERVICE_CHANGED: ${{ steps.filter.outputs.shippingservice }}
         run: |
           services=()
+          validate_all_images=false
+
+          if [ "${EVENT_NAME}" = "pull_request" ] && [ "${WORKFLOW_CHANGED}" = "true" ]; then
+            validate_all_images=true
+          fi
 
           add_service() {
             services+=("{\"image\":\"$1\",\"context\":\"$2\",\"dockerfile\":\"$3\",\"valuesKey\":\"$4\"}")
           }
 
-          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${ADSERVICE_CHANGED}" = "true" ]; then
+          if [ "${validate_all_images}" = "true" ] || [ "${ADSERVICE_CHANGED}" = "true" ]; then
             add_service "adservice" "src/adservice" "src/adservice/Dockerfile" "adService"
           fi
 
-          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${CARTSERVICE_CHANGED}" = "true" ]; then
+          if [ "${validate_all_images}" = "true" ] || [ "${CARTSERVICE_CHANGED}" = "true" ]; then
             add_service "cartservice" "src/cartservice/src" "src/cartservice/src/Dockerfile" "cartService"
           fi
 
-          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${CHECKOUTSERVICE_CHANGED}" = "true" ]; then
+          if [ "${validate_all_images}" = "true" ] || [ "${CHECKOUTSERVICE_CHANGED}" = "true" ]; then
             add_service "checkoutservice" "src/checkoutservice" "src/checkoutservice/Dockerfile" "checkoutService"
           fi
 
-          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${CURRENCYSERVICE_CHANGED}" = "true" ]; then
+          if [ "${validate_all_images}" = "true" ] || [ "${CURRENCYSERVICE_CHANGED}" = "true" ]; then
             add_service "currencyservice" "src/currencyservice" "src/currencyservice/Dockerfile" "currencyService"
           fi
 
-          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${EMAILSERVICE_CHANGED}" = "true" ]; then
+          if [ "${validate_all_images}" = "true" ] || [ "${EMAILSERVICE_CHANGED}" = "true" ]; then
             add_service "emailservice" "src/emailservice" "src/emailservice/Dockerfile" "emailService"
           fi
 
-          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${FRONTEND_CHANGED}" = "true" ]; then
+          if [ "${validate_all_images}" = "true" ] || [ "${FRONTEND_CHANGED}" = "true" ]; then
             add_service "frontend" "src/frontend" "src/frontend/Dockerfile" "frontend"
           fi
 
-          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${LOADGENERATOR_CHANGED}" = "true" ]; then
+          if [ "${validate_all_images}" = "true" ] || [ "${LOADGENERATOR_CHANGED}" = "true" ]; then
             add_service "loadgenerator" "src/loadgenerator" "src/loadgenerator/Dockerfile" "loadGenerator"
           fi
 
-          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${PAYMENTSERVICE_CHANGED}" = "true" ]; then
+          if [ "${validate_all_images}" = "true" ] || [ "${PAYMENTSERVICE_CHANGED}" = "true" ]; then
             add_service "paymentservice" "src/paymentservice" "src/paymentservice/Dockerfile" "paymentService"
           fi
 
-          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${PRODUCTCATALOGSERVICE_CHANGED}" = "true" ]; then
+          if [ "${validate_all_images}" = "true" ] || [ "${PRODUCTCATALOGSERVICE_CHANGED}" = "true" ]; then
             add_service "productcatalogservice" "src/productcatalogservice" "src/productcatalogservice/Dockerfile" "productCatalogService"
           fi
 
-          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${RECOMMENDATIONSERVICE_CHANGED}" = "true" ]; then
+          if [ "${validate_all_images}" = "true" ] || [ "${RECOMMENDATIONSERVICE_CHANGED}" = "true" ]; then
             add_service "recommendationservice" "src/recommendationservice" "src/recommendationservice/Dockerfile" "recommendationService"
           fi
 
-          if [ "${WORKFLOW_CHANGED}" = "true" ] || [ "${SHIPPINGSERVICE_CHANGED}" = "true" ]; then
+          if [ "${validate_all_images}" = "true" ] || [ "${SHIPPINGSERVICE_CHANGED}" = "true" ]; then
             add_service "shippingservice" "src/shippingservice" "src/shippingservice/Dockerfile" "shippingService"
           fi
 
@@ -210,6 +216,8 @@ jobs:
           kubeconform \
             -strict \
             -summary \
+            -schema-location default \
+            -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
             rendered-application-local.yaml \
             rendered-application-eks.yaml \
             rendered-application-aks.yaml
