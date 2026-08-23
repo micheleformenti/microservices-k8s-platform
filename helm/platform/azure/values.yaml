@@ -1,11 +1,19 @@
-# Parent chart settings
+# ALB Controller
 albController:
   enabled: false
 
+alb-controller:
+  albController:
+    namespace: azure-alb-system
+    podIdentity:
+      clientID: ""
+
+# Application Gateway for Containers
 applicationGateway:
   enabled: false
   subnetId: ""
 
+# ExternalDNS
 externalDns:
   enabled: false
   azure:
@@ -13,13 +21,6 @@ externalDns:
     tenantId: ""
     subscriptionId: ""
     resourceGroup: ""
-
-# Upstream chart values
-alb-controller:
-  albController:
-    namespace: azure-alb-system
-    podIdentity:
-      clientID: ""
 
 external-dns:
   fullnameOverride: external-dns
@@ -44,3 +45,14 @@ external-dns:
     - name: azure-config
       mountPath: /etc/kubernetes
       readOnly: true
+
+# cert-manager
+certManager:
+  enabled: false
+
+cert-manager:
+  crds:
+    enabled: true
+  config:
+    gatewayAPI:
+      enabled: true

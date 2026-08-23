@@ -1,0 +1,35 @@
+{{- if and .Values.frontend.gateway.enabled .Values.frontend.gateway.tls.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: letsencrypt-staging
+  namespace: {{ .Values.namespace.name }}
+spec:
+  acme:
+    email: {{ required "frontend.gateway.tls.email is required" .Values.frontend.gateway.tls.email | quote }}
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-staging-account-key
+    solvers:
+      - http01:
+          gatewayHTTPRoute:
+            parentRefs:
+              - name: frontend
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: letsencrypt-production
+  namespace: {{ .Values.namespace.name }}
+spec:
+  acme:
+    email: {{ required "frontend.gateway.tls.email is required" .Values.frontend.gateway.tls.email | quote }}
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-production-account-key
+    solvers:
+      - http01:
+          gatewayHTTPRoute:
+            parentRefs:
+              - name: frontend
+{{- end }}

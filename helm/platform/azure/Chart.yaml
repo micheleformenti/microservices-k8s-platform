@@ -14,3 +14,7 @@ dependencies:
     version: 1.20.0
     repository: https://kubernetes-sigs.github.io/external-dns/
     condition: externalDns.enabled
+  - name: cert-manager
+    version: 1.21.1
+    repository: https://charts.jetstack.io
+    condition: certManager.enabled
