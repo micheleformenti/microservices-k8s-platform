@@ -1,27 +1,22 @@
 # Project Plan
 
-This file tracks the project direction and milestone progress. Details will be
-added incrementally as each milestone starts.
+This file tracks completed milestones and the remaining project roadmap.
 
 ## Objective
 
-Build a Kubernetes platform around a realistic microservices workload, with the
-focus on deployment, GitOps, infrastructure as code, observability, and security.
+Build a portable Kubernetes platform around a realistic microservices workload,
+then operate it consistently across local Kubernetes, AWS EKS, and Azure AKS.
 
 ## Current Scope
 
-- Local Kubernetes deployment
-- Custom Helm packaging
-- CI validation
-- Argo CD app-of-apps delivery for local, EKS, and AKS
-- Terraform-managed EKS cluster
-- Container image build and publishing
-- Terraform-managed AKS cluster
-- EKS storage integration
-- EKS ingress, HTTPS, and automated DNS
-- EKS pod and node autoscaling
+- Portable application, platform, and observability Helm charts
+- CI validation, GHCR publishing, and immutable image tag updates
+- Argo CD app-of-apps delivery for local Kubernetes, EKS, and AKS
+- Terraform-managed, multi-zone EKS and AKS environments
+- Cloud-native identity, storage, autoscaling, load balancing, DNS, and HTTPS
+- Protected OIDC pipelines for the AKS lifecycle
 - Prometheus and Grafana observability baseline
-- Security hardening
+- Planned security hardening and cross-cloud pipeline refinement
 
 ## Repository Structure
 
@@ -33,25 +28,37 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 │   ├── application/
 │   ├── observability/
 │   └── platform/
-│       └── aws/
+│       ├── aws/
+│       └── azure/
 ├── argocd/
 │   ├── roots/
-│   └── applications/
+│   ├── applications/
+│   │   ├── local/
+│   │   ├── aws/
+│   │   └── azure/
+│   └── bootstrap/
 ├── terraform/
 │   ├── aws/
+│   │   ├── bootstrap/
+│   │   └── eks/
 │   └── azure/
+│       ├── bootstrap/
+│       └── aks/
 ├── docs/
-├── .github/
+│   └── diagrams/
+├── .github/workflows/
 ├── LICENSE
 ├── PROJECT.md
 └── README.md
 ```
 
-The Helm structure separates the portable workload from provider-specific
-platform resources:
+The repository separates portable workload configuration from cloud-specific
+infrastructure and platform components:
 
-- `helm/application/` contains the shared application chart.
-- `helm/platform/aws/` contains AWS/EKS-specific platform resources.
+- `helm/` contains application, observability, and provider platform charts.
+- `argocd/` contains roots, child Applications, and bootstrap metadata.
+- `terraform/` separates bootstrap state from disposable EKS and AKS roots.
+- `.github/workflows/` contains CI and protected Azure lifecycle workflows.
 
 ## Milestones
 
@@ -79,8 +86,7 @@ platform resources:
 - [x] Add validation workflows
 - [x] Check service builds and tests where practical
 - [x] Validate Helm changes
-- [x] Validate Kubernetes manifests
-- [x] Add Dependabot for GitHub Actions update PRs
+- [x] Validate rendered Helm resources and Argo CD Applications
 
 ### 5. Local GitOps Delivery
 
@@ -162,6 +168,7 @@ platform resources:
 
 - [ ] Add workload security defaults
 - [ ] Add secret management approach
+- [ ] Add dependency update automation
 - [ ] Add security scanning
 
 ### 15. AKS Platform
