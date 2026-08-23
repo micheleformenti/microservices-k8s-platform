@@ -3,6 +3,11 @@ data "azurerm_role_definition" "application_gateway_configuration_manager" {
   scope = "/subscriptions/${var.subscription_id}"
 }
 
+data "azurerm_role_definition" "dns_zone_contributor" {
+  name  = "DNS Zone Contributor"
+  scope = "/subscriptions/${var.subscription_id}"
+}
+
 data "azurerm_role_definition" "network_contributor" {
   name  = "Network Contributor"
   scope = "/subscriptions/${var.subscription_id}"
@@ -16,6 +21,7 @@ data "azurerm_role_definition" "reader" {
 locals {
   terraform_apply_assignable_role_ids = join(", ", [
     basename(data.azurerm_role_definition.application_gateway_configuration_manager.role_definition_id),
+    basename(data.azurerm_role_definition.dns_zone_contributor.role_definition_id),
     basename(data.azurerm_role_definition.network_contributor.role_definition_id),
     basename(data.azurerm_role_definition.reader.role_definition_id),
   ])
@@ -63,7 +69,7 @@ resource "azurerm_role_assignment" "terraform_apply_project" {
   principal_type       = "ServicePrincipal"
 }
 
-resource "azurerm_role_assignment" "terraform_apply_network_rbac" {
+resource "azurerm_role_assignment" "terraform_apply_delegated_rbac" {
   scope                = "/subscriptions/${var.subscription_id}"
   role_definition_name = "Role Based Access Control Administrator"
   principal_id         = azuread_service_principal.terraform_apply.object_id
