@@ -101,6 +101,7 @@ platform resources:
 - [x] Provision an EKS environment
 - [x] Verify kubectl access to the EKS cluster
 - [x] Document EKS creation and teardown
+- [ ] Add protected OIDC create/update and destroy pipelines for EKS
 
 ### 7. Container Image Build and Publishing
 
@@ -165,12 +166,13 @@ platform resources:
 
 ### 15. AKS Platform
 
-- [x] Bootstrap remote state and GitHub Actions OIDC identities
+- [x] Bootstrap AKS remote state and GitHub Actions OIDC identities
 - [x] Provision a multi-zone, autoscaling AKS environment through Terraform
 - [x] Validate pipeline-based creation and teardown
 - [x] Add persistent storage
-- [ ] Add ingress, DNS, and HTTPS
-- [ ] Document AKS creation and teardown
+- [x] Add Gateway API routing, DNS, and HTTPS
+- [x] Document AKS creation and teardown
+- [ ] Migrate the bootstrap state to the remote backend
 
 ### 16. Deploy to AKS with GitOps
 
@@ -180,6 +182,7 @@ platform resources:
 - [x] Validate the frontend through port forwarding
 - [x] Automate Argo CD bootstrap in the Azure deployment workflow
 - [x] Pass Azure infrastructure metadata to Argo CD through GitOps Bridge
+- [ ] Add sync waves and child Application health aggregation
 - [ ] Document EKS and AKS differences
 
 ### 17. Portfolio Documentation

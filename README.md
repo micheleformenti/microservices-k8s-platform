@@ -1,53 +1,79 @@
 # Microservices Kubernetes Platform
 
-> **Project status:** Active development.
-> Completed and planned work is tracked in [PROJECT.md](PROJECT.md).
+Production-inspired platform engineering project that delivers the same
+microservices workload to local Kubernetes, AWS EKS, and Azure AKS.
 
-Production-inspired platform engineering project focused on Kubernetes, GitOps, Infrastructure as Code, observability, and security. The microservices application serves as a realistic workload.
+The project demonstrates the full lifecycle: CI, container publishing,
+Infrastructure as Code, GitOps delivery, cloud networking, autoscaling,
+persistence, DNS, HTTPS, and environment teardown.
 
-## Current Progress
+## Platform Status
 
-| Status | Component | Documentation |
-|---------|-----------|---------------|
-| ✅ | Local Kubernetes, Helm, and Argo CD delivery | [Guide](docs/local.md) |
-| ✅ | CI validation, GHCR publishing, and GitOps image updates | [Guide](docs/ci.md) |
-| ✅ | AWS EKS platform: Terraform, GitOps, storage, autoscaling, HTTPS, and DNS | [Guide](docs/eks.md) |
-| 🚧 | Azure AKS platform | In progress - [Guide](docs/aks.md) |
-| 🚧 | Observability | In progress, currently on hold |
-| ⏳ | Security hardening | Planned |
+| Status | Area | Guide |
+|--------|------|-------|
+| ✅ | CI validation, GHCR publishing, and GitOps image updates | [CI/CD](docs/ci.md) |
+| ✅ | AWS EKS: storage, autoscaling, HTTPS, and DNS | [EKS](docs/eks.md) |
+| ✅ | Azure AKS: storage, autoscaling, HTTPS, and DNS | [AKS](docs/aks.md) |
+| 🚧 | Observability | Roadmap |
+| ⏳ | Security hardening | Roadmap |
 
-## Architecture
+## Delivery Architecture
 
-<p align="center">
-  <img src="docs/diagrams/eks-platform-architecture.svg" alt="EKS platform architecture" width="900">
-</p>
+```text
+Pull request
+      ↓
+GitHub Actions
+  ├── tests and validates application, Helm, Argo CD, and Terraform
+  └── publishes immutable images to GHCR
+      ↓
+Terraform provisions
+  ├── EKS through the documented manual workflow
+  └── AKS through protected OIDC pipelines
+      ↓
+Argo CD reconciles
+  ├── cloud platform components
+  ├── application workload
+  └── observability stack
+      ↓
+Cloud load balancing, DNS, and HTTPS
+```
 
-The diagram shows the current AWS implementation. See the
-[AWS EKS platform guide](docs/eks.md) for deployment details and tradeoffs.
+## Platform Highlights
 
-## Stack
+- **Infrastructure:** Terraform-managed, multi-zone EKS and AKS environments
+  with private worker nodes and controlled egress.
+- **Identity:** Azure pipelines use GitHub Actions OIDC; controllers use AWS
+  Pod Identity and Azure Workload Identity.
+- **GitOps:** Argo CD app-of-apps delivery, with GitOps Bridge metadata for
+  dynamic Azure infrastructure values.
+- **Runtime:** persistent storage, Horizontal Pod Autoscaling, and node
+  autoscaling.
+- **Traffic:** AWS ALB and Azure Application Gateway for Containers, with
+  automated DNS and HTTPS.
+- **Lifecycle:** protected AKS create/update and destroy workflows support
+  disposable environments; the same pipeline model is planned for EKS.
 
-- Kubernetes
-- Helm
-- Argo CD
-- Terraform
-- EKS
-- AKS
-- CI/CD
-- Observability
-- Kubernetes security hardening
+## Documentation
+
+- [Local development and GitOps](docs/local.md)
+- [CI/CD and image publishing](docs/ci.md)
+- [AWS EKS platform](docs/eks.md)
+- [Azure AKS platform](docs/aks.md)
+- [Implementation roadmap](PROJECT.md)
+
+## Repository Layout
+
+```text
+src/         Microservices source code
+helm/        Application, platform, and observability charts
+argocd/      App-of-apps roots, Applications, and bootstrap metadata
+terraform/   AWS and Azure infrastructure
+.github/     CI/CD and infrastructure workflows
+docs/        Platform guides and architecture diagrams
+```
 
 ## Workload
 
-The workload is based on Google's Online Boutique demo application.
-
-```text
-src/      Microservices source code
-protos/   gRPC API contracts
-```
-
-## Attribution
-
-Application source code is based on Google's
-[Online Boutique](https://github.com/GoogleCloudPlatform/microservices-demo)
-project, licensed under Apache 2.0.
+The workload is based on Google's
+[Online Boutique](https://github.com/GoogleCloudPlatform/microservices-demo),
+licensed under Apache 2.0.
