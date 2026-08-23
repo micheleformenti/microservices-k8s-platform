@@ -1,0 +1,26 @@
+{{- if .Values.externalDns.enabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: external-dns
+  namespace: {{ .Release.Namespace }}
+  labels:
+    azure.workload.identity/use: "true"
+  annotations:
+    azure.workload.identity/client-id: {{ required "externalDns.azure.clientId is required" .Values.externalDns.azure.clientId | quote }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: external-dns-azure
+  namespace: {{ .Release.Namespace }}
+type: Opaque
+stringData:
+  azure.json: |
+    {
+      "tenantId": {{ required "externalDns.azure.tenantId is required" .Values.externalDns.azure.tenantId | quote }},
+      "subscriptionId": {{ required "externalDns.azure.subscriptionId is required" .Values.externalDns.azure.subscriptionId | quote }},
+      "resourceGroup": {{ required "externalDns.azure.resourceGroup is required" .Values.externalDns.azure.resourceGroup | quote }},
+      "useWorkloadIdentityExtension": true
+    }
+{{- end }}

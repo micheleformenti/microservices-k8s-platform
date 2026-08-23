@@ -1,3 +1,46 @@
+# Parent chart settings
+albController:
+  enabled: false
+
 applicationGateway:
   enabled: false
   subnetId: ""
+
+externalDns:
+  enabled: false
+  azure:
+    clientId: ""
+    tenantId: ""
+    subscriptionId: ""
+    resourceGroup: ""
+
+# Upstream chart values
+alb-controller:
+  albController:
+    namespace: azure-alb-system
+    podIdentity:
+      clientID: ""
+
+external-dns:
+  fullnameOverride: external-dns
+  provider:
+    name: azure
+  sources:
+    - gateway-httproute
+  domainFilters: []
+  policy: sync
+  registry: txt
+  txtOwnerId: ""
+  serviceAccount:
+    create: false
+    name: external-dns
+  podLabels:
+    azure.workload.identity/use: "true"
+  extraVolumes:
+    - name: azure-config
+      secret:
+        secretName: external-dns-azure
+  extraVolumeMounts:
+    - name: azure-config
+      mountPath: /etc/kubernetes
+      readOnly: true

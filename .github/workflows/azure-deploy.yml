@@ -257,6 +257,13 @@ jobs:
         if: github.event_name == 'push' || inputs.operation != 'plan'
         working-directory: .
         run: |
+          export AZURE_TENANT_ID="$ARM_TENANT_ID"
+          export AZURE_SUBSCRIPTION_ID="$ARM_SUBSCRIPTION_ID"
+          export CLUSTER_NAME="$(
+            terraform -chdir=terraform/azure/aks output \
+              -raw cluster_name
+          )"
+
           export ALB_CONTROLLER_CLIENT_ID="$(
             terraform -chdir=terraform/azure/aks output \
               -raw application_gateway_controller_client_id
@@ -264,6 +271,19 @@ jobs:
           export APPLICATION_GATEWAY_SUBNET_ID="$(
             terraform -chdir=terraform/azure/aks output \
               -raw application_gateway_subnet_id
+          )"
+
+          export DNS_ZONE_RESOURCE_GROUP_NAME="$(
+            terraform -chdir=terraform/azure/aks output \
+              -raw dns_zone_resource_group_name
+          )"
+          export DNS_ZONE_NAME="$(
+            terraform -chdir=terraform/azure/aks output \
+              -raw dns_zone_name
+          )"
+          export EXTERNAL_DNS_CLIENT_ID="$(
+            terraform -chdir=terraform/azure/aks output \
+              -raw external_dns_client_id
           )"
 
           envsubst \
