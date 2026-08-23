@@ -103,6 +103,7 @@ frontend:
       issuer: ""
       email: ""
       secretName: frontend-tls
+      redirectHttpToHttps: false
   resources:
     requests:
       cpu: 100m

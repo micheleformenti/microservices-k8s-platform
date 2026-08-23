@@ -44,6 +44,7 @@ frontend:
       enabled: true
       issuer: letsencrypt-production
       email: michele.formenti@proton.me
+      redirectHttpToHttps: true
   autoscaling:
     enabled: true
 
