@@ -9,6 +9,18 @@ variable "project_name" {
   default     = "microservices-platform"
 }
 
+variable "dns_zone_name" {
+  description = "Existing Azure DNS zone used for application records."
+  type        = string
+  default     = "azure.micheleformenti.com"
+}
+
+variable "dns_zone_resource_group_name" {
+  description = "Resource group containing the existing Azure DNS zone."
+  type        = string
+  default     = "rg-dns"
+}
+
 variable "vnet_address_space" {
   description = "Address space assigned to the AKS virtual network."
   type        = list(string)

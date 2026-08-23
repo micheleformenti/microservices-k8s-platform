@@ -1,0 +1,9 @@
+dependencies:
+- name: alb-controller
+  repository: oci://mcr.microsoft.com/application-lb/charts
+  version: 1.11.4
+- name: external-dns
+  repository: https://kubernetes-sigs.github.io/external-dns/
+  version: 1.20.0
+digest: sha256:66388cddada3e58910c87778b01baa077225eee4202a42ce4461e3e0b29dbea3
+generated: "2026-08-23T09:57:47.138841258+02:00"

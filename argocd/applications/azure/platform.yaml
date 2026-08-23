@@ -24,27 +24,34 @@ spec:
       project: default
 
       sources:
-        - repoURL: mcr.microsoft.com/application-lb/charts
-          chart: alb-controller
-          targetRevision: 1.11.4
-          helm:
-            releaseName: alb-controller
-            parameters:
-              - name: albController.namespace
-                value: azure-alb-system
-              - name: albController.podIdentity.clientID
-                value: '{{ index .metadata.annotations "gitops-bridge/alb-controller-client-id" }}'
-
         - repoURL: https://github.com/micheleformenti/microservices-k8s-platform.git
           targetRevision: main
           path: helm/platform/azure
           helm:
             releaseName: azure-platform
             parameters:
+              - name: albController.enabled
+                value: "true"
+              - name: alb-controller.albController.podIdentity.clientID
+                value: '{{ index .metadata.annotations "gitops-bridge/alb-controller-client-id" }}'
               - name: applicationGateway.enabled
                 value: "true"
               - name: applicationGateway.subnetId
                 value: '{{ index .metadata.annotations "gitops-bridge/application-gateway-subnet-id" }}'
+              - name: externalDns.enabled
+                value: "true"
+              - name: external-dns.domainFilters[0]
+                value: '{{ index .metadata.annotations "gitops-bridge/dns-zone-name" }}'
+              - name: external-dns.txtOwnerId
+                value: '{{ index .metadata.annotations "gitops-bridge/cluster-name" }}'
+              - name: externalDns.azure.clientId
+                value: '{{ index .metadata.annotations "gitops-bridge/external-dns-client-id" }}'
+              - name: externalDns.azure.tenantId
+                value: '{{ index .metadata.annotations "gitops-bridge/azure-tenant-id" }}'
+              - name: externalDns.azure.subscriptionId
+                value: '{{ index .metadata.annotations "gitops-bridge/azure-subscription-id" }}'
+              - name: externalDns.azure.resourceGroup
+                value: '{{ index .metadata.annotations "gitops-bridge/dns-zone-resource-group-name" }}'
 
       destination:
         server: '{{ .server }}'
