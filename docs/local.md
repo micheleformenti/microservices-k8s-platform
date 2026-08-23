@@ -1,9 +1,9 @@
 # Local Kubernetes and GitOps
 
-This guide covers the local delivery progression used by the project:
+This guide covers the local delivery paths used by the project:
 
 ```text
-plain manifests -> Helm chart -> Argo CD reconciliation
+Helm chart -> Argo CD reconciliation
 ```
 
 The workflow was tested with Rancher Desktop and its Docker runtime.
@@ -19,48 +19,6 @@ Confirm that Docker and kubectl target the intended local environment:
 ```sh
 docker context use rancher-desktop
 kubectl get nodes
-```
-
-## Plain Manifests
-
-The baseline manifests in `manifests/` use local image names with
-`imagePullPolicy: IfNotPresent`. Build the service images into the cluster's
-container runtime before applying them.
-
-```sh
-docker build -t frontend ./src/frontend
-docker build -t productcatalogservice ./src/productcatalogservice
-docker build -t currencyservice ./src/currencyservice
-docker build -t cartservice ./src/cartservice/src
-docker build -t recommendationservice ./src/recommendationservice
-docker build -t shippingservice ./src/shippingservice
-docker build -t adservice ./src/adservice
-docker build -t checkoutservice ./src/checkoutservice
-docker build -t paymentservice ./src/paymentservice
-docker build -t emailservice ./src/emailservice
-docker build -t loadgenerator ./src/loadgenerator
-
-kubectl apply -f manifests/
-kubectl get pods -n microservices-platform
-```
-
-The local frontend is available at `http://localhost:30010`. If the local
-runtime does not expose NodePorts on localhost, forward the service instead:
-
-```sh
-kubectl port-forward -n microservices-platform svc/frontend 8080:80
-```
-
-After rebuilding an image, restart only its Deployment, for example:
-
-```sh
-kubectl rollout restart deployment/frontend -n microservices-platform
-```
-
-Remove the baseline before switching ownership to Helm:
-
-```sh
-kubectl delete -f manifests/
 ```
 
 ## Helm Deployment
