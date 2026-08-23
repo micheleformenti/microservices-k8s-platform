@@ -1,54 +1,51 @@
 # Azure AKS Platform
 
-The AKS implementation provides repeatable infrastructure, GitOps delivery,
-Azure Disk persistence, and the foundation for public ingress. DNS and HTTPS
-are not implemented yet.
+The AKS environment is reproducible, delivered through GitOps, and safe to
+create and destroy from protected GitHub Actions workflows.
 
 ## Architecture
 
-Terraform provisions:
-
-- multi-zone AKS with autoscaling from one to four nodes
-- private Azure CNI Overlay networking with static NAT egress
-- managed identities and a dedicated Application Gateway subnet
-
-AKS provides the managed control plane, Metrics Server, and Azure storage
-drivers.
-
 ```text
-Terraform provisions Azure infrastructure
-    ├── VNet and NAT gateway
-    ├── AKS
-    └── managed identities
-              ↓
-GitHub Actions installs Argo CD
-              ↓
-Terraform outputs
-    ├── ALB Controller client ID
-    └── Application Gateway subnet ID
-              ↓
-Pipeline creates Argo cluster metadata Secret
-              ↓
-ApplicationSet reads metadata
-    ├── installs ALB Controller
-    └── installs helm/platform/azure
-              ↓
-Argo CD owns the platform, workload, and observability resources
+GitHub Actions
+  ├── applies Terraform
+  │     ├── Network: VNet, AKS and gateway subnets, NAT gateway
+  │     ├── Cluster: multi-zone AKS with node autoscaling
+  │     └── Identities: AKS and platform controllers
+  ├── installs Argo CD
+  └── creates the cluster metadata Secret
+        ├── Azure and cluster identifiers
+        ├── controller identity client IDs
+        ├── Application Gateway subnet ID
+        └── DNS zone metadata
+      ↓
+ApplicationSet reads the metadata Secret
+  ├── Azure platform
+  │     ├── ALB Controller and Application Gateway
+  │     ├── ExternalDNS
+  │     └── cert-manager
+  ├── Application workload
+  └── observability stack
+      ↓
+Gateway API routes HTTPS traffic to the frontend Service
 ```
+
+The system node pool spans three availability zones and scales from one to
+four nodes. Pods use Azure CNI Overlay; nodes have no public IPs and use a
+static NAT gateway for egress.
 
 ## Bootstrap
 
-The one-time manual bootstrap creates the remote state backend and separate
-GitHub OIDC identities with scoped plan and apply permissions.
+The privileged bootstrap is applied manually with MFA. It creates the state
+storage, GitHub OIDC identities, and scoped Azure permissions.
 
 ```text
-Manual Terraform apply
-    ├── remote state storage
-    └── GitHub OIDC identities and RBAC
-              ↓
-Script configures the required GitHub secrets
-              ↓
-Pipelines authenticate to Azure with OIDC
+Manual bootstrap
+  ├── Terraform state storage
+  └── GitHub plan/apply identities and RBAC
+                ↓
+configure-github-secrets.sh
+                ↓
+Protected pipelines authenticate with OIDC
 ```
 
 ```sh
@@ -60,29 +57,32 @@ terraform -chdir=terraform/azure/bootstrap apply
 terraform/azure/bootstrap/configure-github-secrets.sh
 ```
 
+Bootstrap state will be migrated to the remote backend separately. Bootstrap
+changes remain privileged manual operations; the regular AKS lifecycle runs
+through its protected pipelines.
+
 ## Create or Update
 
 ```text
-Pull request (or manual plan)
-      ↓
+Pull request or manual plan
+              ↓
 Terraform plan
-      ↓
-Merge to main (or manual apply)
-      ↓
-Protected Terraform apply
-      ↓
-Install Argo CD
-      ↓
-Publish Azure metadata
-      ↓
-Apply argocd/roots/azure.yaml
-      ↓
-Argo CD reconciles the child applications
+              ↓
+Merge to main or approved manual apply
+              ↓
+Terraform apply
+              ↓
+Argo CD bootstrap
+              ↓
+GitOps reconciliation
 ```
+
+Infrastructure metadata such as identity client IDs and subnet IDs is passed
+to Argo CD through the GitOps Bridge pattern rather than committed to Git.
 
 ## Verify
 
-Configure local access after the cluster is running:
+Configure local access:
 
 ```sh
 az aks get-credentials \
@@ -90,50 +90,62 @@ az aks get-credentials \
   --name aks-microservices-platform \
   --admin \
   --overwrite-existing
-
-kubectl get nodes -L topology.kubernetes.io/zone
-kubectl get applications -n argocd
-kubectl get pods -n microservices-platform
-kubectl get pods -n monitoring
 ```
 
-Until public routing is added, test the frontend through port forwarding:
+Check the platform:
 
 ```sh
-kubectl port-forward service/frontend \
-  --namespace microservices-platform \
-  8080:80
+kubectl get nodes -L topology.kubernetes.io/zone
+kubectl get applications,applicationsets -n argocd
+kubectl get pods -n azure-alb-system
+kubectl get pods -n microservices-platform
+kubectl get pvc -n microservices-platform
+kubectl get hpa -n microservices-platform
 ```
 
-Open `http://localhost:8080`.
+Check routing, DNS, and HTTPS:
+
+```sh
+kubectl get gateway,httproute -n microservices-platform
+dig aks-demo.azure.micheleformenti.com
+curl -I http://aks-demo.azure.micheleformenti.com
+curl -I https://aks-demo.azure.micheleformenti.com
+```
+
+HTTP redirects to HTTPS. ExternalDNS manages the Azure DNS record, while
+cert-manager obtains and renews the Let's Encrypt certificate.
 
 ## Destroy
 
-Run the **Destroy Azure Environment** workflow from `main` and enter `destroy`
-when prompted.
+Run **Destroy Azure Environment** from `main` and enter `destroy` when
+prompted.
 
 ```text
-Clear active Argo operations
-      ↓
-Delete the Azure root Application
-      ↓
-Argo finalizers remove child applications and Kubernetes resources
-      ↓
-Wait for Azure to delete Application Gateway for Containers
-      ↓
+Delete the Argo CD root Application
+              ↓
+Argo finalizers remove Kubernetes and controller-managed Azure resources
+              ↓
 Uninstall Argo CD
-      ↓
-Terraform destroy
+              ↓
+Terraform destroys the AKS environment
 ```
 
-The bootstrap resources remain so the pipeline can recreate the environment:
+The state storage, pipeline identities, project resource group, and shared DNS
+zone remain available for the next environment creation.
 
-- Terraform state storage
-- GitHub OIDC identities and role assignments
-- project resource group
+## Design Choices
+
+- **Application Gateway for Containers:** managed through Gateway API rather
+  than legacy Ingress resources.
+- **GitOps Bridge:** passes dynamic Azure metadata to Argo CD without Git
+  mutation or hardcoded identifiers.
+- **Workload Identity:** gives Kubernetes controllers narrowly scoped Azure
+  access without client secrets.
+- **Shared DNS zone:** `azure.micheleformenti.com` lives outside the disposable
+  project environment.
 
 ## Next Steps
 
-- Add Gateway API routing to the frontend.
-- Add DNS and HTTPS.
+- Migrate the bootstrap state to the remote backend.
+- Add Argo CD sync waves and child Application health aggregation.
 - Document the final EKS and AKS design differences.
