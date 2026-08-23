@@ -6,9 +6,14 @@ metadata:
   namespace: {{ .Values.namespace.name }}
   labels:
     {{- include "ms-k8s-platform.frontendLabels" . | nindent 4 }}
-  {{- with .Values.frontend.gateway.annotations }}
+  {{- if or .Values.frontend.gateway.annotations .Values.frontend.gateway.tls.enabled }}
   annotations:
+    {{- with .Values.frontend.gateway.annotations }}
     {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.frontend.gateway.tls.enabled }}
+    cert-manager.io/issuer: {{ required "frontend.gateway.tls.issuer is required" .Values.frontend.gateway.tls.issuer | quote }}
+    {{- end }}
   {{- end }}
 spec:
   gatewayClassName: {{ .Values.frontend.gateway.className }}
@@ -22,4 +27,19 @@ spec:
       allowedRoutes:
         namespaces:
           from: Same
+    {{- if .Values.frontend.gateway.tls.enabled }}
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: {{ required "frontend.gateway.hostname is required when TLS is enabled" .Values.frontend.gateway.hostname | quote }}
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            group: ""
+            name: {{ .Values.frontend.gateway.tls.secretName }}
+      allowedRoutes:
+        namespaces:
+          from: Same
+    {{- end }}
 {{- end }}

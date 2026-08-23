@@ -40,6 +40,10 @@ frontend:
     annotations:
       alb.networking.azure.io/alb-namespace: azure-alb-system
       alb.networking.azure.io/alb-name: public
+    tls:
+      enabled: true
+      issuer: letsencrypt-staging
+      email: michele.formenti@proton.me
   autoscaling:
     enabled: true
 

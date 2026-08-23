@@ -98,6 +98,11 @@ frontend:
     className: ""
     hostname: ""
     annotations: {}
+    tls:
+      enabled: false
+      issuer: ""
+      email: ""
+      secretName: frontend-tls
   resources:
     requests:
       cpu: 100m

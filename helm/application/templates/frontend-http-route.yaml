@@ -10,6 +10,10 @@ spec:
   parentRefs:
     - name: frontend
       sectionName: http
+    {{- if .Values.frontend.gateway.tls.enabled }}
+    - name: frontend
+      sectionName: https
+    {{- end }}
   {{- with .Values.frontend.gateway.hostname }}
   hostnames:
     - {{ . | quote }}
