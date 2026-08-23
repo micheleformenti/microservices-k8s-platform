@@ -42,7 +42,7 @@ frontend:
       alb.networking.azure.io/alb-name: public
     tls:
       enabled: true
-      issuer: letsencrypt-staging
+      issuer: letsencrypt-production
       email: michele.formenti@proton.me
   autoscaling:
     enabled: true
