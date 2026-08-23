@@ -10,6 +10,10 @@ spec:
   parentRefs:
     - name: frontend
       sectionName: http
+  {{- with .Values.frontend.gateway.hostname }}
+  hostnames:
+    - {{ . | quote }}
+  {{- end }}
   rules:
     - matches:
         - path:

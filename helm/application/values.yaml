@@ -96,6 +96,7 @@ frontend:
   gateway:
     enabled: false
     className: ""
+    hostname: ""
     annotations: {}
   resources:
     requests:

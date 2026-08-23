@@ -36,9 +36,10 @@ frontend:
   gateway:
     enabled: true
     className: azure-alb-external
+    hostname: aks-demo.azure.micheleformenti.com
     annotations:
       alb.networking.azure.io/alb-namespace: azure-alb-system
-      alb.networking.azure.io/alb-name: platform
+      alb.networking.azure.io/alb-name: public
   autoscaling:
     enabled: true
 
@@ -77,4 +78,3 @@ shippingService:
     repository: ghcr.io/micheleformenti/shippingservice
     tag: 61d8b4635afb1a8bd10e1306bbe6d30b2fa62761
     pullPolicy: IfNotPresent
-    
