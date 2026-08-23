@@ -29,7 +29,6 @@ focus on deployment, GitOps, infrastructure as code, observability, and security
 .
 ├── src/
 ├── protos/
-├── manifests/
 ├── helm/
 │   ├── application/
 │   ├── observability/

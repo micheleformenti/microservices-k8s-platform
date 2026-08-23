@@ -17,7 +17,7 @@ intentionally exercise every job.
 
 | Area | Validation |
 | --- | --- |
-| Kubernetes | kubeconform for plain manifests and Argo CD applications |
+| Kubernetes | kubeconform for rendered Helm and Argo CD applications |
 | Helm | lint, dependency build, render, and kubeconform for both charts |
 | Terraform | format, backend-disabled initialization, and validation for both roots |
 | Go | `go test ./...` matrix for deployed Go services |
