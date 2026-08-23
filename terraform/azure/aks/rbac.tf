@@ -28,3 +28,19 @@ resource "azurerm_role_assignment" "application_gateway_controller_reader" {
   principal_type                   = "ServicePrincipal"
   skip_service_principal_aad_check = true
 }
+
+resource "azurerm_role_assignment" "external_dns_zone" {
+  scope                            = data.azurerm_dns_zone.application.id
+  role_definition_name             = "DNS Zone Contributor"
+  principal_id                     = azurerm_user_assigned_identity.external_dns.principal_id
+  principal_type                   = "ServicePrincipal"
+  skip_service_principal_aad_check = true
+}
+
+resource "azurerm_role_assignment" "external_dns_resource_group_reader" {
+  scope                            = data.azurerm_resource_group.dns.id
+  role_definition_name             = "Reader"
+  principal_id                     = azurerm_user_assigned_identity.external_dns.principal_id
+  principal_type                   = "ServicePrincipal"
+  skip_service_principal_aad_check = true
+}

@@ -3,6 +3,16 @@ output "resource_group_name" {
   value       = data.azurerm_resource_group.project.name
 }
 
+output "dns_zone_name" {
+  description = "Existing Azure DNS zone used for application records."
+  value       = data.azurerm_dns_zone.application.name
+}
+
+output "dns_zone_resource_group_name" {
+  description = "Resource group containing the existing Azure DNS zone."
+  value       = data.azurerm_dns_zone.application.resource_group_name
+}
+
 output "vnet_id" {
   description = "ID of the AKS virtual network."
   value       = azurerm_virtual_network.project.id
@@ -31,6 +41,11 @@ output "cluster_name" {
 output "application_gateway_controller_client_id" {
   description = "Client ID used by the Application Gateway for Containers ALB Controller."
   value       = azurerm_user_assigned_identity.application_gateway_controller.client_id
+}
+
+output "external_dns_client_id" {
+  description = "Client ID used by ExternalDNS."
+  value       = azurerm_user_assigned_identity.external_dns.client_id
 }
 
 output "kubernetes_version" {
