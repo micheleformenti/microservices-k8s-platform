@@ -52,6 +52,8 @@ spec:
                 value: '{{ index .metadata.annotations "gitops-bridge/azure-subscription-id" }}'
               - name: externalDns.azure.resourceGroup
                 value: '{{ index .metadata.annotations "gitops-bridge/dns-zone-resource-group-name" }}'
+              - name: certManager.enabled
+                value: "true"
 
       destination:
         server: '{{ .server }}'
