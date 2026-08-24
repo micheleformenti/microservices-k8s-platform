@@ -5,7 +5,7 @@ on:
     paths:
       - ".github/workflows/azure-deploy.yml"
       - "argocd/bootstrap/azure/cluster-metadata.yaml.tpl"
-      - "helm/platform/azure/**"
+      - "argocd/roots/azure.yaml"
       - "terraform/azure/aks/**"
   push:
     branches:
@@ -13,7 +13,7 @@ on:
     paths:
       - ".github/workflows/azure-deploy.yml"
       - "argocd/bootstrap/azure/cluster-metadata.yaml.tpl"
-      - "helm/platform/azure/**"
+      - "argocd/roots/azure.yaml"
       - "terraform/azure/aks/**"
   workflow_dispatch:
     inputs:
