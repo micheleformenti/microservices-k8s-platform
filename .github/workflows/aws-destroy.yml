@@ -1,0 +1,138 @@
+name: Destroy AWS Environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type destroy to confirm the EKS environment teardown
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: terraform-aws-eks
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: eu-central-1
+  TERRAFORM_VERSION: 1.15.8
+
+jobs:
+  destroy:
+    name: Destroy AWS environment
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: aws-apply
+
+    permissions:
+      contents: read
+      id-token: write
+
+    defaults:
+      run:
+        working-directory: terraform/aws/eks
+
+    steps:
+      - name: Confirm destruction
+        env:
+          CONFIRMATION: ${{ inputs.confirmation }}
+        working-directory: .
+        run: |
+          if [ "$CONFIRMATION" != "destroy" ]; then
+            echo "Destruction not confirmed. Enter exactly: destroy" >&2
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          role-to-assume: ${{ vars.AWS_APPLY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          mask-aws-account-id: true
+
+      - name: Check formatting
+        run: terraform fmt -check
+
+      - name: Initialize Terraform
+        run: |
+          account_id="$(aws sts get-caller-identity --query Account --output text)"
+
+          terraform init -input=false \
+            -backend-config="bucket=microservices-platform-tfstate-$account_id" \
+            -backend-config="key=project-tfstate/terraform.tfstate" \
+            -backend-config="region=$AWS_REGION" \
+            -backend-config="encrypt=true" \
+            -backend-config="use_lockfile=true"
+
+      - name: Validate Terraform
+        run: terraform validate
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v5
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v5
+
+      - name: Remove GitOps applications
+        run: |
+          if ! terraform state list | grep -Fxq 'module.eks.aws_eks_cluster.this[0]'; then
+            echo "EKS is not present in Terraform state; skipping GitOps cleanup."
+            exit 0
+          fi
+
+          aws eks update-kubeconfig \
+            --region "$AWS_REGION" \
+            --name "$(terraform output -raw cluster_name)" \
+            > /dev/null
+
+          if ! kubectl get crd applications.argoproj.io > /dev/null 2>&1; then
+            echo "Argo CD is not installed; skipping application cleanup."
+            exit 0
+          fi
+
+          kubectl delete application aws \
+            --namespace argocd \
+            --ignore-not-found=true \
+            --wait=true \
+            --timeout 15m
+
+          if helm status argocd -n argocd > /dev/null 2>&1; then
+            helm uninstall argocd -n argocd --wait --timeout 5m
+          fi
+
+      - name: Create destroy plan
+        run: |
+          if ! terraform plan -destroy -input=false -out=tfplan > "$RUNNER_TEMP/terraform-plan.log" 2>&1; then
+            echo "Terraform destroy plan failed. Detailed output was not published to protect infrastructure metadata." >&2
+            exit 1
+          fi
+
+          terraform show -json tfplan | jq -r '
+            [.resource_changes[]?
+              | select(.change.actions != ["no-op"])
+              | "\(.change.actions | join("/")) \(.address)"]
+            | if length == 0 then
+                "No infrastructure resources to destroy."
+              else
+                "Terraform destroy summary:\n" + join("\n")
+              end
+          '
+
+      - name: Apply destroy plan
+        run: |
+          if ! terraform apply -input=false -auto-approve tfplan > "$RUNNER_TEMP/terraform-destroy.log" 2>&1; then
+            echo "Terraform destroy failed. Detailed output was not published to protect infrastructure metadata." >&2
+            exit 1
+          fi
+
+          echo "Terraform destroy completed successfully."
