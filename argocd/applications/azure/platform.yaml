@@ -67,6 +67,8 @@ spec:
           name: azure-platform-cert-manager-webhook
           jqPathExpressions:
             - .webhooks[]?.clientConfig.caBundle
+            - '.webhooks[]?.namespaceSelector.matchExpressions[]? | select(.key == "control-plane")'
+            - '.webhooks[]?.namespaceSelector.matchExpressions[]? | select(.key == "kubernetes.azure.com/managedby")'
 
       syncPolicy:
         automated:
