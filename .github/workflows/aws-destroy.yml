@@ -1,10 +1,10 @@
-name: Destroy Azure Environment
+name: Destroy AWS Environment
 
 on:
   workflow_dispatch:
     inputs:
       confirmation:
-        description: Type destroy to confirm the AKS environment teardown
+        description: Type destroy to confirm the EKS environment teardown
         required: true
         type: string
 
@@ -12,34 +12,27 @@ permissions:
   contents: read
 
 concurrency:
-  group: terraform-azure-aks
+  group: terraform-aws-eks
   cancel-in-progress: false
 
 env:
+  AWS_REGION: eu-central-1
   TERRAFORM_VERSION: 1.15.8
 
 jobs:
   destroy:
-    name: Destroy Azure environment
+    name: Destroy AWS environment
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    environment: azure-apply
+    environment: aws-apply
 
     permissions:
       contents: read
       id-token: write
 
-    env:
-      ARM_USE_OIDC: true
-      ARM_USE_AZUREAD: true
-      ARM_CLIENT_ID: ${{ secrets.AZURE_APPLY_CLIENT_ID }}
-      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
     defaults:
       run:
-        working-directory: terraform/azure/aks
+        working-directory: terraform/aws/eks
 
     steps:
       - name: Confirm destruction
@@ -60,18 +53,26 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - name: Log in to Azure
-        uses: azure/login@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6.2.3
         with:
-          client-id: ${{ secrets.AZURE_APPLY_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          role-to-assume: ${{ vars.AWS_APPLY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          mask-aws-account-id: true
 
       - name: Check formatting
         run: terraform fmt -check
 
       - name: Initialize Terraform
-        run: terraform init -input=false
+        run: |
+          account_id="$(aws sts get-caller-identity --query Account --output text)"
+
+          terraform init -input=false \
+            -backend-config="bucket=microservices-platform-tfstate-$account_id" \
+            -backend-config="key=project-tfstate/terraform.tfstate" \
+            -backend-config="region=$AWS_REGION" \
+            -backend-config="encrypt=true" \
+            -backend-config="use_lockfile=true"
 
       - name: Validate Terraform
         run: terraform validate
@@ -84,55 +85,26 @@ jobs:
 
       - name: Remove GitOps applications
         run: |
-          if ! terraform state show azurerm_kubernetes_cluster.platform > /dev/null 2>&1; then
-            echo "AKS is not present in Terraform state; skipping GitOps cleanup."
+          if ! terraform state list | grep -Fxq 'module.eks.aws_eks_cluster.this[0]'; then
+            echo "EKS is not present in Terraform state; skipping GitOps cleanup."
             exit 0
           fi
 
-          RESOURCE_GROUP="$(terraform output -raw resource_group_name)"
-          CLUSTER_NAME="$(terraform output -raw cluster_name)"
-          NODE_RESOURCE_GROUP="$(
-            az aks show \
-              --resource-group "$RESOURCE_GROUP" \
-              --name "$CLUSTER_NAME" \
-              --query nodeResourceGroup \
-              --output tsv
-          )"
-
-          az aks get-credentials \
-            --admin \
-            --overwrite-existing \
-            --resource-group "$RESOURCE_GROUP" \
-            --name "$CLUSTER_NAME" \
+          aws eks update-kubeconfig \
+            --region "$AWS_REGION" \
+            --name "$(terraform output -raw cluster_name)" \
             > /dev/null
 
-          if kubectl get crd applications.argoproj.io > /dev/null 2>&1; then
-            if kubectl get application azure -n argocd > /dev/null 2>&1; then
-              kubectl delete application azure \
-                --namespace argocd \
-                --wait=true \
-                --timeout 15m
-            fi
-          else
+          if ! kubectl get crd applications.argoproj.io > /dev/null 2>&1; then
             echo "Argo CD is not installed; skipping application cleanup."
+            exit 0
           fi
 
-          mapfile -t GATEWAY_IDS < <(
-            az resource list \
-              --resource-group "$NODE_RESOURCE_GROUP" \
-              --resource-type Microsoft.ServiceNetworking/trafficControllers \
-              --query '[].id' \
-              --output tsv
-          )
-
-          if [ "${#GATEWAY_IDS[@]}" -gt 0 ]; then
-            echo "Waiting for Application Gateway for Containers deletion..."
-            az resource wait \
-              --deleted \
-              --ids "${GATEWAY_IDS[@]}" \
-              --interval 20 \
-              --timeout 1800
-          fi
+          kubectl delete application aws \
+            --namespace argocd \
+            --ignore-not-found=true \
+            --wait=true \
+            --timeout 15m
 
           if helm status argocd -n argocd > /dev/null 2>&1; then
             helm uninstall argocd -n argocd --wait --timeout 5m

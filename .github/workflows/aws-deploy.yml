@@ -1,24 +1,22 @@
-name: Deploy Azure Environment
+name: Deploy AWS Environment
 
 on:
   pull_request:
     paths:
-      - ".github/workflows/azure-deploy.yml"
-      - "argocd/bootstrap/azure/cluster-metadata.yaml.tpl"
-      - "argocd/roots/azure.yaml"
-      - "terraform/azure/aks/**"
+      - ".github/workflows/aws-deploy.yml"
+      - "argocd/roots/aws.yaml"
+      - "terraform/aws/eks/**"
   push:
     branches:
       - main
     paths:
-      - ".github/workflows/azure-deploy.yml"
-      - "argocd/bootstrap/azure/cluster-metadata.yaml.tpl"
-      - "argocd/roots/azure.yaml"
-      - "terraform/azure/aks/**"
+      - ".github/workflows/aws-deploy.yml"
+      - "argocd/roots/aws.yaml"
+      - "terraform/aws/eks/**"
   workflow_dispatch:
     inputs:
       operation:
-        description: Plan or create/update the AKS environment
+        description: Plan or create/update the EKS environment
         required: true
         type: choice
         options:
@@ -29,16 +27,17 @@ permissions:
   contents: read
 
 concurrency:
-  group: terraform-azure-aks
+  group: terraform-aws-eks
   cancel-in-progress: false
 
 env:
+  AWS_REGION: eu-central-1
   TERRAFORM_VERSION: 1.15.8
   ARGO_CD_CHART_VERSION: 10.4.0
 
 jobs:
   plan:
-    name: Plan AKS infrastructure
+    name: Plan EKS infrastructure
     if: >-
       github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.full_name == github.repository
@@ -48,17 +47,9 @@ jobs:
       contents: read
       id-token: write
 
-    env:
-      ARM_USE_OIDC: true
-      ARM_USE_AZUREAD: true
-      ARM_CLIENT_ID: ${{ secrets.AZURE_PLAN_CLIENT_ID }}
-      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
     defaults:
       run:
-        working-directory: terraform/azure/aks
+        working-directory: terraform/aws/eks
 
     steps:
       - name: Checkout
@@ -69,18 +60,26 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - name: Log in to Azure
-        uses: azure/login@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6.2.3
         with:
-          client-id: ${{ secrets.AZURE_PLAN_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          role-to-assume: ${{ vars.AWS_PLAN_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          mask-aws-account-id: true
 
       - name: Check formatting
         run: terraform fmt -check
 
       - name: Initialize Terraform
-        run: terraform init -input=false
+        run: |
+          account_id="$(aws sts get-caller-identity --query Account --output text)"
+
+          terraform init -input=false \
+            -backend-config="bucket=microservices-platform-tfstate-$account_id" \
+            -backend-config="key=project-tfstate/terraform.tfstate" \
+            -backend-config="region=$AWS_REGION" \
+            -backend-config="encrypt=true" \
+            -backend-config="use_lockfile=true"
 
       - name: Validate Terraform
         run: terraform validate
@@ -115,28 +114,20 @@ jobs:
           '
 
   apply:
-    name: Create/Update Azure environment
+    name: Create/Update AWS environment
     if: >-
       github.event_name == 'push' ||
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
-    environment: azure-apply
+    environment: aws-apply
 
     permissions:
       contents: read
       id-token: write
 
-    env:
-      ARM_USE_OIDC: true
-      ARM_USE_AZUREAD: true
-      ARM_CLIENT_ID: ${{ secrets.AZURE_APPLY_CLIENT_ID }}
-      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
     defaults:
       run:
-        working-directory: terraform/azure/aks
+        working-directory: terraform/aws/eks
 
     steps:
       - name: Checkout
@@ -147,18 +138,26 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - name: Log in to Azure
-        uses: azure/login@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6.2.3
         with:
-          client-id: ${{ secrets.AZURE_APPLY_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          role-to-assume: ${{ vars.AWS_APPLY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          mask-aws-account-id: true
 
       - name: Check formatting
         run: terraform fmt -check
 
       - name: Initialize Terraform
-        run: terraform init -input=false
+        run: |
+          account_id="$(aws sts get-caller-identity --query Account --output text)"
+
+          terraform init -input=false \
+            -backend-config="bucket=microservices-platform-tfstate-$account_id" \
+            -backend-config="key=project-tfstate/terraform.tfstate" \
+            -backend-config="region=$AWS_REGION" \
+            -backend-config="encrypt=true" \
+            -backend-config="use_lockfile=true"
 
       - name: Validate Terraform
         run: terraform validate
@@ -202,10 +201,8 @@ jobs:
       - name: Configure kubectl
         if: github.event_name == 'push' || inputs.operation != 'plan'
         run: |
-          az aks get-credentials \
-            --admin \
-            --overwrite-existing \
-            --resource-group "$(terraform output -raw resource_group_name)" \
+          aws eks update-kubeconfig \
+            --region "$AWS_REGION" \
             --name "$(terraform output -raw cluster_name)" \
             > /dev/null
 
@@ -225,52 +222,13 @@ jobs:
             --wait \
             --timeout 10m
 
-      - name: Publish Azure GitOps metadata
+      - name: Bootstrap AWS GitOps applications
         if: github.event_name == 'push' || inputs.operation != 'plan'
         working-directory: .
         run: |
-          export AZURE_TENANT_ID="$ARM_TENANT_ID"
-          export AZURE_SUBSCRIPTION_ID="$ARM_SUBSCRIPTION_ID"
-          export CLUSTER_NAME="$(
-            terraform -chdir=terraform/azure/aks output \
-              -raw cluster_name
-          )"
-
-          export ALB_CONTROLLER_CLIENT_ID="$(
-            terraform -chdir=terraform/azure/aks output \
-              -raw application_gateway_controller_client_id
-          )"
-          export APPLICATION_GATEWAY_SUBNET_ID="$(
-            terraform -chdir=terraform/azure/aks output \
-              -raw application_gateway_subnet_id
-          )"
-
-          export DNS_ZONE_RESOURCE_GROUP_NAME="$(
-            terraform -chdir=terraform/azure/aks output \
-              -raw dns_zone_resource_group_name
-          )"
-          export DNS_ZONE_NAME="$(
-            terraform -chdir=terraform/azure/aks output \
-              -raw dns_zone_name
-          )"
-          export EXTERNAL_DNS_CLIENT_ID="$(
-            terraform -chdir=terraform/azure/aks output \
-              -raw external_dns_client_id
-          )"
-
-          envsubst \
-            < argocd/bootstrap/azure/cluster-metadata.yaml.tpl \
-            > "$RUNNER_TEMP/azure-cluster-metadata.yaml"
-
-          kubectl apply -f "$RUNNER_TEMP/azure-cluster-metadata.yaml"
-
-      - name: Bootstrap Azure GitOps applications
-        if: github.event_name == 'push' || inputs.operation != 'plan'
-        working-directory: .
-        run: |
-          kubectl apply -f argocd/roots/azure.yaml
+          kubectl apply -f argocd/roots/aws.yaml
           kubectl wait \
             --for=jsonpath='{.status.sync.status}'=Synced \
-            application/azure \
+            application/aws \
             --namespace argocd \
             --timeout 5m
