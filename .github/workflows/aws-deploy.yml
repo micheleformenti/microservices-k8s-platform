@@ -1,0 +1,234 @@
+name: Deploy AWS Environment
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/aws-deploy.yml"
+      - "argocd/roots/aws.yaml"
+      - "terraform/aws/eks/**"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/aws-deploy.yml"
+      - "argocd/roots/aws.yaml"
+      - "terraform/aws/eks/**"
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Plan or create/update the EKS environment
+        required: true
+        type: choice
+        options:
+          - plan
+          - apply
+
+permissions:
+  contents: read
+
+concurrency:
+  group: terraform-aws-eks
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: eu-central-1
+  TERRAFORM_VERSION: 1.15.8
+  ARGO_CD_CHART_VERSION: 10.4.0
+
+jobs:
+  plan:
+    name: Plan EKS infrastructure
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    defaults:
+      run:
+        working-directory: terraform/aws/eks
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          role-to-assume: ${{ vars.AWS_PLAN_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          mask-aws-account-id: true
+
+      - name: Check formatting
+        run: terraform fmt -check
+
+      - name: Initialize Terraform
+        run: |
+          account_id="$(aws sts get-caller-identity --query Account --output text)"
+
+          terraform init -input=false \
+            -backend-config="bucket=microservices-platform-tfstate-$account_id" \
+            -backend-config="key=project-tfstate/terraform.tfstate" \
+            -backend-config="region=$AWS_REGION" \
+            -backend-config="encrypt=true" \
+            -backend-config="use_lockfile=true"
+
+      - name: Validate Terraform
+        run: terraform validate
+
+      - name: Plan Terraform changes
+        run: |
+          if ! terraform plan -json -input=false -out=tfplan > "$RUNNER_TEMP/terraform-plan.json" 2> "$RUNNER_TEMP/terraform-plan.stderr"; then
+            echo "Terraform plan failed:" >&2
+            jq -Rr '
+              fromjson?
+              |
+              select(.type == "diagnostic" and .diagnostic.severity == "error")
+              | .diagnostic.summary
+            ' "$RUNNER_TEMP/terraform-plan.json" >&2
+            echo "Detailed output was not published to protect infrastructure metadata." >&2
+            exit 1
+          fi
+
+          terraform show -json tfplan | jq -r '
+            [.resource_changes[]?
+              | select(.change.actions != ["no-op"] or .change.importing != null)
+              | if .change.importing != null then
+                  "import \(.address)"
+                else
+                  "\(.change.actions | join("/")) \(.address)"
+                end]
+            | if length == 0 then
+                "No infrastructure changes."
+              else
+                "Terraform plan summary:\n" + join("\n")
+              end
+          '
+
+  apply:
+    name: Create/Update AWS environment
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    environment: aws-apply
+
+    permissions:
+      contents: read
+      id-token: write
+
+    defaults:
+      run:
+        working-directory: terraform/aws/eks
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          role-to-assume: ${{ vars.AWS_APPLY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          mask-aws-account-id: true
+
+      - name: Check formatting
+        run: terraform fmt -check
+
+      - name: Initialize Terraform
+        run: |
+          account_id="$(aws sts get-caller-identity --query Account --output text)"
+
+          terraform init -input=false \
+            -backend-config="bucket=microservices-platform-tfstate-$account_id" \
+            -backend-config="key=project-tfstate/terraform.tfstate" \
+            -backend-config="region=$AWS_REGION" \
+            -backend-config="encrypt=true" \
+            -backend-config="use_lockfile=true"
+
+      - name: Validate Terraform
+        run: terraform validate
+
+      - name: Create Terraform plan
+        run: |
+          if ! terraform plan -input=false -out=tfplan > "$RUNNER_TEMP/terraform-plan.log" 2>&1; then
+            echo "Terraform plan failed. Detailed output was not published to protect infrastructure metadata." >&2
+            exit 1
+          fi
+
+          terraform show -json tfplan | jq -r '
+            [.resource_changes[]?
+              | select(.change.actions != ["no-op"] or .change.importing != null)
+              | if .change.importing != null then
+                  "import \(.address)"
+                else
+                  "\(.change.actions | join("/")) \(.address)"
+                end]
+            | if length == 0 then
+                "No infrastructure changes."
+              else
+                "Terraform plan summary:\n" + join("\n")
+              end
+          '
+
+      - name: Apply Terraform plan
+        if: github.event_name == 'push' || inputs.operation != 'plan'
+        run: |
+          if ! terraform apply -input=false -auto-approve tfplan > "$RUNNER_TEMP/terraform-apply.log" 2>&1; then
+            echo "Terraform apply failed. Detailed output was not published to protect infrastructure metadata." >&2
+            exit 1
+          fi
+
+          echo "Terraform apply completed successfully."
+
+      - name: Set up kubectl
+        if: github.event_name == 'push' || inputs.operation != 'plan'
+        uses: azure/setup-kubectl@v5
+
+      - name: Configure kubectl
+        if: github.event_name == 'push' || inputs.operation != 'plan'
+        run: |
+          aws eks update-kubeconfig \
+            --region "$AWS_REGION" \
+            --name "$(terraform output -raw cluster_name)" \
+            > /dev/null
+
+      - name: Set up Helm
+        if: github.event_name == 'push' || inputs.operation != 'plan'
+        uses: azure/setup-helm@v5
+
+      - name: Install Argo CD
+        if: github.event_name == 'push' || inputs.operation != 'plan'
+        working-directory: .
+        run: |
+          helm repo add argo https://argoproj.github.io/argo-helm
+          helm upgrade --install argocd argo/argo-cd \
+            --version "$ARGO_CD_CHART_VERSION" \
+            --namespace argocd \
+            --create-namespace \
+            --wait \
+            --timeout 10m
+
+      - name: Bootstrap AWS GitOps applications
+        if: github.event_name == 'push' || inputs.operation != 'plan'
+        working-directory: .
+        run: |
+          kubectl apply -f argocd/roots/aws.yaml
+          kubectl wait \
+            --for=jsonpath='{.status.sync.status}'=Synced \
+            application/aws \
+            --namespace argocd \
+            --timeout 5m
