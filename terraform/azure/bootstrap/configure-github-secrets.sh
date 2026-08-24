@@ -7,6 +7,16 @@ repository="$(
   cd "$bootstrap_dir"
   gh repo view --json nameWithOwner --jq '.nameWithOwner'
 )"
+reviewer_id="$(gh api user --jq '.id')"
+
+gh api \
+  --method PUT \
+  "repos/$repository/environments/azure-apply" \
+  -F wait_timer=0 \
+  -F prevent_self_review=false \
+  -F 'reviewers[][type]=User' \
+  -F "reviewers[][id]=$reviewer_id" \
+  > /dev/null
 
 gh secret set AZURE_PLAN_CLIENT_ID \
   --repo "$repository" \
@@ -24,4 +34,4 @@ gh secret set AZURE_TENANT_ID \
   --repo "$repository" \
   --body "$(az account show --query tenantId --output tsv)"
 
-echo "Configured masked Azure GitHub secrets for $repository."
+echo "Configured the azure-apply environment and masked Azure secrets for $repository."
