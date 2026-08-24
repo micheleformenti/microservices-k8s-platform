@@ -40,6 +40,11 @@ variable "cluster_endpoint_public_access_cidrs" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "cluster_admin_principal_arn" {
+  description = "IAM principal granted administrative access to EKS."
+  type        = string
+}
+
 variable "single_nat_gateway" {
   description = "Use one NAT Gateway for all private subnets to reduce demo cost. Set to false for one NAT Gateway per private subnet."
   type        = bool
