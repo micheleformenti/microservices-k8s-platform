@@ -61,11 +61,19 @@ spec:
         server: '{{ .server }}'
         namespace: azure-alb-system
 
+      ignoreDifferences:
+        - group: admissionregistration.k8s.io
+          kind: ValidatingWebhookConfiguration
+          name: azure-platform-cert-manager-webhook
+          jqPathExpressions:
+            - .webhooks[]?.clientConfig.caBundle
+
       syncPolicy:
         automated:
           prune: true
           selfHeal: true
         syncOptions:
           - CreateNamespace=true
+          - RespectIgnoreDifferences=true
           - ServerSideApply=true
           - SkipDryRunOnMissingResource=true
