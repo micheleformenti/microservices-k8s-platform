@@ -10,7 +10,7 @@ terraform {
 
   backend "azurerm" {
     storage_account_name = "stmicroplatformtf"
-    container_name       = "tfstate"
+    container_name       = "project-tfstate"
     key                  = "aks/terraform.tfstate"
     use_azuread_auth     = true
   }

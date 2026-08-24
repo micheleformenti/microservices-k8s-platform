@@ -18,6 +18,11 @@ data "azurerm_role_definition" "reader" {
   scope = "/subscriptions/${var.subscription_id}"
 }
 
+data "azuread_group" "bootstrap_operators" {
+  display_name     = var.bootstrap_operators_group_name
+  security_enabled = true
+}
+
 locals {
   terraform_apply_assignable_role_ids = join(", ", [
     basename(data.azurerm_role_definition.application_gateway_configuration_manager.role_definition_id),
@@ -27,18 +32,25 @@ locals {
   ])
 }
 
-resource "azurerm_role_assignment" "terraform_plan_state" {
-  scope                = azurerm_storage_container.terraform_state.id
+resource "azurerm_role_assignment" "terraform_plan_project_state" {
+  scope                = azurerm_storage_container.project_state.id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azuread_service_principal.terraform_plan.object_id
   principal_type       = "ServicePrincipal"
 }
 
-resource "azurerm_role_assignment" "terraform_apply_state" {
-  scope                = azurerm_storage_container.terraform_state.id
+resource "azurerm_role_assignment" "terraform_apply_project_state" {
+  scope                = azurerm_storage_container.project_state.id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azuread_service_principal.terraform_apply.object_id
   principal_type       = "ServicePrincipal"
+}
+
+resource "azurerm_role_assignment" "bootstrap_operators_state" {
+  scope                = azurerm_storage_container.bootstrap_state.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = data.azuread_group.bootstrap_operators.object_id
+  principal_type       = "Group"
 }
 
 resource "azurerm_role_assignment" "terraform_plan_subscription" {

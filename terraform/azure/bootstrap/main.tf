@@ -43,8 +43,22 @@ resource "azurerm_storage_account" "terraform_state" {
   }
 }
 
-resource "azurerm_storage_container" "terraform_state" {
-  name                  = "tfstate"
+resource "azurerm_storage_container" "project_state" {
+  name                  = "project-tfstate"
   storage_account_id    = azurerm_storage_account.terraform_state.id
   container_access_type = "private"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "azurerm_storage_container" "bootstrap_state" {
+  name                  = "bootstrap-tfstate"
+  storage_account_id    = azurerm_storage_account.terraform_state.id
+  container_access_type = "private"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }

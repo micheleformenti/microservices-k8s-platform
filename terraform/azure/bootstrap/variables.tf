@@ -30,3 +30,9 @@ variable "github_apply_environment" {
   type        = string
   default     = "azure-apply"
 }
+
+variable "bootstrap_operators_group_name" {
+  description = "Entra ID group allowed to manage the bootstrap Terraform state."
+  type        = string
+  default     = "grp-microservices-platform-bootstrap-operators"
+}
