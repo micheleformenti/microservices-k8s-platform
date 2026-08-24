@@ -35,8 +35,9 @@ static NAT gateway for egress.
 
 ## Bootstrap
 
-The privileged bootstrap is applied manually with MFA. It creates the state
-storage, GitHub OIDC identities, and scoped Azure permissions.
+The manual MFA bootstrap creates isolated remote state, GitHub OIDC identities,
+and scoped Azure permissions. State access is limited to the bootstrap
+operators Entra group.
 
 ```text
 Manual bootstrap
@@ -56,10 +57,6 @@ terraform -chdir=terraform/azure/bootstrap init
 terraform -chdir=terraform/azure/bootstrap apply
 terraform/azure/bootstrap/configure-github-secrets.sh
 ```
-
-Bootstrap state will be migrated to the remote backend separately. Bootstrap
-changes remain privileged manual operations; the regular AKS lifecycle runs
-through its protected pipelines.
 
 ## Create or Update
 
@@ -146,6 +143,5 @@ zone remain available for the next environment creation.
 
 ## Next Steps
 
-- Migrate the bootstrap state to the remote backend.
 - Add Argo CD sync waves and child Application health aggregation.
 - Document the final EKS and AKS design differences.

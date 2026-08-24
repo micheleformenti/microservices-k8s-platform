@@ -179,7 +179,7 @@ infrastructure and platform components:
 - [x] Add persistent storage
 - [x] Add Gateway API routing, DNS, and HTTPS
 - [x] Document AKS creation and teardown
-- [ ] Migrate the bootstrap state to the remote backend
+- [x] Migrate the bootstrap state to an isolated remote backend
 
 ### 16. Deploy to AKS with GitOps
 
