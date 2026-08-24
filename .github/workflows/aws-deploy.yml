@@ -34,6 +34,7 @@ env:
   AWS_REGION: eu-central-1
   TERRAFORM_VERSION: 1.15.8
   ARGO_CD_CHART_VERSION: 10.4.0
+  TF_VAR_cluster_admin_principal_arn: ${{ vars.AWS_EKS_ADMIN_PRINCIPAL_ARN }}
 
 jobs:
   plan:
