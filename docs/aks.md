@@ -143,5 +143,4 @@ zone remain available for the next environment creation.
 
 ## Next Steps
 
-- Add Argo CD sync waves and child Application health aggregation.
 - Document the final EKS and AKS design differences.

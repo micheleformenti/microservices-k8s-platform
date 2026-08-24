@@ -19,13 +19,12 @@ intentionally exercise every job.
 | --- | --- |
 | Kubernetes | kubeconform for rendered Helm and Argo CD applications |
 | Helm | lint, dependency build, render, and kubeconform for both charts |
-| Terraform | format, backend-disabled initialization, and validation for both roots |
 | Go | `go test ./...` matrix for deployed Go services |
 | .NET | `dotnet test` for cartservice |
 
 Custom-resource schemas are supplied to kubeconform for the AWS platform and
-Argo CD resources. Terraform uses `init -backend=false`, so CI needs neither
-remote-state access nor AWS credentials.
+Argo CD resources. Cloud-specific workflows validate and plan Terraform using
+OIDC and remote state.
 
 The Go matrix covers checkout, frontend, product catalog, and shipping. These
 commands also compile their packages. Other upstream services currently have

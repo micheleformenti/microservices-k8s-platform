@@ -107,7 +107,7 @@ infrastructure and platform components:
 - [x] Provision an EKS environment
 - [x] Verify kubectl access to the EKS cluster
 - [x] Document EKS creation and teardown
-- [ ] Add protected OIDC create/update and destroy pipelines for EKS
+- [x] Add protected OIDC create/update and destroy pipelines for EKS
 
 ### 7. Container Image Build and Publishing
 
@@ -189,7 +189,7 @@ infrastructure and platform components:
 - [x] Validate the frontend through port forwarding
 - [x] Automate Argo CD bootstrap in the Azure deployment workflow
 - [x] Pass Azure infrastructure metadata to Argo CD through GitOps Bridge
-- [ ] Add sync waves and child Application health aggregation
+- [x] Add sync waves across platform, workload, and observability Applications
 - [ ] Document EKS and AKS differences
 
 ### 17. Portfolio Documentation

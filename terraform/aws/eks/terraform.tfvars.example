@@ -13,7 +13,7 @@ single_nat_gateway = true
 
 # SPOT is cheaper. Use ON_DEMAND if interruptions get in the way.
 node_capacity_type  = "SPOT"
-node_instance_types = ["t3.medium"]
+node_instance_types = ["t3.large"]
 node_desired_size   = 2
 node_min_size       = 1
-node_max_size       = 4
+node_max_size       = 3
