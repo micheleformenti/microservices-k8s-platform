@@ -108,14 +108,6 @@ jobs:
 
           if kubectl get crd applications.argoproj.io > /dev/null 2>&1; then
             if kubectl get application azure -n argocd > /dev/null 2>&1; then
-              while read -r application; do
-                kubectl patch "$application" \
-                  --namespace argocd \
-                  --type merge \
-                  --patch '{"operation":null}' \
-                  > /dev/null
-              done < <(kubectl get applications -n argocd --output name)
-
               kubectl delete application azure \
                 --namespace argocd \
                 --wait=true \
