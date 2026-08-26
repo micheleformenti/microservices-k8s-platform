@@ -23,6 +23,9 @@ Prometheus retains metrics for 24 hours. This is sufficient for disposable
 portfolio environments; persistent monitoring storage is outside the current
 scope.
 
+Grafana provisions a `Microservices Platform Overview` dashboard for alerts,
+workload health, resource usage, restarts, autoscaling, and Redis storage.
+
 ## Project Alerts
 
 | Alert | Condition | Severity |
@@ -90,7 +93,7 @@ curl --silent http://localhost:9090/api/v1/alerts |
 
 ## Scope
 
-This milestone covers Kubernetes infrastructure metrics, default Grafana
-dashboards, and project-specific Prometheus alerts. Centralized logging,
+This milestone covers Kubernetes infrastructure metrics, Grafana dashboards,
+and project-specific Prometheus alerts. Centralized logging,
 distributed tracing, application metrics, external notification receivers,
 and persistent monitoring storage are possible future improvements.
