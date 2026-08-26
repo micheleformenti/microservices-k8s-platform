@@ -3,3 +3,7 @@ kube-prometheus-stack:
     prometheusSpec:
       replicas: 1
       retention: 24h
+
+projectAlerts:
+  enabled: true
+  workloadNamespace: microservices-platform

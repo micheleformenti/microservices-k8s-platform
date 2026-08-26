@@ -1,0 +1,34 @@
+{{- if .Values.projectAlerts.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: microservices-platform
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  groups:
+    - name: microservices-platform.rules
+      rules:
+        - alert: ApplicationDeploymentUnavailable
+          expr: kube_deployment_spec_replicas{namespace="{{ .Values.projectAlerts.workloadNamespace }}", deployment!="loadgenerator"} > 0 and on (namespace, deployment) kube_deployment_status_replicas_available{namespace="{{ .Values.projectAlerts.workloadNamespace }}", deployment!="loadgenerator"} == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: Application deployment has no available replicas
+            description: A customer-serving deployment has had no available replicas for two minutes.
+
+        - alert: ApplicationStatefulSetUnavailable
+          expr: kube_statefulset_replicas{namespace="{{ .Values.projectAlerts.workloadNamespace }}", statefulset="redis-cart"} > 0 and on (namespace, statefulset) kube_statefulset_status_replicas_ready{namespace="{{ .Values.projectAlerts.workloadNamespace }}", statefulset="redis-cart"} == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: Application StatefulSet has no ready replicas
+            description: Redis has had no ready replicas for two minutes.
+
+{{- end }}

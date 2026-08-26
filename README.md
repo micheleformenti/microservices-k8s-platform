@@ -60,7 +60,7 @@ docs/                Platform guides and architecture diagrams
 | ✅ | CI validation, GHCR publishing, and GitOps image updates | [CI/CD](docs/ci.md) |
 | ✅ | AWS EKS: storage, autoscaling, HTTPS, and DNS | [EKS](docs/eks.md) |
 | ✅ | Azure AKS: storage, autoscaling, HTTPS, and DNS | [AKS](docs/aks.md) |
-| 🚧 | Observability | Roadmap |
+| ✅ | Prometheus, Grafana, and project alerts | [Observability](docs/observability.md) |
 | ⏳ | Security hardening | Roadmap |
 
 ## Documentation
@@ -69,6 +69,7 @@ docs/                Platform guides and architecture diagrams
 - [CI/CD and image publishing](docs/ci.md)
 - [AWS EKS platform](docs/eks.md)
 - [Azure AKS platform](docs/aks.md)
+- [Observability](docs/observability.md)
 - [Implementation roadmap](PROJECT.md)
 
 ## Workload
