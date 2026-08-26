@@ -157,7 +157,7 @@ infrastructure and platform components:
 - [x] Deploy Prometheus and Grafana through Argo CD
 - [x] Validate dashboards and monitoring resource usage
 - [x] Add observability Helm chart validation to CI
-- [ ] Add project-specific alerts
+- [x] Add project-specific alerts
 
 ### 13. Pod and Node Autoscaling
 
