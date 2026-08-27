@@ -14,11 +14,15 @@ GitHub Actions
   │     ├── Cluster: multi-zone EKS with node autoscaling
   │     ├── Identities: EKS and platform controllers
   │     └── Edge: ACM certificate and Route 53 validation
-  └── installs Argo CD
+  ├── installs Argo CD
+  └── creates the cluster metadata Secret from Terraform outputs
+        ├── cluster name, region, and DNS zone
+        └── application hostname and ACM certificate ARN
       ↓
 Argo CD app-of-apps
-  ├── AWS platform controllers and storage
-  ├── Application workload
+  ├── ApplicationSets read the metadata
+  │     ├── AWS platform controllers and storage
+  │     └── Application workload
   └── observability stack
       ↓
 Ingress → Application Load Balancer → frontend Service
@@ -121,6 +125,8 @@ The state bucket and existing Route 53 zone remain for the next environment.
   resilient capacity and NAT topology.
 - **Controller-owned cloud resources:** Kubernetes controllers manage ALBs,
   DNS records, and EBS volumes discovered at runtime.
+- **GitOps Bridge:** passes Terraform-derived AWS metadata to Argo CD without
+  duplicating it in Helm values.
 - **EKS Pod Identity:** gives controllers scoped AWS access without static
   credentials.
 - **Persistent Redis:** demonstrates EBS-backed persistence, not highly

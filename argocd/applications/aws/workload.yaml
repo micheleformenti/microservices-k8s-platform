@@ -1,30 +1,50 @@
 apiVersion: argoproj.io/v1alpha1
-kind: Application
+kind: ApplicationSet
 metadata:
   name: aws-workload
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "1"
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
-  project: default
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
 
-  source:
-    repoURL: https://github.com/micheleformenti/microservices-k8s-platform.git
-    targetRevision: main
-    path: helm/application
-    helm:
-      releaseName: microservices-platform
-      valueFiles:
-        - values.yaml
-        - values-eks.yaml
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            cloud: aws
 
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: microservices-platform
+  template:
+    metadata:
+      name: aws-workload
+      namespace: argocd
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
 
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+      source:
+        repoURL: https://github.com/micheleformenti/microservices-k8s-platform.git
+        targetRevision: main
+        path: helm/application
+        helm:
+          releaseName: microservices-platform
+          valueFiles:
+            - values.yaml
+            - values-eks.yaml
+          parameters:
+            - name: frontend.ingress.host
+              value: '{{ index .metadata.annotations "gitops-bridge/application-domain-name" }}'
+            - name: frontend.ingress.annotations.alb\.ingress\.kubernetes\.io/certificate-arn
+              value: '{{ index .metadata.annotations "gitops-bridge/application-certificate-arn" }}'
+
+      destination:
+        server: '{{ .server }}'
+        namespace: microservices-platform
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
