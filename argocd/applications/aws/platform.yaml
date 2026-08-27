@@ -1,27 +1,55 @@
 apiVersion: argoproj.io/v1alpha1
-kind: Application
+kind: ApplicationSet
 metadata:
   name: aws-platform
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "0"
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
-  project: default
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
 
-  source:
-    repoURL: https://github.com/micheleformenti/microservices-k8s-platform.git
-    targetRevision: main
-    path: helm/platform/aws
-    helm:
-      releaseName: aws-platform
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            cloud: aws
 
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: kube-system
+  template:
+    metadata:
+      name: aws-platform
+      namespace: argocd
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
 
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+      source:
+        repoURL: https://github.com/micheleformenti/microservices-k8s-platform.git
+        targetRevision: main
+        path: helm/platform/aws
+        helm:
+          releaseName: aws-platform
+          parameters:
+            - name: aws-load-balancer-controller.clusterName
+              value: '{{ index .metadata.annotations "gitops-bridge/cluster-name" }}'
+            - name: aws-load-balancer-controller.region
+              value: '{{ index .metadata.annotations "gitops-bridge/aws-region" }}'
+            - name: external-dns.domainFilters[0]
+              value: '{{ index .metadata.annotations "gitops-bridge/dns-zone-name" }}'
+            - name: external-dns.txtOwnerId
+              value: '{{ index .metadata.annotations "gitops-bridge/cluster-name" }}'
+            - name: cluster-autoscaler.awsRegion
+              value: '{{ index .metadata.annotations "gitops-bridge/aws-region" }}'
+            - name: cluster-autoscaler.autoDiscovery.clusterName
+              value: '{{ index .metadata.annotations "gitops-bridge/cluster-name" }}'
+
+      destination:
+        server: '{{ .server }}'
+        namespace: kube-system
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true

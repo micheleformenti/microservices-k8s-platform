@@ -18,6 +18,11 @@ output "application_domain_name" {
   value       = var.application_domain_name
 }
 
+output "hosted_zone_name" {
+  description = "Route 53 hosted zone used for application records."
+  value       = var.hosted_zone_name
+}
+
 output "application_certificate_arn" {
   description = "ARN of the validated ACM certificate for the application."
   value       = aws_acm_certificate_validation.application.certificate_arn

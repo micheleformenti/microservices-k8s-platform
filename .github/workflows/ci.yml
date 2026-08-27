@@ -197,6 +197,8 @@ jobs:
             --namespace microservices-platform \
             -f helm/application/values.yaml \
             -f helm/application/values-eks.yaml \
+            --set frontend.ingress.host=eks.example.com \
+            --set-string 'frontend.ingress.annotations.alb\.ingress\.kubernetes\.io/certificate-arn=arn:aws:acm:eu-central-1:123456789012:certificate/example' \
             > rendered-application-eks.yaml
           helm template microservices-platform ./helm/application \
             --namespace microservices-platform \
@@ -224,10 +226,26 @@ jobs:
           helm dependency build ./helm/platform/aws
 
       - name: Lint AWS platform Helm chart
-        run: helm lint ./helm/platform/aws
+        run: |
+          helm lint ./helm/platform/aws \
+            --set aws-load-balancer-controller.clusterName=example-cluster \
+            --set aws-load-balancer-controller.region=eu-central-1 \
+            --set external-dns.domainFilters[0]=example.com \
+            --set external-dns.txtOwnerId=example-cluster \
+            --set cluster-autoscaler.awsRegion=eu-central-1 \
+            --set cluster-autoscaler.autoDiscovery.clusterName=example-cluster
 
       - name: Render AWS platform Helm chart
-        run: helm template aws-platform ./helm/platform/aws --namespace kube-system > rendered-aws-platform.yaml
+        run: |
+          helm template aws-platform ./helm/platform/aws \
+            --namespace kube-system \
+            --set aws-load-balancer-controller.clusterName=example-cluster \
+            --set aws-load-balancer-controller.region=eu-central-1 \
+            --set external-dns.domainFilters[0]=example.com \
+            --set external-dns.txtOwnerId=example-cluster \
+            --set cluster-autoscaler.awsRegion=eu-central-1 \
+            --set cluster-autoscaler.autoDiscovery.clusterName=example-cluster \
+            > rendered-aws-platform.yaml
 
       - name: Validate rendered AWS platform manifests
         run: |

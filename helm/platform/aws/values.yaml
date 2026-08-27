@@ -9,8 +9,6 @@ storageClasses:
     encrypted: true
 
 aws-load-balancer-controller:
-  clusterName: microservices-platform-eks
-  region: eu-central-1
   serviceAccount:
     create: true
     name: aws-load-balancer-controller
@@ -20,20 +18,19 @@ external-dns:
     name: aws
   sources:
     - ingress
-  domainFilters:
-    - aws.micheleformenti.com
+  domainFilters: []
   policy: sync
   registry: txt
-  txtOwnerId: microservices-platform-eks
+  txtOwnerId: ""
   serviceAccount:
     create: true
     name: external-dns
 
 cluster-autoscaler:
   cloudProvider: aws
-  awsRegion: eu-central-1
+  awsRegion: ""
   autoDiscovery:
-    clusterName: microservices-platform-eks
+    clusterName: ""
   image:
     tag: v1.36.1
   rbac:

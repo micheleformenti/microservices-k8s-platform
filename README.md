@@ -14,7 +14,7 @@ persistence, DNS, HTTPS, and environment teardown.
 - **Identity:** Cloud pipelines use GitHub Actions OIDC; controllers use AWS Pod
   Identity and Azure Workload Identity.
 - **GitOps:** Argo CD app-of-apps delivery, with GitOps Bridge metadata for
-  dynamic Azure infrastructure values.
+  dynamic cloud infrastructure values.
 - **Runtime:** persistent storage, Horizontal Pod Autoscaling, and node
   autoscaling.
 - **Traffic:** AWS ALB and Azure Application Gateway for Containers, with

@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - ".github/workflows/aws-deploy.yml"
+      - "argocd/bootstrap/aws/cluster-metadata.yaml.tpl"
       - "argocd/roots/aws.yaml"
       - "terraform/aws/eks/**"
   push:
@@ -11,6 +12,7 @@ on:
       - main
     paths:
       - ".github/workflows/aws-deploy.yml"
+      - "argocd/bootstrap/aws/cluster-metadata.yaml.tpl"
       - "argocd/roots/aws.yaml"
       - "terraform/aws/eks/**"
   workflow_dispatch:
@@ -222,6 +224,37 @@ jobs:
             --create-namespace \
             --wait \
             --timeout 10m
+
+      - name: Publish AWS GitOps metadata
+        if: github.event_name == 'push' || inputs.operation != 'plan'
+        working-directory: .
+        run: |
+          export CLUSTER_NAME="$(
+            terraform -chdir=terraform/aws/eks output \
+              -raw cluster_name
+          )"
+          export AWS_REGION="$(
+            terraform -chdir=terraform/aws/eks output \
+              -raw region
+          )"
+          export DNS_ZONE_NAME="$(
+            terraform -chdir=terraform/aws/eks output \
+              -raw hosted_zone_name
+          )"
+          export APPLICATION_DOMAIN_NAME="$(
+            terraform -chdir=terraform/aws/eks output \
+              -raw application_domain_name
+          )"
+          export APPLICATION_CERTIFICATE_ARN="$(
+            terraform -chdir=terraform/aws/eks output \
+              -raw application_certificate_arn
+          )"
+
+          envsubst \
+            < argocd/bootstrap/aws/cluster-metadata.yaml.tpl \
+            > "$RUNNER_TEMP/aws-cluster-metadata.yaml"
+
+          kubectl apply -f "$RUNNER_TEMP/aws-cluster-metadata.yaml"
 
       - name: Bootstrap AWS GitOps applications
         if: github.event_name == 'push' || inputs.operation != 'plan'
