@@ -61,6 +61,7 @@ docs/                Platform guides and architecture diagrams
 | ✅ | AWS EKS: storage, autoscaling, HTTPS, and DNS | [EKS](docs/eks.md) |
 | ✅ | Azure AKS: storage, autoscaling, HTTPS, and DNS | [AKS](docs/aks.md) |
 | ✅ | Prometheus, Grafana, and project alerts | [Observability](docs/observability.md) |
+| ✅ | Trivy dependency and secret scanning | [Security](docs/security.md) |
 | ⏳ | Security hardening | Roadmap |
 
 ## Documentation
@@ -70,6 +71,7 @@ docs/                Platform guides and architecture diagrams
 - [AWS EKS platform](docs/eks.md)
 - [Azure AKS platform](docs/aks.md)
 - [Observability](docs/observability.md)
+- [Security scanning](docs/security.md)
 - [Implementation roadmap](PROJECT.md)
 
 ## Workload

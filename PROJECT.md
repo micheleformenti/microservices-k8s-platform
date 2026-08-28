@@ -16,7 +16,7 @@ then operate it consistently across local Kubernetes, AWS EKS, and Azure AKS.
 - Cloud-native identity, storage, autoscaling, load balancing, DNS, and HTTPS
 - Protected OIDC pipelines for the AKS lifecycle
 - Prometheus and Grafana observability baseline
-- Planned security hardening and cross-cloud pipeline refinement
+- Security scanning baseline with Trivy
 
 ## Repository Structure
 
@@ -169,7 +169,9 @@ infrastructure and platform components:
 - [ ] Add workload security defaults
 - [ ] Add secret management approach
 - [ ] Add dependency update automation
-- [ ] Add security scanning
+- [x] Add repository dependency and secret scanning
+- [ ] Scan images before publishing
+- [ ] Scan Terraform, Dockerfiles, and rendered Kubernetes configuration
 
 ### 15. AKS Platform
 

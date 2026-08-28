@@ -63,9 +63,6 @@ The packages are public, so local Kubernetes and EKS do not need registry
 credentials. Private image authentication is deferred to the security
 milestone. Redis and BusyBox continue to use their upstream images.
 
-`shoppingassistantservice` is excluded because it is not deployed by the Helm
-chart and depends on external Google Cloud services.
-
 ## GitOps Image Updates
 
 After publishing from `main`, the workflow updates only the services that were
