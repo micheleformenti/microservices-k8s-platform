@@ -102,6 +102,7 @@ func main() {
 // server controls RPC service responses.
 type server struct {
 	pb.UnimplementedShippingServiceServer
+	healthpb.UnimplementedHealthServer
 }
 
 // Check is for health checking.
