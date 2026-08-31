@@ -172,7 +172,8 @@ infrastructure and platform components:
 - [x] Add repository dependency and secret scanning
 - [x] Scan images before publishing
 - [x] Scan Terraform configuration
-- [ ] Scan Dockerfiles and rendered Kubernetes configuration
+- [x] Scan Dockerfiles
+- [ ] Scan rendered Kubernetes configuration
 
 ### 15. AKS Platform
 
