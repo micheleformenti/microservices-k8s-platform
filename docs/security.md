@@ -1,14 +1,16 @@
 # Security scanning
 
-Trivy `v0.74.0` scans repository dependencies and secrets in `security.yml`.
-It scans affected service images in `ci.yml` before they are published.
+Trivy `v0.74.0` scans repository dependencies, secrets, and Terraform
+configuration in `security.yml`. It scans affected service images in `ci.yml`
+before they are published.
 
 ```text
 Pull request or main push
             ↓
       ├── Repository scan
       │     ├── dependencies
-      │     └── secrets
+      │     ├── secrets
+      │     └── Terraform configuration
       └── Image build
             └── image scan
             ↓
@@ -16,6 +18,7 @@ Pull request or main push
 ```
 
 Repository scanning also runs weekly. Actionable `CRITICAL` vulnerabilities and
-detected secrets fail their jobs; unfixed vulnerabilities are ignored.
+misconfigurations, and detected secrets fail their jobs. Unfixed vulnerabilities
+are ignored.
 
-Terraform, Dockerfile, and rendered Kubernetes scans are next steps.
+Dockerfile and rendered Kubernetes scans are next steps.

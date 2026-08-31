@@ -1,3 +1,7 @@
+# Public API access is required because administrator and GitHub-hosted runner IP addresses are dynamic.
+# Unrestricted node egress avoids the cost and complexity of VPC endpoints
+# and controlled egress infrastructure in this portfolio environment.
+#trivy:ignore:AWS-0040 trivy:ignore:AWS-0041 trivy:ignore:AWS-0104
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "20.37.2"

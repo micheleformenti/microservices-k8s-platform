@@ -1,3 +1,5 @@
+# Public API access is required because administrator and GitHub-hosted runner IP addresses are dynamic.
+#trivy:ignore:AZU-0041
 resource "azurerm_kubernetes_cluster" "platform" {
   name                = "aks-${var.project_name}"
   location            = data.azurerm_resource_group.project.location
