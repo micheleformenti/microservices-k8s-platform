@@ -39,11 +39,14 @@ matrix. A workflow change builds every image.
 ```text
 pull request
   -> validation and tests
-  -> build affected images without publishing
+  -> build affected images
+  -> scan images with Trivy
 
 push to main
   -> validation and tests
-  -> build and publish affected images
+  -> build affected images
+  -> scan images with Trivy
+  -> publish images that pass
   -> update immutable Helm tags
   -> open automated pull request
 ```
@@ -52,12 +55,10 @@ Images are published as:
 
 ```text
 ghcr.io/micheleformenti/<service>:<git-sha>
-ghcr.io/micheleformenti/<service>:main
 ```
 
 The SHA tag is immutable by convention and is used by deployments for an
-explicit, reproducible version. The moving `main` tag is convenient for manual
-inspection but is not the GitOps deployment reference.
+explicit, reproducible version.
 
 The packages are public, so local Kubernetes and EKS do not need registry
 credentials. Private image authentication is deferred to the security
