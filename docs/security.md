@@ -1,20 +1,21 @@
 # Security scanning
 
-`security.yml` runs on pull requests, pushes to `main`, and on a weekly schedule. Trivy
-`v0.74.0` scans dependencies and secrets; actionable critical findings and
-detected secrets fail the check.
+Trivy `v0.74.0` scans repository dependencies and secrets in `security.yml`.
+It scans affected service images in `ci.yml` before they are published.
 
 ```text
 Pull request or main push
             ↓
-      Repository scan
-        ├── dependencies
-        └── secrets
+      ├── Repository scan
+      │     ├── dependencies
+      │     └── secrets
+      └── Image build
+            └── image scan
             ↓
        Merge is gated
 ```
 
-CI already builds and publishes immutable images. Image scanning, Terraform,
-Dockerfile, and rendered Kubernetes scans are next steps.
+Repository scanning also runs weekly. Actionable `CRITICAL` vulnerabilities and
+detected secrets fail their jobs; unfixed vulnerabilities are ignored.
 
-Findings without a fix are currently ignored.
+Terraform, Dockerfile, and rendered Kubernetes scans are next steps.
