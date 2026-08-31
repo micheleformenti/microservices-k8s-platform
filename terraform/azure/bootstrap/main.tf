@@ -19,6 +19,8 @@ resource "azurerm_resource_group" "project" {
   }
 }
 
+# Public network access is required because administrator and GitHub-hosted runner IP addresses are dynamic.
+#trivy:ignore:AZU-0012
 resource "azurerm_storage_account" "terraform_state" {
   name                            = "stmicroplatformtf"
   resource_group_name             = azurerm_resource_group.terraform_state.name
