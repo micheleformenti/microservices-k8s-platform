@@ -1,7 +1,7 @@
 adService:
   image:
     repository: ghcr.io/micheleformenti/adservice
-    tag: 61d8b4635afb1a8bd10e1306bbe6d30b2fa62761
+    tag: f5222b4bacd5275843c7ef652f8fe2f7944c95c9
     pullPolicy: IfNotPresent
 cartService:
   image:
@@ -16,12 +16,12 @@ checkoutService:
 currencyService:
   image:
     repository: ghcr.io/micheleformenti/currencyservice
-    tag: 457aaf413b2089915a239f1fddbf69ac37c30e52
+    tag: f5222b4bacd5275843c7ef652f8fe2f7944c95c9
     pullPolicy: IfNotPresent
 emailService:
   image:
     repository: ghcr.io/micheleformenti/emailservice
-    tag: 61d8b4635afb1a8bd10e1306bbe6d30b2fa62761
+    tag: f5222b4bacd5275843c7ef652f8fe2f7944c95c9
     pullPolicy: IfNotPresent
 frontend:
   image:
@@ -44,12 +44,12 @@ frontend:
 loadGenerator:
   image:
     repository: ghcr.io/micheleformenti/loadgenerator
-    tag: 61d8b4635afb1a8bd10e1306bbe6d30b2fa62761
+    tag: f5222b4bacd5275843c7ef652f8fe2f7944c95c9
     pullPolicy: IfNotPresent
 paymentService:
   image:
     repository: ghcr.io/micheleformenti/paymentservice
-    tag: 457aaf413b2089915a239f1fddbf69ac37c30e52
+    tag: f5222b4bacd5275843c7ef652f8fe2f7944c95c9
     pullPolicy: IfNotPresent
 productCatalogService:
   image:
@@ -59,7 +59,7 @@ productCatalogService:
 recommendationService:
   image:
     repository: ghcr.io/micheleformenti/recommendationservice
-    tag: 61d8b4635afb1a8bd10e1306bbe6d30b2fa62761
+    tag: f5222b4bacd5275843c7ef652f8fe2f7944c95c9
     pullPolicy: IfNotPresent
 redisCart:
   persistence:
