@@ -15,10 +15,14 @@ spec:
       labels:
         {{- include "ms-k8s-platform.adServiceSelectorLabels" . | nindent 8 }}
     spec:
+      securityContext:
+        {{- include "ms-k8s-platform.podSecurityContext" . | nindent 8 }}
       containers:
         - name: adservice
           image: "{{ .Values.adService.image.repository }}:{{ .Values.adService.image.tag }}"
           imagePullPolicy: {{ .Values.adService.image.pullPolicy }}
+          securityContext:
+            {{- include "ms-k8s-platform.containerSecurityContext" . | nindent 12 }}
           ports:
             - name: grpc
               containerPort: 9555

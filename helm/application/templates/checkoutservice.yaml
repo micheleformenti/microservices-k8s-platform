@@ -15,10 +15,14 @@ spec:
       labels:
         {{- include "ms-k8s-platform.checkoutServiceSelectorLabels" . | nindent 8 }}
     spec:
+      securityContext:
+        {{- include "ms-k8s-platform.podSecurityContext" . | nindent 8 }}
       containers:
         - name: checkoutservice
           image: "{{ .Values.checkoutService.image.repository }}:{{ .Values.checkoutService.image.tag }}"
           imagePullPolicy: {{ .Values.checkoutService.image.pullPolicy }}
+          securityContext:
+            {{- include "ms-k8s-platform.containerSecurityContext" . | nindent 12 }}
           ports:
             - name: grpc
               containerPort: 5050

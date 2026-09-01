@@ -16,10 +16,14 @@ spec:
       labels:
         {{- include "ms-k8s-platform.redisCartSelectorLabels" . | nindent 8 }}
     spec:
+      securityContext:
+        {{- include "ms-k8s-platform.podSecurityContext" . | nindent 8 }}
       containers:
         - name: redis
           image: "{{ .Values.redisCart.image.repository }}:{{ .Values.redisCart.image.tag }}"
           imagePullPolicy: {{ .Values.redisCart.image.pullPolicy }}
+          securityContext:
+            {{- include "ms-k8s-platform.containerSecurityContext" . | nindent 12 }}
           ports:
             - name: redis
               containerPort: 6379

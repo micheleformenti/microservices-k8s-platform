@@ -15,10 +15,14 @@ spec:
       labels:
         {{- include "ms-k8s-platform.paymentServiceSelectorLabels" . | nindent 8 }}
     spec:
+      securityContext:
+        {{- include "ms-k8s-platform.podSecurityContext" . | nindent 8 }}
       containers:
         - name: paymentservice
           image: "{{ .Values.paymentService.image.repository }}:{{ .Values.paymentService.image.tag }}"
           imagePullPolicy: {{ .Values.paymentService.image.pullPolicy }}
+          securityContext:
+            {{- include "ms-k8s-platform.containerSecurityContext" . | nindent 12 }}
           ports:
             - name: grpc
               containerPort: 50051

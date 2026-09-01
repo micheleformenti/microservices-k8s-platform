@@ -15,10 +15,14 @@ spec:
       labels:
         {{- include "ms-k8s-platform.cartServiceSelectorLabels" . | nindent 8 }}
     spec:
+      securityContext:
+        {{- include "ms-k8s-platform.podSecurityContext" . | nindent 8 }}
       containers:
         - name: cartservice
           image: "{{ .Values.cartService.image.repository }}:{{ .Values.cartService.image.tag }}"
           imagePullPolicy: {{ .Values.cartService.image.pullPolicy }}
+          securityContext:
+            {{- include "ms-k8s-platform.containerSecurityContext" . | nindent 12 }}
           ports:
             - name: grpc
               containerPort: 7070
