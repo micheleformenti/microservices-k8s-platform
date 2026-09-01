@@ -99,8 +99,8 @@ jobs:
           version: ${{ env.TRIVY_VERSION }}
           scan-type: config
           scan-ref: rendered-application-local.yaml
-          severity: HIGH,CRITICAL
-          exit-code: 0
+          severity: CRITICAL
+          exit-code: 1
 
       - name: Scan EKS Kubernetes configuration
         if: always() && steps.render_application.outcome == 'success'
@@ -109,8 +109,8 @@ jobs:
           version: ${{ env.TRIVY_VERSION }}
           scan-type: config
           scan-ref: rendered-application-eks.yaml
-          severity: HIGH,CRITICAL
-          exit-code: 0
+          severity: CRITICAL
+          exit-code: 1
 
       - name: Scan AKS Kubernetes configuration
         if: always() && steps.render_application.outcome == 'success'
@@ -119,5 +119,5 @@ jobs:
           version: ${{ env.TRIVY_VERSION }}
           scan-type: config
           scan-ref: rendered-application-aks.yaml
-          severity: HIGH,CRITICAL
-          exit-code: 0
+          severity: CRITICAL
+          exit-code: 1
