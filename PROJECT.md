@@ -166,14 +166,15 @@ infrastructure and platform components:
 
 ### 14. Security Hardening
 
-- [ ] Add workload security defaults
+- [x] Add workload security defaults
+- [ ] Add workload NetworkPolicies
 - [ ] Add secret management approach
 - [ ] Add dependency update automation
 - [x] Add repository dependency and secret scanning
 - [x] Scan images before publishing
 - [x] Scan Terraform configuration
 - [x] Scan Dockerfiles
-- [ ] Scan rendered Kubernetes configuration
+- [x] Scan rendered Kubernetes configuration
 
 ### 15. AKS Platform
 
