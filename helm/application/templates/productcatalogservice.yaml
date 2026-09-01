@@ -15,10 +15,14 @@ spec:
       labels:
         {{- include "ms-k8s-platform.productCatalogServiceSelectorLabels" . | nindent 8 }}
     spec:
+      securityContext:
+        {{- include "ms-k8s-platform.podSecurityContext" . | nindent 8 }}
       containers:
         - name: productcatalogservice
           image: "{{ .Values.productCatalogService.image.repository }}:{{ .Values.productCatalogService.image.tag }}"
           imagePullPolicy: {{ .Values.productCatalogService.image.pullPolicy }}
+          securityContext:
+            {{- include "ms-k8s-platform.containerSecurityContext" . | nindent 12 }}
           ports:
             - containerPort: 3550
           env:

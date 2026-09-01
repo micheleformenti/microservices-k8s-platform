@@ -15,10 +15,14 @@ spec:
       labels:
         {{- include "ms-k8s-platform.recommendationServiceSelectorLabels" . | nindent 8 }}
     spec:
+      securityContext:
+        {{- include "ms-k8s-platform.podSecurityContext" . | nindent 8 }}
       containers:
         - name: recommendationservice
           image: "{{ .Values.recommendationService.image.repository }}:{{ .Values.recommendationService.image.tag }}"
           imagePullPolicy: {{ .Values.recommendationService.image.pullPolicy }}
+          securityContext:
+            {{- include "ms-k8s-platform.containerSecurityContext" . | nindent 12 }}
           ports:
             - name: grpc
               containerPort: 8080

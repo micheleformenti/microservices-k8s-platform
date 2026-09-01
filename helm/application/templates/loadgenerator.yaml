@@ -16,6 +16,8 @@ spec:
         {{- include "ms-k8s-platform.loadGeneratorSelectorLabels" . | nindent 8 }}
     spec:
       restartPolicy: Always
+      securityContext:
+        {{- include "ms-k8s-platform.podSecurityContext" . | nindent 8 }}
       initContainers:
         - command:
           - /bin/sh
@@ -38,6 +40,8 @@ spec:
           name: frontend-check
           image: "{{ .Values.loadGenerator.initImage.repository }}:{{ .Values.loadGenerator.initImage.tag }}"
           imagePullPolicy: {{ .Values.loadGenerator.initImage.pullPolicy }}
+          securityContext:
+            {{- include "ms-k8s-platform.containerSecurityContext" . | nindent 12 }}
           env:
             - name: FRONTEND_ADDR
               value: "frontend:80"
@@ -45,6 +49,8 @@ spec:
         - name: loadgenerator
           image: "{{ .Values.loadGenerator.image.repository }}:{{ .Values.loadGenerator.image.tag }}"
           imagePullPolicy: {{ .Values.loadGenerator.image.pullPolicy }}
+          securityContext:
+            {{- include "ms-k8s-platform.containerSecurityContext" . | nindent 12 }}
           env:
             - name: FRONTEND_ADDR
               value: "frontend:80"

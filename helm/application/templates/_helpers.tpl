@@ -157,3 +157,21 @@ app.kubernetes.io/name: {{ include "ms-k8s-platform.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/component: redis-cart
 {{- end }}
+
+{{- define "ms-k8s-platform.podSecurityContext" -}}
+fsGroup: 1000
+runAsGroup: 1000
+runAsNonRoot: true
+runAsUser: 1000
+seccompProfile:
+  type: RuntimeDefault
+{{- end }}
+
+{{- define "ms-k8s-platform.containerSecurityContext" -}}
+allowPrivilegeEscalation: false
+capabilities:
+  drop:
+    - ALL
+privileged: false
+readOnlyRootFilesystem: true
+{{- end }}

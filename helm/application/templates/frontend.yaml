@@ -17,10 +17,14 @@ spec:
       labels:
         {{- include "ms-k8s-platform.frontendSelectorLabels" . | nindent 8 }}
     spec:
+      securityContext:
+        {{- include "ms-k8s-platform.podSecurityContext" . | nindent 8 }}
       containers:
         - name: frontend
           image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
           imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
+          securityContext:
+            {{- include "ms-k8s-platform.containerSecurityContext" . | nindent 12 }}
           ports:
             - containerPort: 8080
           readinessProbe:

@@ -15,10 +15,14 @@ spec:
       labels:
         {{- include "ms-k8s-platform.emailServiceSelectorLabels" . | nindent 8 }}
     spec:
+      securityContext:
+        {{- include "ms-k8s-platform.podSecurityContext" . | nindent 8 }}
       containers:
         - name: emailservice
           image: "{{ .Values.emailService.image.repository }}:{{ .Values.emailService.image.tag }}"
           imagePullPolicy: {{ .Values.emailService.image.pullPolicy }}
+          securityContext:
+            {{- include "ms-k8s-platform.containerSecurityContext" . | nindent 12 }}
           ports:
             - name: grpc
               containerPort: 8080

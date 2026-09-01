@@ -15,10 +15,14 @@ spec:
       labels:
         {{- include "ms-k8s-platform.currencyServiceSelectorLabels" . | nindent 8 }}
     spec:
+      securityContext:
+        {{- include "ms-k8s-platform.podSecurityContext" . | nindent 8 }}
       containers:
         - name: currencyservice
           image: "{{ .Values.currencyService.image.repository }}:{{ .Values.currencyService.image.tag }}"
           imagePullPolicy: {{ .Values.currencyService.image.pullPolicy }}
+          securityContext:
+            {{- include "ms-k8s-platform.containerSecurityContext" . | nindent 12 }}
           ports:
             - name: grpc
               containerPort: 7000
