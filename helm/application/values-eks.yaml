@@ -11,7 +11,7 @@ cartService:
 checkoutService:
   image:
     repository: ghcr.io/micheleformenti/checkoutservice
-    tag: 457aaf413b2089915a239f1fddbf69ac37c30e52
+    tag: c347e5e9a811faedd6ea956ecef81cc4dcd44ca1
     pullPolicy: IfNotPresent
 currencyService:
   image:
@@ -26,7 +26,7 @@ emailService:
 frontend:
   image:
     repository: ghcr.io/micheleformenti/frontend
-    tag: 457aaf413b2089915a239f1fddbf69ac37c30e52
+    tag: c347e5e9a811faedd6ea956ecef81cc4dcd44ca1
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
@@ -54,7 +54,7 @@ paymentService:
 productCatalogService:
   image:
     repository: ghcr.io/micheleformenti/productcatalogservice
-    tag: 457aaf413b2089915a239f1fddbf69ac37c30e52
+    tag: c347e5e9a811faedd6ea956ecef81cc4dcd44ca1
     pullPolicy: IfNotPresent
 recommendationService:
   image:
@@ -69,5 +69,5 @@ redisCart:
 shippingService:
   image:
     repository: ghcr.io/micheleformenti/shippingservice
-    tag: 457aaf413b2089915a239f1fddbf69ac37c30e52
+    tag: c347e5e9a811faedd6ea956ecef81cc4dcd44ca1
     pullPolicy: IfNotPresent

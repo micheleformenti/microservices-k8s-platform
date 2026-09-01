@@ -424,7 +424,11 @@ jobs:
     needs:
       - detect-changes
       - build-container-images
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.detect-changes.outputs.container-images == 'true'
+    if: |
+      always() &&
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      needs.build-container-images.result == 'success'
 
     permissions:
       contents: write
