@@ -1,0 +1,13 @@
+aws-load-balancer-controller:
+  clusterName: example-cluster
+  region: eu-central-1
+
+external-dns:
+  domainFilters:
+    - example.com
+  txtOwnerId: example-cluster
+
+cluster-autoscaler:
+  awsRegion: eu-central-1
+  autoDiscovery:
+    clusterName: example-cluster

@@ -227,25 +227,13 @@ jobs:
           helm dependency build ./helm/platform/aws
 
       - name: Lint AWS platform Helm chart
-        run: |
-          helm lint ./helm/platform/aws \
-            --set aws-load-balancer-controller.clusterName=example-cluster \
-            --set aws-load-balancer-controller.region=eu-central-1 \
-            --set external-dns.domainFilters[0]=example.com \
-            --set external-dns.txtOwnerId=example-cluster \
-            --set cluster-autoscaler.awsRegion=eu-central-1 \
-            --set cluster-autoscaler.autoDiscovery.clusterName=example-cluster
+        run: helm lint ./helm/platform/aws -f helm/platform/aws/ci/values.yaml
 
       - name: Render AWS platform Helm chart
         run: |
           helm template aws-platform ./helm/platform/aws \
             --namespace kube-system \
-            --set aws-load-balancer-controller.clusterName=example-cluster \
-            --set aws-load-balancer-controller.region=eu-central-1 \
-            --set external-dns.domainFilters[0]=example.com \
-            --set external-dns.txtOwnerId=example-cluster \
-            --set cluster-autoscaler.awsRegion=eu-central-1 \
-            --set cluster-autoscaler.autoDiscovery.clusterName=example-cluster \
+            -f helm/platform/aws/ci/values.yaml \
             > rendered-aws-platform.yaml
 
       - name: Validate rendered AWS platform manifests
@@ -257,6 +245,31 @@ jobs:
             -schema-location default \
             -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
             rendered-aws-platform.yaml
+
+      - name: Build Azure platform Helm dependencies
+        run: |
+          helm repo add jetstack https://charts.jetstack.io
+          helm dependency build ./helm/platform/azure
+
+      - name: Lint Azure platform Helm chart
+        run: helm lint ./helm/platform/azure -f helm/platform/azure/ci/values.yaml
+
+      - name: Render Azure platform Helm chart
+        run: |
+          helm template azure-platform ./helm/platform/azure \
+            --namespace aks-platform \
+            -f helm/platform/azure/ci/values.yaml \
+            > rendered-azure-platform.yaml
+
+      - name: Validate rendered Azure platform manifests
+        run: |
+          kubeconform \
+            -strict \
+            -summary \
+            -skip CustomResourceDefinition \
+            -schema-location default \
+            -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
+            rendered-azure-platform.yaml
 
       - name: Build observability Helm dependencies
         run: |
