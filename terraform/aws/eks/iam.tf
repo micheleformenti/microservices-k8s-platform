@@ -80,6 +80,39 @@ resource "aws_iam_role_policy_attachment" "external_dns" {
   policy_arn = aws_iam_policy.external_dns.arn
 }
 
+data "aws_secretsmanager_secret" "ghcr" {
+  name = var.ghcr_secret_name
+}
+
+data "aws_iam_policy_document" "external_secrets" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:GetSecretValue",
+    ]
+
+    resources = [data.aws_secretsmanager_secret.ghcr.arn]
+  }
+}
+
+resource "aws_iam_policy" "external_secrets" {
+  name_prefix = "${var.name}-eso-"
+  description = "Allow External Secrets Operator to read the GHCR pull credential"
+  policy      = data.aws_iam_policy_document.external_secrets.json
+}
+
+resource "aws_iam_role" "external_secrets" {
+  name_prefix        = "${var.name}-eso-"
+  assume_role_policy = data.aws_iam_policy_document.pod_identity_assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "external_secrets" {
+  role       = aws_iam_role.external_secrets.name
+  policy_arn = aws_iam_policy.external_secrets.arn
+}
+
 data "aws_iam_policy_document" "cluster_autoscaler" {
   statement {
     effect = "Allow"
