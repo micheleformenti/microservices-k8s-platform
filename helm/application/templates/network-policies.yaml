@@ -238,3 +238,21 @@ spec:
       ports:
         - protocol: TCP
           port: 8080
+{{- if and .Values.frontend.gateway.enabled .Values.frontend.gateway.tls.enabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-acme-http-solver-ingress
+  namespace: {{ .Values.namespace.name }}
+spec:
+  podSelector:
+    matchLabels:
+      acme.cert-manager.io/http01-solver: "true"
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 8089
+{{- end }}
