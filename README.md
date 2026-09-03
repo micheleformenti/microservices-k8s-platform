@@ -5,7 +5,7 @@ microservices workload to local Kubernetes, AWS EKS, and Azure AKS.
 
 The project demonstrates the full lifecycle: CI, container publishing,
 Infrastructure as Code, GitOps delivery, cloud networking, autoscaling,
-persistence, DNS, HTTPS, and environment teardown.
+persistence, secret management, DNS, HTTPS, and environment teardown.
 
 ## Platform Highlights
 
@@ -13,6 +13,8 @@ persistence, DNS, HTTPS, and environment teardown.
   with private worker nodes and controlled egress.
 - **Identity:** Cloud pipelines use GitHub Actions OIDC; controllers use AWS Pod
   Identity and Azure Workload Identity.
+- **Secrets:** External Secrets Operator synchronizes GHCR credentials from AWS
+  Secrets Manager and Azure Key Vault into workload namespaces.
 - **GitOps:** Argo CD app-of-apps delivery, with GitOps Bridge metadata for
   dynamic cloud infrastructure values.
 - **Runtime:** persistent storage, Horizontal Pod Autoscaling, and node
@@ -58,11 +60,11 @@ docs/                Platform guides and architecture diagrams
 | Status | Area | Guide |
 |--------|------|-------|
 | ✅ | CI validation, GHCR publishing, and GitOps image updates | [CI/CD](docs/ci.md) |
-| ✅ | AWS EKS: storage, autoscaling, HTTPS, and DNS | [EKS](docs/eks.md) |
-| ✅ | Azure AKS: storage, autoscaling, HTTPS, and DNS | [AKS](docs/aks.md) |
+| ✅ | AWS EKS: storage, autoscaling, secrets, HTTPS, and DNS | [EKS](docs/eks.md) |
+| ✅ | Azure AKS: storage, autoscaling, secrets, HTTPS, and DNS | [AKS](docs/aks.md) |
 | ✅ | Prometheus, Grafana, and project alerts | [Observability](docs/observability.md) |
 | ✅ | Trivy scanning, workload security contexts, and NetworkPolicies | [Security](docs/security.md) |
-| 🚧 | Secret management | In progress |
+| ⏳ | Local cluster secret management | Roadmap |
 | ⏳ | Dependency update automation | Roadmap |
 
 ## Documentation
