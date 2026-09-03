@@ -33,7 +33,7 @@ frontend:
     className: azure-alb-external
     hostname: aks-demo.azure.micheleformenti.com
     annotations:
-      alb.networking.azure.io/alb-namespace: azure-alb-system
+      alb.networking.azure.io/alb-namespace: aks-platform
       alb.networking.azure.io/alb-name: public
     tls:
       enabled: true

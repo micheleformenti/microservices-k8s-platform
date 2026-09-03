@@ -94,7 +94,7 @@ Check the platform:
 ```sh
 kubectl get nodes -L topology.kubernetes.io/zone
 kubectl get applications,applicationsets -n argocd
-kubectl get pods -n azure-alb-system
+kubectl get pods -n aks-platform
 kubectl get pods -n microservices-platform
 kubectl get pvc -n microservices-platform
 kubectl get hpa -n microservices-platform

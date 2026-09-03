@@ -59,7 +59,7 @@ spec:
 
       destination:
         server: '{{ .server }}'
-        namespace: azure-alb-system
+        namespace: aks-platform
 
       ignoreDifferences:
         - group: admissionregistration.k8s.io

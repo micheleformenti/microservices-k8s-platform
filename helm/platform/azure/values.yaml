@@ -4,7 +4,7 @@ albController:
 
 alb-controller:
   albController:
-    namespace: azure-alb-system
+    namespace: aks-platform
     podIdentity:
       clientID: ""
 
