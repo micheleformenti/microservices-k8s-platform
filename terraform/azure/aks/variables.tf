@@ -9,6 +9,11 @@ variable "project_name" {
   default     = "microservices-platform"
 }
 
+variable "key_vault_name" {
+  description = "Name of the persistent bootstrap Key Vault used for application secrets."
+  type        = string
+}
+
 variable "dns_zone_name" {
   description = "Existing Azure DNS zone used for application records."
   type        = string

@@ -15,6 +15,19 @@ variable "project_name" {
   default     = "microservices-platform"
 }
 
+variable "key_vault_name" {
+  description = "Globally unique name of the persistent Key Vault used for application secrets."
+  type        = string
+
+  validation {
+    condition = (
+      can(regex("^[a-zA-Z][a-zA-Z0-9-]{1,22}[a-zA-Z0-9]$", var.key_vault_name)) &&
+      !strcontains(var.key_vault_name, "--")
+    )
+    error_message = "key_vault_name must be 3-24 characters, start with a letter, end with a letter or digit, contain only letters, digits, and non-consecutive hyphens."
+  }
+}
+
 variable "github_repository" {
   description = "GitHub repository allowed to authenticate through OIDC, in owner/name format."
   type        = string

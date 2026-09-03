@@ -2,6 +2,11 @@ data "azurerm_resource_group" "project" {
   name = "rg-${var.project_name}"
 }
 
+data "azurerm_key_vault" "secrets" {
+  name                = var.key_vault_name
+  resource_group_name = data.azurerm_resource_group.project.name
+}
+
 data "azurerm_resource_group" "dns" {
   name = var.dns_zone_resource_group_name
 }
