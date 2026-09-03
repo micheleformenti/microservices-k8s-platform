@@ -167,6 +167,13 @@ seccompProfile:
   type: RuntimeDefault
 {{- end }}
 
+{{- define "ms-k8s-platform.imagePullSecrets" -}}
+{{- with .Values.imagePullSecrets -}}
+imagePullSecrets:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- end }}
+
 {{- define "ms-k8s-platform.containerSecurityContext" -}}
 allowPrivilegeEscalation: false
 capabilities:
