@@ -223,6 +223,7 @@ jobs:
           helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
           helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
           helm repo add autoscaler https://kubernetes.github.io/autoscaler
+          helm repo add external-secrets https://charts.external-secrets.io
           helm dependency build ./helm/platform/aws
 
       - name: Lint AWS platform Helm chart
