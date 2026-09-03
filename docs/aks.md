@@ -138,6 +138,7 @@ zone remain available for the next environment creation.
   mutation or hardcoded identifiers.
 - **Workload Identity:** gives Kubernetes controllers narrowly scoped Azure
   access without client secrets.
+- **Cilium:** enforces NetworkPolicies on the Azure CNI Overlay data plane.
 - **Shared DNS zone:** `azure.micheleformenti.com` lives outside the disposable
   project environment.
 
