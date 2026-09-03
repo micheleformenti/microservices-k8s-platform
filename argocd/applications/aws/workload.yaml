@@ -35,6 +35,10 @@ spec:
             - values.yaml
             - values-eks.yaml
           parameters:
+            - name: externalSecrets.remoteKey
+              value: '{{ index .metadata.annotations "gitops-bridge/ghcr-secret-name" }}'
+            - name: secretStore.provider.aws.region
+              value: '{{ index .metadata.annotations "gitops-bridge/aws-region" }}'
             - name: frontend.ingress.host
               value: '{{ index .metadata.annotations "gitops-bridge/application-domain-name" }}'
             - name: frontend.ingress.annotations.alb\.ingress\.kubernetes\.io/certificate-arn

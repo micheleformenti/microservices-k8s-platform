@@ -168,7 +168,8 @@ infrastructure and platform components:
 
 - [x] Add workload security defaults
 - [x] Add workload NetworkPolicies
-- [ ] Add secret management approach
+- [x] Add EKS secret management with AWS Secrets Manager and External Secrets Operator
+- [ ] Add AKS and local secret management
 - [ ] Add dependency update automation
 - [x] Add repository dependency and secret scanning
 - [x] Scan images before publishing

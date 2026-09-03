@@ -22,6 +22,12 @@ variable "application_domain_name" {
   default     = "eks-demo.aws.micheleformenti.com"
 }
 
+variable "ghcr_secret_name" {
+  description = "Name of the persistent Secrets Manager secret containing GHCR pull credentials."
+  type        = string
+  default     = "microservices-platform/ghcr"
+}
+
 variable "kubernetes_version" {
   description = "EKS Kubernetes minor version. Use a version in standard support to avoid extended support fees."
   type        = string

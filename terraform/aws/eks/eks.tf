@@ -98,6 +98,13 @@ resource "aws_eks_pod_identity_association" "external_dns" {
   role_arn        = aws_iam_role.external_dns.arn
 }
 
+resource "aws_eks_pod_identity_association" "external_secrets" {
+  cluster_name    = module.eks.cluster_name
+  namespace       = "kube-system"
+  service_account = "external-secrets"
+  role_arn        = aws_iam_role.external_secrets.arn
+}
+
 resource "aws_eks_pod_identity_association" "cluster_autoscaler" {
   cluster_name    = module.eks.cluster_name
   namespace       = "kube-system"

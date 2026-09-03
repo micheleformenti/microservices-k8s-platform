@@ -21,7 +21,7 @@ GitHub Actions
       ↓
 Argo CD app-of-apps
   ├── ApplicationSets read the metadata
-  │     ├── AWS platform controllers and storage
+  │     ├── AWS platform controllers, secrets, and storage
   │     └── Application workload
   └── observability stack
       ↓
@@ -34,17 +34,19 @@ egress.
 
 ## Bootstrap
 
-The manual bootstrap creates isolated remote state, GitHub OIDC roles, and an
-EKS administrator variable.
+The manual bootstrap creates isolated remote state, GitHub OIDC roles, and a
+persistent AWS Secrets Manager container for the GHCR credential. The helper
+scripts configure the GitHub Actions variables and load the credential value.
 
 ```text
 Manual bootstrap
   ├── encrypted S3 state and native lockfiles
-  └── GitHub plan/apply roles
-                ↓
-configure-github-variables.sh
-                ↓
-Protected pipelines authenticate with OIDC
+  ├── GitHub plan/apply roles
+  └── AWS Secrets Manager GHCR credential container
+                      ↓
+Helper scripts
+  ├── configure GitHub Actions variables
+  └── set the GHCR credential value in Secrets manager
 ```
 
 ```sh
@@ -53,6 +55,7 @@ cp terraform/aws/bootstrap/backend.hcl.example \
 terraform -chdir=terraform/aws/bootstrap init -backend-config=backend.hcl
 terraform -chdir=terraform/aws/bootstrap apply
 terraform/aws/bootstrap/configure-github-variables.sh
+terraform/aws/bootstrap/configure-ghcr-secret.sh
 ```
 
 ## Create or Update
@@ -89,6 +92,7 @@ kubectl --context eks get nodes -L topology.kubernetes.io/zone
 kubectl --context eks get applications -n argocd
 kubectl --context eks get pods -n kube-system
 kubectl --context eks get pods,pvc,hpa -n microservices-platform
+kubectl --context eks get secretstore,externalsecret -n microservices-platform
 ```
 
 Check DNS and HTTPS:
@@ -129,6 +133,8 @@ The state bucket and existing Route 53 zone remain for the next environment.
   duplicating it in Helm values.
 - **EKS Pod Identity:** gives controllers scoped AWS access without static
   credentials.
+- **External Secrets Operator:** reads the persistent GHCR credential and
+  maintains the workload image pull secret.
 - **VPC CNI NetworkPolicy:** enforces the workload's isolation rules.
 - **Persistent Redis:** demonstrates EBS-backed persistence, not highly
   available Redis.

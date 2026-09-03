@@ -13,6 +13,11 @@ output "region" {
   value       = var.aws_region
 }
 
+output "ghcr_secret_name" {
+  description = "Secrets Manager secret name containing GHCR pull credentials."
+  value       = var.ghcr_secret_name
+}
+
 output "application_domain_name" {
   description = "Public DNS name used for the EKS application."
   value       = var.application_domain_name

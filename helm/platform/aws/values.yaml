@@ -37,3 +37,8 @@ cluster-autoscaler:
     serviceAccount:
       create: true
       name: cluster-autoscaler
+
+external-secrets:
+  fullnameOverride: external-secrets
+  serviceAccount:
+    name: external-secrets

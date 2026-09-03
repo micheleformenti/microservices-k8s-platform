@@ -31,3 +31,10 @@ are ignored.
   runtime-default seccomp, read-only root filesystems, and explicit writable volumes.
 - **NetworkPolicies:** deny ingress by default and allow only declared service
   flows. Egress remains unrestricted. EKS uses VPC CNI enforcement; AKS uses Cilium.
+
+## Secret management
+
+Application secrets are stored outside Git and Terraform state. External
+Secrets Operator reads them from the cloud secret store using workload identity
+and creates the Kubernetes Secrets consumed by the workloads. Application pods
+do not receive permission to access the cloud secret store directly.

@@ -2,6 +2,19 @@ namespace:
   create: true
   name: microservices-platform
 
+imagePullSecrets: []
+
+externalSecrets:
+  enabled: false
+  refreshInterval: 5m
+  remoteKey: ""
+  targetSecretName: ghcr-pull
+
+secretStore:
+  enabled: false
+  name: ""
+  provider: {}
+
 adService:
   replicas: 1
   image:
