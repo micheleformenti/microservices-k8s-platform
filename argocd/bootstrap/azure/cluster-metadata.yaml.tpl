@@ -15,6 +15,8 @@ metadata:
     gitops-bridge/dns-zone-resource-group-name: ${DNS_ZONE_RESOURCE_GROUP_NAME}
     gitops-bridge/dns-zone-name: ${DNS_ZONE_NAME}
     gitops-bridge/external-dns-client-id: ${EXTERNAL_DNS_CLIENT_ID}
+    gitops-bridge/external-secrets-client-id: ${EXTERNAL_SECRETS_CLIENT_ID}
+    gitops-bridge/key-vault-uri: ${KEY_VAULT_URI}
 type: Opaque
 stringData:
   name: aks

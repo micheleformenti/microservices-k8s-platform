@@ -18,3 +18,6 @@ dependencies:
     version: 1.21.1
     repository: https://charts.jetstack.io
     condition: certManager.enabled
+  - name: external-secrets
+    version: 2.8.0
+    repository: https://charts.external-secrets.io

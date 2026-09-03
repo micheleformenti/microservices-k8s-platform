@@ -8,5 +8,8 @@ dependencies:
 - name: cert-manager
   repository: https://charts.jetstack.io
   version: v1.21.1
-digest: sha256:edddb5791a2283c367882ce1254eeabd16e7d61c7a096192d8aa8fe4c25cb153
-generated: "2026-08-23T11:13:47.603803663+02:00"
+- name: external-secrets
+  repository: https://charts.external-secrets.io
+  version: 2.8.0
+digest: sha256:43720343f4f0a8ee19bcb399d8d96b6dee8a94ae669b28f7ca7fc32e3ab5f0f9
+generated: "2026-09-03T20:39:14.562805249+02:00"

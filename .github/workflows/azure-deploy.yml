@@ -259,6 +259,14 @@ jobs:
             terraform -chdir=terraform/azure/aks output \
               -raw external_dns_client_id
           )"
+          export EXTERNAL_SECRETS_CLIENT_ID="$(
+            terraform -chdir=terraform/azure/aks output \
+              -raw external_secrets_client_id
+          )"
+          export KEY_VAULT_URI="$(
+            terraform -chdir=terraform/azure/aks output \
+              -raw key_vault_uri
+          )"
 
           envsubst \
             < argocd/bootstrap/azure/cluster-metadata.yaml.tpl \
