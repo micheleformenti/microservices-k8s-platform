@@ -129,6 +129,7 @@ The state bucket and existing Route 53 zone remain for the next environment.
   duplicating it in Helm values.
 - **EKS Pod Identity:** gives controllers scoped AWS access without static
   credentials.
+- **VPC CNI NetworkPolicy:** enforces the workload's isolation rules.
 - **Persistent Redis:** demonstrates EBS-backed persistence, not highly
   available Redis.
 - **Shared DNS zone:** `aws.micheleformenti.com` remains outside the disposable

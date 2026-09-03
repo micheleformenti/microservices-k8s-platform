@@ -167,7 +167,7 @@ infrastructure and platform components:
 ### 14. Security Hardening
 
 - [x] Add workload security defaults
-- [ ] Add workload NetworkPolicies
+- [x] Add workload NetworkPolicies
 - [ ] Add secret management approach
 - [ ] Add dependency update automation
 - [x] Add repository dependency and secret scanning
