@@ -9,6 +9,7 @@ metadata:
   annotations:
     gitops-bridge/cluster-name: ${CLUSTER_NAME}
     gitops-bridge/aws-region: ${AWS_REGION}
+    gitops-bridge/ghcr-secret-name: ${GHCR_SECRET_NAME}
     gitops-bridge/dns-zone-name: ${DNS_ZONE_NAME}
     gitops-bridge/application-domain-name: ${APPLICATION_DOMAIN_NAME}
     gitops-bridge/application-certificate-arn: ${APPLICATION_CERTIFICATE_ARN}

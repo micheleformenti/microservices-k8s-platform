@@ -237,6 +237,10 @@ jobs:
             terraform -chdir=terraform/aws/eks output \
               -raw region
           )"
+          export GHCR_SECRET_NAME="$(
+            terraform -chdir=terraform/aws/eks output \
+              -raw ghcr_secret_name
+          )"
           export DNS_ZONE_NAME="$(
             terraform -chdir=terraform/aws/eks output \
               -raw hosted_zone_name
