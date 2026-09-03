@@ -18,6 +18,11 @@ data "azurerm_role_definition" "reader" {
   scope = "/subscriptions/${var.subscription_id}"
 }
 
+data "azurerm_role_definition" "key_vault_secrets_user" {
+  name  = "Key Vault Secrets User"
+  scope = "/subscriptions/${var.subscription_id}"
+}
+
 data "azuread_group" "bootstrap_operators" {
   display_name     = var.bootstrap_operators_group_name
   security_enabled = true
@@ -29,6 +34,7 @@ locals {
     basename(data.azurerm_role_definition.dns_zone_contributor.role_definition_id),
     basename(data.azurerm_role_definition.network_contributor.role_definition_id),
     basename(data.azurerm_role_definition.reader.role_definition_id),
+    basename(data.azurerm_role_definition.key_vault_secrets_user.role_definition_id),
   ])
 }
 

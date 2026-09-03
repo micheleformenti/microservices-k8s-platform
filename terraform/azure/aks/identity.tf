@@ -39,3 +39,20 @@ resource "azurerm_federated_identity_credential" "external_dns" {
   issuer              = azurerm_kubernetes_cluster.platform.oidc_issuer_url
   subject             = "system:serviceaccount:azure-alb-system:external-dns"
 }
+
+resource "azurerm_user_assigned_identity" "external_secrets" {
+  name                = "id-${var.project_name}-external-secrets"
+  location            = data.azurerm_resource_group.project.location
+  resource_group_name = data.azurerm_resource_group.project.name
+
+  tags = local.common_tags
+}
+
+resource "azurerm_federated_identity_credential" "external_secrets" {
+  name                = "fic-${var.project_name}-external-secrets"
+  resource_group_name = data.azurerm_resource_group.project.name
+  parent_id           = azurerm_user_assigned_identity.external_secrets.id
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = azurerm_kubernetes_cluster.platform.oidc_issuer_url
+  subject             = "system:serviceaccount:azure-alb-system:external-secrets"
+}
