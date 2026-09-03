@@ -12,3 +12,8 @@ output "terraform_apply_role_arn" {
   description = "IAM role assumed by approved GitHub Actions Terraform apply jobs."
   value       = aws_iam_role.terraform_apply.arn
 }
+
+output "ghcr_secret_arn" {
+  description = "ARN of the Secrets Manager secret that stores GHCR pull credentials."
+  value       = aws_secretsmanager_secret.ghcr.arn
+}
