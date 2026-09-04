@@ -60,9 +60,10 @@ ghcr.io/micheleformenti/<service>:<git-sha>
 The SHA tag is immutable by convention and is used by deployments for an
 explicit, reproducible version.
 
-The packages are public, so local Kubernetes and EKS do not need registry
-credentials. Private image authentication is deferred to the security
-milestone. Redis and BusyBox continue to use their upstream images.
+The packages are private. Local Kubernetes uses a manually bootstrapped pull
+Secret, while EKS and AKS use External Secrets Operator to synchronize the
+credential from their cloud secret stores. Redis and BusyBox continue to use
+their upstream images.
 
 ## GitOps Image Updates
 
