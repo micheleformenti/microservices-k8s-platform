@@ -171,7 +171,7 @@ infrastructure and platform components:
 - [x] Add workload NetworkPolicies
 - [x] Add EKS secret management with AWS Secrets Manager and External Secrets Operator
 - [x] Add AKS secret management with Azure Key Vault and External Secrets Operator
-- [ ] Add local secret management
+- [x] Add local secret management
 - [ ] Add dependency update automation
 - [x] Add repository dependency and secret scanning
 - [x] Scan images before publishing
