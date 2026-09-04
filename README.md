@@ -64,7 +64,6 @@ docs/                Platform guides and architecture diagrams
 | ✅ | Azure AKS: storage, autoscaling, secrets, HTTPS, and DNS | [AKS](docs/aks.md) |
 | ✅ | Prometheus, Grafana, and project alerts | [Observability](docs/observability.md) |
 | ✅ | Trivy scanning, workload security contexts, and NetworkPolicies | [Security](docs/security.md) |
-| ⏳ | Local cluster secret management | Roadmap |
 | ⏳ | Dependency update automation | Roadmap |
 
 ## Documentation

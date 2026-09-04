@@ -11,14 +11,20 @@ The workflow was tested with Rancher Desktop and its Docker runtime.
 ## Prerequisites
 
 - a local Kubernetes cluster
-- Docker, kubectl, and Helm
-- public service images in GHCR for the Helm and Argo CD paths
+- Docker, kubectl, Helm, GitHub CLI, and jq
+- a classic GitHub personal access token with `read:packages`
 
 Confirm that Docker and kubectl target the intended local environment:
 
 ```sh
 docker context use rancher-desktop
 kubectl get nodes
+```
+
+Create the pull secret used for the private GHCR images:
+
+```sh
+argocd/bootstrap/local/configure-ghcr-secret.sh
 ```
 
 ## Helm Deployment
