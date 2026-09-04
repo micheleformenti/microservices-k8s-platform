@@ -12,18 +12,21 @@ GitHub Actions
   │     ├── Cluster: multi-zone AKS with node autoscaling
   │     └── Identities: AKS and platform controllers
   ├── installs Argo CD
-  └── creates the cluster metadata Secret
+  └── creates the cluster metadata Secret from Terraform outputs
         ├── Azure and cluster identifiers
         ├── controller identity client IDs
         ├── Application Gateway subnet ID
-        └── DNS zone metadata
+        ├── DNS zone metadata
+        └── Key Vault URI
       ↓
 ApplicationSet reads the metadata Secret
   ├── Azure platform
   │     ├── ALB Controller and Application Gateway
   │     ├── ExternalDNS
-  │     └── cert-manager
+  │     ├── cert-manager
+  │     └── External Secrets Operator
   ├── Application workload
+  │     └── synchronizes the GHCR pull secret from Key Vault
   └── observability stack
       ↓
 Gateway API routes HTTPS traffic to the frontend Service
@@ -36,18 +39,21 @@ static NAT gateway for egress.
 ## Bootstrap
 
 The manual MFA bootstrap creates isolated remote state, GitHub OIDC identities,
-and scoped Azure permissions. State access is limited to the bootstrap
-operators Entra group.
+an RBAC-enabled Key Vault, and scoped Azure permissions. State and Key Vault
+secret management are limited to the bootstrap operators Entra group.
 
 ```text
 Manual bootstrap
   ├── Terraform state storage
-  └── GitHub plan/apply identities and RBAC
-                ↓
-configure-github-secrets.sh
-                ↓
-Protected pipelines authenticate with OIDC
+  ├── GitHub plan/apply identities and RBAC
+  └── Azure Key Vault
+                    ↓
+Helper scripts
+  ├── configure GitHub Actions secrets
+  └── store the GHCR credential in Key Vault
 ```
+
+Create a classic GitHub personal access token with `read:packages`, then run:
 
 ```sh
 cp terraform/azure/bootstrap/terraform.tfvars.example \
@@ -56,6 +62,7 @@ cp terraform/azure/bootstrap/terraform.tfvars.example \
 terraform -chdir=terraform/azure/bootstrap init
 terraform -chdir=terraform/azure/bootstrap apply
 terraform/azure/bootstrap/configure-github-secrets.sh
+terraform/azure/bootstrap/configure-ghcr-secret.sh
 ```
 
 ## Create or Update
@@ -94,11 +101,19 @@ Check the platform:
 ```sh
 kubectl get nodes -L topology.kubernetes.io/zone
 kubectl get applications,applicationsets -n argocd
-kubectl get pods -n azure-alb-system
-kubectl get pods -n microservices-platform
-kubectl get pvc -n microservices-platform
-kubectl get hpa -n microservices-platform
+kubectl get pods -n aks-platform
+kubectl get pods,pvc,hpa -n microservices-platform
 ```
+
+Check secret synchronization without displaying the credential:
+
+```sh
+kubectl get secretstore,externalsecret -n microservices-platform
+kubectl get secret ghcr-pull -n microservices-platform
+```
+
+The `ExternalSecret` should report ready, and the generated `ghcr-pull` Secret
+should have type `kubernetes.io/dockerconfigjson`.
 
 Check routing, DNS, and HTTPS:
 
@@ -138,6 +153,8 @@ zone remain available for the next environment creation.
   mutation or hardcoded identifiers.
 - **Workload Identity:** gives Kubernetes controllers narrowly scoped Azure
   access without client secrets.
+- **External Secrets:** synchronizes GHCR credentials from Azure Key Vault into
+  the workload namespace without storing credentials in Git.
 - **Cilium:** enforces NetworkPolicies on the Azure CNI Overlay data plane.
 - **Shared DNS zone:** `azure.micheleformenti.com` lives outside the disposable
   project environment.

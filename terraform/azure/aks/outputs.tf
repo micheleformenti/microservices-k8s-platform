@@ -48,6 +48,16 @@ output "external_dns_client_id" {
   value       = azurerm_user_assigned_identity.external_dns.client_id
 }
 
+output "external_secrets_client_id" {
+  description = "Client ID used by External Secrets Operator."
+  value       = azurerm_user_assigned_identity.external_secrets.client_id
+}
+
+output "key_vault_uri" {
+  description = "URI of the persistent Key Vault used for application secrets."
+  value       = data.azurerm_key_vault.secrets.vault_uri
+}
+
 output "kubernetes_version" {
   description = "Kubernetes version used by AKS."
   value       = azurerm_kubernetes_cluster.platform.kubernetes_version

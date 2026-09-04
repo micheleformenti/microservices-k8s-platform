@@ -55,6 +55,7 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_key_vault_name: ${{ secrets.AZURE_KEY_VAULT_NAME }}
 
     defaults:
       run:
@@ -133,6 +134,7 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_key_vault_name: ${{ secrets.AZURE_KEY_VAULT_NAME }}
 
     defaults:
       run:
@@ -256,6 +258,14 @@ jobs:
           export EXTERNAL_DNS_CLIENT_ID="$(
             terraform -chdir=terraform/azure/aks output \
               -raw external_dns_client_id
+          )"
+          export EXTERNAL_SECRETS_CLIENT_ID="$(
+            terraform -chdir=terraform/azure/aks output \
+              -raw external_secrets_client_id
+          )"
+          export KEY_VAULT_URI="$(
+            terraform -chdir=terraform/azure/aks output \
+              -raw key_vault_uri
           )"
 
           envsubst \

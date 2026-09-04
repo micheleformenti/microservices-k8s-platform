@@ -14,7 +14,8 @@ then operate it consistently across local Kubernetes, AWS EKS, and Azure AKS.
 - Argo CD app-of-apps delivery for local Kubernetes, EKS, and AKS
 - Terraform-managed, multi-zone EKS and AKS environments
 - Cloud-native identity, storage, autoscaling, load balancing, DNS, and HTTPS
-- Protected OIDC pipelines for the AKS lifecycle
+- Cloud-native secret management for EKS and AKS
+- Protected OIDC pipelines for the EKS and AKS lifecycles
 - Prometheus and Grafana observability baseline
 - Security scanning baseline with Trivy
 
@@ -58,7 +59,7 @@ infrastructure and platform components:
 - `helm/` contains application, observability, and provider platform charts.
 - `argocd/` contains roots, child Applications, and bootstrap metadata.
 - `terraform/` separates bootstrap state from disposable EKS and AKS roots.
-- `.github/workflows/` contains CI and protected Azure lifecycle workflows.
+- `.github/workflows/` contains CI and protected cloud lifecycle workflows.
 
 ## Milestones
 
@@ -169,7 +170,8 @@ infrastructure and platform components:
 - [x] Add workload security defaults
 - [x] Add workload NetworkPolicies
 - [x] Add EKS secret management with AWS Secrets Manager and External Secrets Operator
-- [ ] Add AKS and local secret management
+- [x] Add AKS secret management with Azure Key Vault and External Secrets Operator
+- [ ] Add local secret management
 - [ ] Add dependency update automation
 - [x] Add repository dependency and secret scanning
 - [x] Scan images before publishing

@@ -49,6 +49,8 @@ Helper scripts
   └── set the GHCR credential value in Secrets manager
 ```
 
+Create a classic GitHub personal access token with `read:packages`, then run:
+
 ```sh
 cp terraform/aws/bootstrap/backend.hcl.example \
   terraform/aws/bootstrap/backend.hcl

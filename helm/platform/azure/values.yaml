@@ -4,7 +4,7 @@ albController:
 
 alb-controller:
   albController:
-    namespace: azure-alb-system
+    namespace: aks-platform
     podIdentity:
       clientID: ""
 
@@ -56,3 +56,13 @@ cert-manager:
   config:
     gatewayAPI:
       enabled: true
+
+# External Secrets Operator
+external-secrets:
+  fullnameOverride: external-secrets
+  podLabels:
+    azure.workload.identity/use: "true"
+  serviceAccount:
+    name: external-secrets
+    annotations:
+      azure.workload.identity/client-id: ""

@@ -34,4 +34,8 @@ gh secret set AZURE_TENANT_ID \
   --repo "$repository" \
   --body "$(az account show --query tenantId --output tsv)"
 
+gh secret set AZURE_KEY_VAULT_NAME \
+  --repo "$repository" \
+  --body "$(terraform -chdir="$bootstrap_dir" output -raw key_vault_name)"
+
 echo "Configured the azure-apply environment and masked Azure secrets for $repository."

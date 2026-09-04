@@ -44,3 +44,11 @@ resource "azurerm_role_assignment" "external_dns_resource_group_reader" {
   principal_type                   = "ServicePrincipal"
   skip_service_principal_aad_check = true
 }
+
+resource "azurerm_role_assignment" "external_secrets_key_vault" {
+  scope                            = data.azurerm_key_vault.secrets.id
+  role_definition_name             = "Key Vault Secrets User"
+  principal_id                     = azurerm_user_assigned_identity.external_secrets.principal_id
+  principal_type                   = "ServicePrincipal"
+  skip_service_principal_aad_check = true
+}

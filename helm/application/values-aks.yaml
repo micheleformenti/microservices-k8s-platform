@@ -1,28 +1,48 @@
+imagePullSecrets:
+  - name: ghcr-pull
+
+externalSecrets:
+  enabled: true
+  remoteKey: ghcr
+
+secretStore:
+  enabled: true
+  name: azure-key-vault
+  provider:
+    azurekv:
+      authType: WorkloadIdentity
+      vaultUrl: ""
+
 adService:
   image:
     repository: ghcr.io/micheleformenti/adservice
     tag: f5222b4bacd5275843c7ef652f8fe2f7944c95c9
     pullPolicy: IfNotPresent
+
 cartService:
   image:
     repository: ghcr.io/micheleformenti/cartservice
     tag: 61d8b4635afb1a8bd10e1306bbe6d30b2fa62761
     pullPolicy: IfNotPresent
+
 checkoutService:
   image:
     repository: ghcr.io/micheleformenti/checkoutservice
     tag: c347e5e9a811faedd6ea956ecef81cc4dcd44ca1
     pullPolicy: IfNotPresent
+
 currencyService:
   image:
     repository: ghcr.io/micheleformenti/currencyservice
     tag: f5222b4bacd5275843c7ef652f8fe2f7944c95c9
     pullPolicy: IfNotPresent
+
 emailService:
   image:
     repository: ghcr.io/micheleformenti/emailservice
     tag: f5222b4bacd5275843c7ef652f8fe2f7944c95c9
     pullPolicy: IfNotPresent
+
 frontend:
   image:
     repository: ghcr.io/micheleformenti/frontend
@@ -33,7 +53,7 @@ frontend:
     className: azure-alb-external
     hostname: aks-demo.azure.micheleformenti.com
     annotations:
-      alb.networking.azure.io/alb-namespace: azure-alb-system
+      alb.networking.azure.io/alb-namespace: aks-platform
       alb.networking.azure.io/alb-name: public
     tls:
       enabled: true
@@ -42,31 +62,37 @@ frontend:
       redirectHttpToHttps: true
   autoscaling:
     enabled: true
+
 loadGenerator:
   image:
     repository: ghcr.io/micheleformenti/loadgenerator
     tag: f5222b4bacd5275843c7ef652f8fe2f7944c95c9
     pullPolicy: IfNotPresent
+
 paymentService:
   image:
     repository: ghcr.io/micheleformenti/paymentservice
     tag: f5222b4bacd5275843c7ef652f8fe2f7944c95c9
     pullPolicy: IfNotPresent
+
 productCatalogService:
   image:
     repository: ghcr.io/micheleformenti/productcatalogservice
     tag: c347e5e9a811faedd6ea956ecef81cc4dcd44ca1
     pullPolicy: IfNotPresent
+
 recommendationService:
   image:
     repository: ghcr.io/micheleformenti/recommendationservice
     tag: f5222b4bacd5275843c7ef652f8fe2f7944c95c9
     pullPolicy: IfNotPresent
+
 redisCart:
   persistence:
     enabled: true
     storageClassName: managed-csi
     size: 1Gi
+
 shippingService:
   image:
     repository: ghcr.io/micheleformenti/shippingservice

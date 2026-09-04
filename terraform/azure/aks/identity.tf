@@ -15,12 +15,11 @@ resource "azurerm_user_assigned_identity" "application_gateway_controller" {
 }
 
 resource "azurerm_federated_identity_credential" "application_gateway_controller" {
-  name                = "fic-${var.project_name}-appgateway-controller"
-  resource_group_name = data.azurerm_resource_group.project.name
-  parent_id           = azurerm_user_assigned_identity.application_gateway_controller.id
-  audience            = ["api://AzureADTokenExchange"]
-  issuer              = azurerm_kubernetes_cluster.platform.oidc_issuer_url
-  subject             = "system:serviceaccount:azure-alb-system:alb-controller-sa"
+  name                      = "fic-${var.project_name}-appgateway-controller"
+  user_assigned_identity_id = azurerm_user_assigned_identity.application_gateway_controller.id
+  audience                  = ["api://AzureADTokenExchange"]
+  issuer                    = azurerm_kubernetes_cluster.platform.oidc_issuer_url
+  subject                   = "system:serviceaccount:aks-platform:alb-controller-sa"
 }
 
 resource "azurerm_user_assigned_identity" "external_dns" {
@@ -32,10 +31,25 @@ resource "azurerm_user_assigned_identity" "external_dns" {
 }
 
 resource "azurerm_federated_identity_credential" "external_dns" {
-  name                = "fic-${var.project_name}-external-dns"
+  name                      = "fic-${var.project_name}-external-dns"
+  user_assigned_identity_id = azurerm_user_assigned_identity.external_dns.id
+  audience                  = ["api://AzureADTokenExchange"]
+  issuer                    = azurerm_kubernetes_cluster.platform.oidc_issuer_url
+  subject                   = "system:serviceaccount:aks-platform:external-dns"
+}
+
+resource "azurerm_user_assigned_identity" "external_secrets" {
+  name                = "id-${var.project_name}-external-secrets"
+  location            = data.azurerm_resource_group.project.location
   resource_group_name = data.azurerm_resource_group.project.name
-  parent_id           = azurerm_user_assigned_identity.external_dns.id
-  audience            = ["api://AzureADTokenExchange"]
-  issuer              = azurerm_kubernetes_cluster.platform.oidc_issuer_url
-  subject             = "system:serviceaccount:azure-alb-system:external-dns"
+
+  tags = local.common_tags
+}
+
+resource "azurerm_federated_identity_credential" "external_secrets" {
+  name                      = "fic-${var.project_name}-external-secrets"
+  user_assigned_identity_id = azurerm_user_assigned_identity.external_secrets.id
+  audience                  = ["api://AzureADTokenExchange"]
+  issuer                    = azurerm_kubernetes_cluster.platform.oidc_issuer_url
+  subject                   = "system:serviceaccount:aks-platform:external-secrets"
 }

@@ -56,10 +56,12 @@ spec:
                 value: '{{ index .metadata.annotations "gitops-bridge/dns-zone-resource-group-name" }}'
               - name: certManager.enabled
                 value: "true"
+              - name: external-secrets.serviceAccount.annotations.azure\.workload\.identity/client-id
+                value: '{{ index .metadata.annotations "gitops-bridge/external-secrets-client-id" }}'
 
       destination:
         server: '{{ .server }}'
-        namespace: azure-alb-system
+        namespace: aks-platform
 
       ignoreDifferences:
         - group: admissionregistration.k8s.io

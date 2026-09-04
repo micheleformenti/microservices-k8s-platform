@@ -1,0 +1,32 @@
+albController:
+  enabled: true
+
+alb-controller:
+  albController:
+    podIdentity:
+      clientID: 00000000-0000-0000-0000-000000000000
+
+applicationGateway:
+  enabled: true
+  subnetId: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/example/providers/Microsoft.Network/virtualNetworks/example/subnets/alb
+
+externalDns:
+  enabled: true
+  azure:
+    clientId: 00000000-0000-0000-0000-000000000000
+    tenantId: 00000000-0000-0000-0000-000000000000
+    subscriptionId: 00000000-0000-0000-0000-000000000000
+    resourceGroup: example
+
+external-dns:
+  domainFilters:
+    - example.com
+  txtOwnerId: example-cluster
+
+certManager:
+  enabled: true
+
+external-secrets:
+  serviceAccount:
+    annotations:
+      azure.workload.identity/client-id: 00000000-0000-0000-0000-000000000000

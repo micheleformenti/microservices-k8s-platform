@@ -1,30 +1,48 @@
 apiVersion: argoproj.io/v1alpha1
-kind: Application
+kind: ApplicationSet
 metadata:
   name: azure-workload
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "1"
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
-  project: default
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
 
-  source:
-    repoURL: https://github.com/micheleformenti/microservices-k8s-platform.git
-    targetRevision: main
-    path: helm/application
-    helm:
-      releaseName: microservices-platform
-      valueFiles:
-        - values.yaml
-        - values-aks.yaml
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            cloud: azure
 
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: microservices-platform
+  template:
+    metadata:
+      name: azure-workload
+      namespace: argocd
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
 
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+      source:
+        repoURL: https://github.com/micheleformenti/microservices-k8s-platform.git
+        targetRevision: main
+        path: helm/application
+        helm:
+          releaseName: microservices-platform
+          valueFiles:
+            - values.yaml
+            - values-aks.yaml
+          parameters:
+            - name: secretStore.provider.azurekv.vaultUrl
+              value: '{{ index .metadata.annotations "gitops-bridge/key-vault-uri" }}'
+
+      destination:
+        server: '{{ .server }}'
+        namespace: microservices-platform
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
