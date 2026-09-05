@@ -5,8 +5,6 @@ create and destroy from protected GitHub Actions workflows.
 
 ## Architecture
 
-![EKS platform architecture](diagrams/eks-platform-architecture.svg)
-
 ```text
 GitHub Actions
   ├── applies Terraform
@@ -16,7 +14,7 @@ GitHub Actions
   │     └── Edge: ACM certificate and Route 53 validation
   ├── installs Argo CD
   └── creates the cluster metadata Secret from Terraform outputs
-        ├── cluster name, region, and DNS zone
+        ├── cluster name, region, DNS zone, and GHCR secret name
         └── application hostname and ACM certificate ARN
       ↓
 Argo CD app-of-apps
@@ -25,7 +23,23 @@ Argo CD app-of-apps
   │     └── Application workload
   └── observability stack
       ↓
-Ingress → Application Load Balancer → frontend Service
+Ingress configures the Application Load Balancer → frontend Service
+```
+
+### Network Topology
+
+```text
+Internet users
+      ↓
+HTTPS ingress
+      ↓
+Application Load Balancer (public subnets)
+      ↓
+EKS worker nodes (private subnets across two Availability Zones)
+      ↓
+Outbound egress
+      ↓
+NAT Gateway (public subnet) → Internet services
 ```
 
 The Spot node group spans two Availability Zones and scales from one to three
@@ -142,7 +156,3 @@ The state bucket and existing Route 53 zone remain for the next environment.
   available Redis.
 - **Shared DNS zone:** `aws.micheleformenti.com` remains outside the disposable
   project environment.
-
-## Next Steps
-
-- Document the final EKS and AKS design differences.

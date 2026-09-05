@@ -172,7 +172,6 @@ infrastructure and platform components:
 - [x] Add EKS secret management with AWS Secrets Manager and External Secrets Operator
 - [x] Add AKS secret management with Azure Key Vault and External Secrets Operator
 - [x] Add local secret management
-- [ ] Add dependency update automation
 - [x] Add repository dependency and secret scanning
 - [x] Scan images before publishing
 - [x] Scan Terraform configuration
@@ -198,10 +197,13 @@ infrastructure and platform components:
 - [x] Automate Argo CD bootstrap in the Azure deployment workflow
 - [x] Pass Azure infrastructure metadata to Argo CD through GitOps Bridge
 - [x] Add sync waves across platform, workload, and observability Applications
-- [ ] Document EKS and AKS differences
 
 ### 17. Portfolio Documentation
 
 - [x] Add architecture diagrams
-- [ ] Add screenshots
-- [ ] Document design decisions and tradeoffs
+- [x] Document EKS and AKS differences
+- [x] Document design decisions and tradeoffs
+
+## Future Improvements
+
+- [ ] Add dependency update automation

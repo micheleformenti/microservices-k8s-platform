@@ -19,17 +19,30 @@ GitHub Actions
         ├── DNS zone metadata
         └── Key Vault URI
       ↓
-ApplicationSet reads the metadata Secret
-  ├── Azure platform
-  │     ├── ALB Controller and Application Gateway
-  │     ├── ExternalDNS
-  │     ├── cert-manager
-  │     └── External Secrets Operator
-  ├── Application workload
-  │     └── synchronizes the GHCR pull secret from Key Vault
+Argo CD app-of-apps
+  ├── ApplicationSets read the metadata
+  │     ├── Azure platform controllers
+  │     └── Application workload and secret synchronization
   └── observability stack
       ↓
-Gateway API routes HTTPS traffic to the frontend Service
+Gateway and HTTPRoute configure Application Gateway for Containers
+  → frontend Service
+```
+
+### Network Topology
+
+```text
+Internet users
+      ↓
+HTTPS ingress
+      ↓
+Application Gateway for Containers (delegated association subnet)
+      ↓
+AKS nodes (AKS subnet across three zones, no public IPs)
+      ↓
+Outbound egress
+      ↓
+NAT Gateway → Internet services
 ```
 
 The system node pool spans three availability zones and scales from one to
@@ -158,7 +171,3 @@ zone remain available for the next environment creation.
 - **Cilium:** enforces NetworkPolicies on the Azure CNI Overlay data plane.
 - **Shared DNS zone:** `azure.micheleformenti.com` lives outside the disposable
   project environment.
-
-## Next Steps
-
-- Document the final EKS and AKS design differences.
