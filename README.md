@@ -32,7 +32,7 @@ build and operate the platform.
 
 ## Delivery Flow
 
-![Platform delivery overview](docs/diagrams/platform-delivery-overview.svg)
+[![Platform delivery overview](docs/diagrams/platform-delivery-overview.svg)](docs/architecture.md)
 
 Application changes pass CI and security gates in GitHub Actions. Trivy scans
 the repository, infrastructure configuration, rendered manifests, secrets, and
@@ -45,6 +45,11 @@ Terraform outputs such as cluster identifiers, identity client IDs, DNS data,
 and certificate references reach the Helm charts through GitOps Bridge cluster
 metadata. Environment-specific infrastructure values therefore do not need to
 be committed to Git.
+
+### [Explore the detailed architecture flows](docs/architecture.md)
+
+Application delivery, infrastructure, GitOps, secrets, and request traffic are
+explained separately in five focused flows.
 
 ## Cloud Platform Comparison
 
@@ -64,9 +69,10 @@ be committed to Git.
 
 ### Terraform provisions; Argo CD operates
 
-Terraform owns cloud infrastructure and the initial Argo CD bootstrap. Argo CD
-then owns Kubernetes resources and controller deployments. This keeps cloud
-provisioning separate from continuous in-cluster reconciliation.
+Terraform owns cloud infrastructure. After it finishes, GitHub Actions
+bootstraps Argo CD, which then owns Kubernetes resources and controller
+deployments. This keeps cloud provisioning separate from continuous in-cluster
+reconciliation.
 
 ### Cloud metadata crosses the boundary explicitly
 
@@ -105,6 +111,7 @@ Desktop for development and Helm chart validation.
 
 | Area | Start here |
 | --- | --- |
+| End-to-end platform flows | [Architecture flows](docs/architecture.md) |
 | CI, image publishing, and GitOps updates | [CI/CD guide](docs/ci.md) |
 | AWS infrastructure and platform | [EKS guide](docs/eks.md) |
 | Azure infrastructure and platform | [AKS guide](docs/aks.md) |
